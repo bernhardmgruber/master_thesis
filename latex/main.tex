@@ -1,0 +1,101 @@
+\documentclass[10pt,a4paper,oneside, numbers=noenddot]{scrreprt}
+
+% packages
+\usepackage{graphicx}
+\usepackage[style=authoryear,backend=bibtex8,urldate=iso8601]{biblatex}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage[iso]{datetime}
+\usepackage{pdfpages}
+
+
+% basic latex configuration
+
+
+% biblatex
+\addbibresource{references.bib}
+\let\cite\parencite
+
+
+% graphics
+\graphicspath{ {./images/} }
+
+
+% listings
+\lstdefinelanguage{CPP}[ISO]{C++}
+{
+	morekeywords={size_t},
+	morekeywords={inline}
+}
+
+\lstset
+{
+	numberbychapter=false,
+	tabsize=2,
+	captionpos=b,
+	basicstyle=\ttfamily{},
+	aboveskip=\parskip,
+% keywordstyle=\color{blue}\bfseries,
+	commentstyle=\color{gray},
+% stringstyle=\color{red},
+	showstringspaces=false,
+	breaklines=true,
+	numbers=left,
+	morekeywords={size_t}
+%	frame=single,
+% backgroundcolor=\color{lightgray}
+}
+
+\title{Detailed and adaptive surface reconstruction of implicitly defined geometries}
+%\subtitle{Comparing GPU accelerated standard algorithms with traditonal CPU implementations}
+\author{Bernhard Manfred Gruber}
+\date{\today}
+
+\begin{document}
+
+% Three into pages
+%\setcounter{page}{4}
+
+%\includepdf{titlepage}
+\maketitle
+%\thispagestyle{empty}
+\clearpage
+
+%\pagenumbering{Roman}
+
+\include{declaration}
+
+\include{acknowledgement}
+
+\include{abstract}
+
+\tableofcontents
+
+\clearpage
+
+%\pagenumbering{arabic}
+
+\include{introduction}
+
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\renewcommand\listfigurename{List of Figures}
+\listoffigures
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{List of Listings}
+\renewcommand\lstlistlistingname{List of Listings} 
+\lstlistoflistings
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{References}
+%\appto{\bibsetup}{\emergencystretch=1em}
+%\setcounter{biburllcpenalty}{9000}
+\printbibliography[title=References]
+
+\appendix
+\include{appendix}
+
+\end{document}
