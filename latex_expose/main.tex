@@ -1,11 +1,13 @@
 \documentclass[10pt, a4paper, oneside, numbers=noenddot]{scrreprt}
 
+%
 % packages
+%
+
 \usepackage{graphicx}
 \usepackage[style=authoryear,backend=bibtex8,urldate=iso8601]{biblatex}
 \usepackage{courier}
 \usepackage[iso]{datetime}
-\usepackage{tocloft}
 
 %
 % basic latex configuration
@@ -14,13 +16,14 @@
 % biblatex
 \addbibresource{references.bib}
 \let\cite\parencite
- 
+
 
 % graphics
 \graphicspath{ {./images/} }
 
-% table of content
-\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+%
+% title
+%
 
 \title{Expos\`e: Detailed and adaptive surface reconstruction of implicitly defined geometries}
 %\subtitle{}
