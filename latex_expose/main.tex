@@ -4,10 +4,13 @@
 % packages
 %
 
-\usepackage{graphicx}
-\usepackage[style=authoryear,backend=bibtex8,urldate=iso8601]{biblatex}
 \usepackage{courier}
 \usepackage[iso]{datetime}
+\usepackage{graphicx}
+\usepackage[style=numeric,backend=bibtex8,urldate=iso8601]{biblatex}
+\usepackage{refcheck}
+
+
 
 %
 % basic latex configuration
@@ -17,6 +20,18 @@
 \addbibresource{references.bib}
 \let\cite\parencite
 
+\renewbibmacro{finentry}
+{
+	\finentry
+	\iffieldundef{annotation}
+	{}
+	{
+		\par\medskip
+		\printfield{annotation}
+	}
+}
+
+\nocite{*} % include full bibliography (unused items)
 
 % graphics
 \graphicspath{ {./images/} }
@@ -48,7 +63,6 @@
 \include{stateoftheart}
 \include{goal}
 \include{risc}
-\include{literature}
 
 % List of figures
 \addcontentsline{toc}{chapter}{List of Figures}
@@ -57,8 +71,7 @@
 \clearpage
 
 % References
-\addcontentsline{toc}{chapter}{References}
-\bibliographystyle{annotate}
-\printbibliography[title=References]
+\addcontentsline{toc}{chapter}{Annotated references}
+\printbibliography[title=Annotated references]
 
 \end{document}
