@@ -1,4 +1,4 @@
-\documentclass[10pt, a4paper, oneside, numbers=noenddot]{scrreprt}
+\documentclass[10pt, a4paper, oneside, numbers=noenddot]{scrartcl}
 
 %
 % packages
@@ -49,20 +49,20 @@
 
 \maketitle
 %\thispagestyle{empty}
-\clearpage
+%\clearpage
 
 %\pagenumbering{Roman}
 
-\tableofcontents
-\clearpage
+%\tableofcontents
+%\clearpage
 
 %\pagenumbering{arabic}
 
-\include{motivation}
-\include{problem}
-\include{stateoftheart}
-\include{goal}
-\include{risc}
+\input{motivation}
+\input{problem}
+\input{stateoftheart}
+\input{goal}
+\input{risc}
 
 % List of figures
 \addcontentsline{toc}{chapter}{List of Figures}
