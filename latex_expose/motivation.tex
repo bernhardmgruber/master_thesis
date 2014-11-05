@@ -1,19 +1,14 @@
 
-
-\section{Previous work}
-
-As part of project Enlight
-\footnote{
-	Enlight was a research project conducted by the RISC Software GmbH in Hagenberg im M\"uhlkreis, Austria. The project was funded by the political program Regio 13, which aimed to improve the sustainably improve the contestability of regional companies, economic growth and employment inside of Upper Austria. The program was co-funded by the European Union as well as Land Ober\"osterreich and undertaken between 2007 and 2013.
-}
-a method for modeling and visualizing dynamic geometry models has been developed. These models are defined by a set of triangle meshes which are combined using set operations (particularly subtraction). Applications of such a system are primarily found in simulations of material removal processes, a core discipline of machining, sometimes also referred to as subtractive manufacturing. A vital requirement of such systems is to support a large number of fine triangulated meshes (up to hundreds of millions triangles) to deliver simulations of appropriate quality. Therefore, well-conceived space partitioning and triangle elimination strategies have been developed to deal with this amount of input. As a result the simulated model is described implicitly using only a subset of the input triangles. For visualization, this implicit model is sampled using an adapted ray casting approach \cite{enlight}. By applying a small set of rules, the surface can be recovered to retrieve an image of the model.
-
-
+ 
 \section{Motivation}
 
-TODO: add references here
-Simulation and visualization of material removal processes are vital for verifying the correctness of a machining process. However, there exist numerous scenarios where an explicit surface model of the final product is required. Many of these situations occur in CAE (computer-aided engineering) such as stress, thermal and safety analyses as well as structural optimizations using finite element methods.
+Many applications in different fields have to deal with the representation of geometries, their volumes and surfaces. As visualization often plays an important role, being able to efficiently render a piece of geometry becomes a decisive factor when choosing an appropriate data structure. Modern hardware architectures and well-established graphic APIs like OpenGL and DirectX are commonly optimized towards rasterization and require explicit surface meshes (i.e. triangles). In addition to rendering, triangle meshes are furthermore well established means to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
 
+However, despite their great suitability and acceptance triangle based representations also have their drawbacks and a numerous amount of problems can be addressed better using different, often implicit methods. In many of these situations efficient rendering is only a secondary requirement. Implicit models like functional and parametric surfaces shine in mathematical exactness, expressiveness and memory requirements. A sphere for example is easily expressed as an equation with radius and center as parameters, describing an exact surface. Triangle meshes are in most cases only approximations of such shapes and require an appropriate resolution (i.e. triangle count) to achieve the desired visual quality. Exactness is vital in fields like CAD (Computer Aided Design) and CAM (Computer Aided Manufacturing).
+Some kinds of problems may also benefit greatly in runtime when solved for implicit models. Questions like whether a point is inside a volume or if two volumes intersect can be more easily answered on a few mathematically defined shapes than on a large set of triangles. Applications range from ray tracing photo realistic images to collision detection in physics engines or milling machines. 
+Sometimes an implicit representation is easier to create. An example would be CSG where a complex shape is constructed using set operations like union, intersection or subtraction on simple primitives. The resulting model is described using a tree where each node is an operator and each leaf a primitive. CSG is supported by a wide range of modelling tools and CAD kernels.
+Finally, some problems are just inherently implicit. Simulating material removal processes in CAM for example is often described as the subtraction of swept volumes (volumes swept by the cutting tool which are themselves described as the cutter's geometry moved along a specified path) from an initial volume. The final work piece can be seen as subtraction of all swept volumes from the initial volume.
 
-
-
+Explicit and implicit representations both have their specific usage scenarios. Nevertheless, it is sometimes necessary to convert between them.
+A common scenario in CAD for example is to export an implicitly described model (e.g. CSG tree) as an explicit triangle mesh. This process is called tessellation or triangulation. The quality of the triangle approximation often depends on a parameterized resolution which in most cases directly influences the number of generated triangles. Several algorithms exist trying to create triangles adaptively, using more and small triangles where detail is necessary to preserve a models so-called features.
+The inverse process does also exist where algorithms try to recognize shapes in given triangle sets.
