@@ -9,16 +9,16 @@ After a survey of existing approaches to surface reconstruction at least four di
 Directly intersecting each triangle of one volume with another is the most direct approach and described for example by Rosen to smooth the sharp intersection line between two meshes \cite{mesh_intersection}. Triangle-triangle intersection is described by M\"oller \cite{tri_tri_intersection_moller} as well as Tropp, Tal and Shimshoni \cite{tri_tri_intersection_2}. Each intersected triangle can than be re-triangulated based on the cut segments from other triangles (constraints). A possible algorithm is CDT (constrained Delaunay triangulation) and was first described by Chew \cite{CDT} and refined by Sloan \cite{CDT_fast}. After re-triangulating intersected triangles, all triangles not belonging to the new surface are removed. Gong demonstrates a very similar approach in his master thesis \cite{cutter_workpiece_engagement}.
 
 \item[Point cloud based] \hfill \\
-Point clouds are data structures where an object as approximated by a set of points with optional normal vectors. These points can be obtained e.g. by sampling an implicit model. These point clouds can then be triangulated using different algorithms. 
+Point clouds are data structures where an object as approximated by a set of points with optional normal vectors. These points can be obtained \eg by sampling an implicit model. These point clouds can then be triangulated using different algorithms. 
 Amenta, Bern and Kamvysselis present an algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees for "good" inputs \cite{vornoi_surface_reconstruction}.
-Hoppe et. al. present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface. The contour of this function is then traced by a marching cubes variant to extract an iso surface (triangle mesh) \cite{surface_reconstruction}.
-Bernardini et. al. describe the BPA (ball-pivoting algorithm) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{BPA}.
+Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface. The contour of this function is then traced by a marching cubes variant to extract an iso surface (triangle mesh) \cite{surface_reconstruction}.
+Bernardini \etal describe the BPA (ball-pivoting algorithm) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{BPA}.
 
 
 \item[Voxel based] \hfill \\
 
 As Enlight already uses a regular grid data structure to organize triangles and classify the grid's voxel as inside, outside and surface, algorithms can be used which can directly operate on these cells/voxels.
-Kobbelt et. al. propose a post-processing step to the commonly known marching cubes algorithm to extract/preserve features of the original surface \cite{extended_marching_cubes}. This algorithm is sometimes also referred to as extended marching cubes and makes use of triangles, points, implicit surface functions and scalar distance fields inside each voxel.
+Kobbelt \etal propose a post-processing step to the commonly known marching cubes algorithm to extract/preserve features of the original surface \cite{extended_marching_cubes}. This algorithm is sometimes also referred to as extended marching cubes and makes use of triangles, points, implicit surface functions and scalar distance fields inside each voxel.
 
 
 \item[Dexel based] \hfill \\

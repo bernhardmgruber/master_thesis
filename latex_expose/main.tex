@@ -1,4 +1,4 @@
-\documentclass[10pt, a4paper, oneside, numbers=noenddot]{scrartcl}
+\documentclass{scrartcl}
 
 %
 % packages
@@ -6,10 +6,11 @@
 
 \usepackage{courier}
 \usepackage[iso]{datetime}
-\usepackage{graphicx}
 \usepackage[style=numeric,backend=bibtex8,urldate=iso8601]{biblatex}
 \usepackage{tabularx}
 \usepackage[hang,flushmargin]{footmisc}
+\usepackage{xspace}
+
 
 %
 % basic latex configuration
@@ -30,26 +31,32 @@
 	}
 }
 
-% graphics
-\graphicspath{ {./images/} }
+% e.g. i.e. etc. et al.
 
-%
+\newcommand*{\eg}{e.g.\@\xspace}
+\newcommand*{\ie}{i.e.\@\xspace}
+\newcommand*{\cf}{cf.\@\xspace}
+\makeatletter
+\newcommand*{\etc}{%
+	\@ifnextchar{.}%
+	{etc}%
+	{etc.\@\xspace}%
+}
+\newcommand*{\etal}{%
+	\@ifnextchar{.}%
+	{et al}%
+	{et al.\@\xspace}%
+}
+\makeatother
+
 % title
-%
-
 \title{Expos\`e: Detailed and adaptive surface reconstruction of implicitly defined geometries}
-%\subtitle{}
 \author{Bernhard Manfred Gruber}
 \date{\today}
 
 \begin{document}
 
 \maketitle
-%\thispagestyle{empty}
-%\clearpage
-
-%\tableofcontents
-%\clearpage
 
 \input{topic}
 \input{motivation}
@@ -59,9 +66,7 @@
 \input{goal}
 \input{schedule}
 
-%\clearpage
-
-% References
+% references
 \addcontentsline{toc}{chapter}{Annotated references}
 \printbibliography[title=Annotated references]
 
