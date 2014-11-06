@@ -8,7 +8,6 @@
 \usepackage[iso]{datetime}
 \usepackage{graphicx}
 \usepackage[style=numeric,backend=bibtex8,urldate=iso8601]{biblatex}
-\usepackage{refcheck}
 \usepackage{tabularx}
 
 %
@@ -30,8 +29,6 @@
 	}
 }
 
-\nocite{*} % include full bibliography (unused items)
-
 % graphics
 \graphicspath{ {./images/} }
 
@@ -39,7 +36,7 @@
 % title
 %
 
-\title{Expos\`e: Detailed and adaptive surface reconstruction of implicitly defined geometries (for CAM?)}
+\title{Expos\`e: Detailed and adaptive surface reconstruction of implicitly defined geometries}
 %\subtitle{}
 \author{Bernhard Manfred Gruber}
 \date{\today}
@@ -50,12 +47,8 @@
 %\thispagestyle{empty}
 %\clearpage
 
-%\pagenumbering{Roman}
-
 %\tableofcontents
 %\clearpage
-
-%\pagenumbering{arabic}
 
 \input{topic}
 \input{motivation}
@@ -65,12 +58,7 @@
 \input{goal}
 \input{schedule}
 
-
-% List of figures
-\addcontentsline{toc}{chapter}{List of Figures}
-\renewcommand\listfigurename{List of Figures}
-\listoffigures
-\clearpage
+%\clearpage
 
 % References
 \addcontentsline{toc}{chapter}{Annotated references}
