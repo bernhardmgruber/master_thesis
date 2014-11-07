@@ -4,12 +4,14 @@
 % packages
 %
 
-\usepackage{courier}
+\usepackage[english]{babel}
 \usepackage[iso]{datetime}
-\usepackage[style=numeric,backend=bibtex8,urldate=iso8601]{biblatex}
+\usepackage[style=numeric,backend=bibtex8]{biblatex}
 \usepackage{tabularx}
 \usepackage[hang,flushmargin]{footmisc}
 \usepackage{xspace}
+\usepackage{hyperref}
+\usepackage{csquotes}
 
 
 %
@@ -48,6 +50,9 @@
 	{et al.\@\xspace}%
 }
 \makeatother
+
+% hyperef
+\hypersetup{hidelinks=true}
 
 % title
 \title{Expos\`e: Detailed and adaptive surface reconstruction of implicitly defined geometries}
