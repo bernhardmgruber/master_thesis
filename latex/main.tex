@@ -1,25 +1,32 @@
-\documentclass[10pt,a4paper,oneside, numbers=noenddot]{scrreprt}
+\documentclass[
+10pt,
+a4paper,
+%numbers=noenddot
+]
+{scrreprt}
 
-% packages
+% ====================================================================================================
+% ===   Packages                                                                                   ===
+% ====================================================================================================
 \usepackage{graphicx}
-\usepackage[style=authoryear,backend=bibtex8,urldate=iso8601]{biblatex}
+\usepackage[style=authoryear,backend=biber,urldate=iso8601]{biblatex}
 \usepackage{listings}
 \usepackage{courier}
 \usepackage[iso]{datetime}
 \usepackage{pdfpages}
 
 
-% basic latex configuration
+% ====================================================================================================
+% ===   Latex config                                                                               ===
+% ====================================================================================================
 
 
 % biblatex
 \addbibresource{references.bib}
 \let\cite\parencite
 
-
 % graphics
 \graphicspath{ {./images/} }
-
 
 % listings
 \lstdefinelanguage{CPP}[ISO]{C++}
@@ -46,12 +53,15 @@
 % backgroundcolor=\color{lightgray}
 }
 
-\title{Detailed and adaptive surface reconstruction of implicitly defined geometries}
-%\subtitle{Comparing GPU accelerated standard algorithms with traditonal CPU implementations}
+\begin{document}
+% ====================================================================================================
+% ===   Front matter                                                                               ===
+% ====================================================================================================
+
+%\title{Detailed and adaptive surface reconstruction of implicitly defined geometries}
+\title{Surface reconstruction from models for subtractive manufacturing simulation}
 \author{Bernhard Manfred Gruber}
 \date{\today}
-
-\begin{document}
 
 % Three into pages
 %\setcounter{page}{4}
@@ -63,36 +73,44 @@
 
 %\pagenumbering{Roman}
 
-\include{declaration}
-
-\include{acknowledgement}
-
-\include{abstract}
+%\input{declaration}
+%\input{acknowledgement}
+%\input{abstract}
 
 \tableofcontents
-
 \clearpage
+
+% ====================================================================================================
+% ===   Main matter                                                                                ===
+% ====================================================================================================
 
 %\pagenumbering{arabic}
 
-\include{introduction}
+\input{introduction}
+\input{previous_work}
+\input{background}
+\input{state_of_the_art}
+\input{direct_intersection}
+\input{tri_dexel}
+\input{bpa}
+\input{benchmarks}
+\input{conclusion}
 
+% ====================================================================================================
+% ===   Back matter                                                                                ===
+% ====================================================================================================
 
 \addcontentsline{toc}{chapter}{List of Figures}
 \renewcommand\listfigurename{List of Figures}
 \listoffigures
-
 \clearpage
 
 \addcontentsline{toc}{chapter}{List of Listings}
 \renewcommand\lstlistlistingname{List of Listings} 
 \lstlistoflistings
-
 \clearpage
 
 \addcontentsline{toc}{chapter}{References}
-%\appto{\bibsetup}{\emergencystretch=1em}
-%\setcounter{biburllcpenalty}{9000}
 \printbibliography[title=References]
 
 \appendix

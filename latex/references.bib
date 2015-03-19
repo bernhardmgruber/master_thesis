@@ -1,0 +1,177 @@
+@article{CDT,
+	title={Constrained delaunay triangulations},
+	author={Chew, Paul},
+	journal={Algorithmica},
+	volume={4},
+	number={1-4},
+	pages={97--108},
+	year={1989},
+	publisher={Springer},
+	annotation={Shows a divide and conquer approach for creating a triangulation from a given set of points and a number of predefined edges (constraints). The resulting triangulation is as close to a Delaunay triangulation as possible.}
+}
+
+@article{CDT_fast,
+	title={A fast algorithm for generating constrained Delaunay triangulations},
+	author={Sloan, Scott},
+	journal={Computers \& Structures},
+	volume={47},
+	number={3},
+	pages={441--450},
+	year={1993},
+	publisher={Elsevier},
+	annotation={Presents an algorithm for fast generation of Delaunay triangulations. In addition to a given point set, several edges can be specified which must be included in the resulting triangulation (constraints). The algorithm has slightly above linear runtime complexity.}
+}
+
+@article{tri_tri_intersection_moller,
+	title={A fast triangle-triangle intersection test},
+	author={M{\"o}ller, Tomas},
+	journal={Journal of graphics tools},
+	volume={2},
+	number={2},
+	pages={25--30},
+	year={1997},
+	publisher={Taylor \& Francis},
+	annotation={Basic and well-known algorithm to determine if two triangles intersect. The author uses a geometric approach and discusses a few optimizations. The intersection line itself is not calculated, but it can be derived from variables of the algorithm.}
+}
+
+@article{tri_tri_intersection_2,
+	title={A fast triangle to triangle intersection test for collision detection},
+	author={Tropp, Oren and Tal, Ayellet and Shimshoni, Ilan},
+	journal={Computer Animation and Virtual Worlds},
+	volume={17},
+	number={5},
+	pages={527--535},
+	year={2006},
+	publisher={Wiley Online Library},
+	annotation={Presents a fast algorithm for intersecting two triangles and retrieving the intersection segment. The algorithm is algebraic and stems from solving a set of linear equations. The authors claim that their approach is generic and can be easily used to intersect other primitives such as rectangles. }
+}
+
+@article{tridexel_reconstruction,
+	title={Feature conservation and conversion of Tri-dexel volumetric models to polyhedral surface models for product prototyping},
+	author={Ren, Yongfu and Zhu, Weihang and Lee, Yuan-Shin},
+	journal={Computer-Aided Design and Applications},
+	volume={5},
+	number={6},
+	pages={932--941},
+	year={2008},
+	publisher={Taylor \& Francis},
+	annotation={This paper discusses the reconstruction of triangle meshes from tri-dexel volumes. Furthermore, refinements are presented to extract features of the original surface. }
+}
+
+@inproceedings{tridexel_intersection,
+	title={Bridging the gap between CSG and Brep via a triple ray representation},
+	author={Benouamer, Mohand Ourabah and Michelucci, Dominique},
+	booktitle={Proceedings of the fourth ACM symposium on Solid modeling and applications},
+	pages={68--79},
+	year={1997},
+	organization={ACM},
+	annotation={As popular representations of volumes with free-form surfaces like z-maps, depth images or ray representations (dexels) do not work well together with boundary representations (Brep), which are often represented by triangle meshes, this paper proposes a triple ray representation (tri-dexel) to combine free-form surfaces with triangle-based meshes for intersection tests. }
+}
+
+@inproceedings{mesh_intersection,
+	title={Seamless Intersection Between Triangle Meshes},
+	author={Rosen, David},
+	booktitle={Proceedings: Senior Conference on Computational Geometry},
+	pages={1--8},
+	year={2008},
+	annotation={This paper proposes a method for enhancing the visual appeal of mesh intersections in video games and similar applications. To soften sharp intersection lines between two objects (e.g. rocks on a beach), geometry can be morphed around the intersection of both meshes and textured differently (using texture bands). The intersecting itself is computed using triangle-triangle intersection tests and constrained Delaunay triangulations of the cut triangles using the intersection segments on the triangle as constraints. }
+}
+
+@article{BPA,
+	title={The ball-pivoting algorithm for surface reconstruction},
+	author={Bernardini, Fausto and Mittleman, Joshua and Rushmeier, Holly and Silva, Cl{\'a}udio and Taubin, Gabriel},
+	journal={Visualization and Computer Graphics, IEEE Transactions on},
+	volume={5},
+	number={4},
+	pages={349--359},
+	year={1999},
+	publisher={IEEE},
+	annotation={This paper presents the ball-pivoting algorithm (BPA) for reconstructing triangle meshes from point clouds. According to the paper, the BPA's principle is easy to understand and the algorithm excels in memory and runtime efficiency. The paper describes all steps required to implement the algorithm as well as advantages and shortcomings. Furthermore, runtime benchmarks and test scene results are included. }
+}
+
+@article{cutter_workpiece_engagement,
+	title={Triangle-mesh based cutter-workpiece engagement extraction for general milling processes},
+	author={Gong, Xun},
+	year={2013},
+	publisher={University of British Columbia},
+	annotation={Master thesis describing how cutter-workpiece engagement can be extracted from a given cutter and workpiece geometry as well as a chain of cutter transformations over time. Cutter geometry and transformation paths are used to generate the volume swept by the cutter (swept volume) by reducing the cutter mesh to a point cloud which is than interpolated along the cutter's path using the cutter's chain of transformations. The resulting point cloud is re-triangulated using the ball pivoting algorithm and subtracted from the workpiece mesh. By increasing the cutter's size by a small amount, an intersection test can be performed against the cut workpiece to find the engagement area of the cutter. This area can than be used for calculating forces occuring during the simulated machining process. }
+}
+
+@inproceedings{extended_marching_cubes,
+	title={Feature sensitive surface extraction from volume data},
+	author={Kobbelt, Leif and Botsch, Mario and Schwanecke, Ulrich and Seidel, Hans-Peter},
+	booktitle={Proceedings of the 28th annual conference on Computer graphics and interactive techniques},
+	pages={57--66},
+	year={2001},
+	organization={ACM},
+	annotation={Based on the marching cubes algorithm, this paper provides a strategy for improving features extracted from a given volumetric data set (a regular grid containing triangles, points, implicit surface functions or scalar distance fields). The proposed extended marching cubes algorithm employs a post-processing step which detects features inside a cell using e.g. normal vectors of the contained points. Additional vertices may then be generated to improve the reconstructed surface, especially concerning features like sharp edges. The discussed algorithm is implemented in OpenVDB.}
+}
+
+@incollection{enlight,
+	title={New Scalable SIMD-Based Ray Caster Implementation for Virtual Machining},
+	author={Leutgeb, Alexander and Welsch, Torsten and Hava, Michael},
+	booktitle={Parallel Processing and Applied Mathematics},
+	pages={317--326},
+	year={2014},
+	publisher={Springer},
+	annotation={A paper from the author's co-workers on the subject of Enlight. It discusses an optimized ray casting approach for visualizing subtractive manufacturing. The presented implementation is directly based on the regular grid data structure which will be used as primary input for the surface reconstruction tackled by this thesis. Beside grid traversal, intersection counting and optimizations, acceleration by surface cell evaluation (SCE) and triangle elimination is presented. The latter two have direct implications for the reconstruction process. }
+}
+
+@book{surface_reconstruction,
+	title={Surface reconstruction from unorganized points},
+	author={Hoppe, Hugues and DeRose, Tony and Duchamp, Tom and McDonald, John and Stuetzle, Werner},
+	volume={26},
+	number={2},
+	year={1992},
+	publisher={ACM},
+	annotation={Demonstrates an algorithm for creating a triangulation approximating a given point cloud, where each point is near or on the surface. The algorithm does not need normal vectors for each point as it takes them from interpolated tangent planes. The surface is described as a signed distance function, estimating the distance of each sample point to the actual surface. This function is then sampled again by a marching cubes variant which emits the triangles of the surface. }
+}
+
+@inproceedings{vornoi_surface_reconstruction,
+	title={A new Voronoi-based surface reconstruction algorithm},
+	author={Amenta, Nina and Bern, Marshall and Kamvysselis, Manolis},
+	booktitle={Proceedings of the 25th annual conference on Computer graphics and interactive techniques},
+	pages={415--421},
+	year={1998},
+	organization={ACM},
+	annotation={Discusses surface reconstruction from a point cloud using 3D voronoid diagrams. For a set of sample points with sufficient quality, guarantees can be made about the topological correctness and convergence towards the original surface. The input point cloud can and should be adaptive with higher resoluations in feature-rich areas. The resulting triangulation is Delaunay.}
+}
+
+@article{virtual_machining_review,
+	title={Material Removal Simulation and Cutting Force Prediction of Multi-Axis Machining Processes on General-Purpose Graphics Processing Units},
+	author={Tukora, Balazs},
+	year={2012},
+	publisher={hgpu. org},
+	annotation={A PhD Dissertation about GPU accelerated simulation of material removal (using a dexel approach) and cutter force prediction. The thesis starts with a good review of existing virtual machining technologies. }
+}
+
+@inbook{implicit_techniques,
+	title={An introduction to implicit techniques},
+	author={Menon, Jai},
+	booktitle={Implicit Surfaces for Geometric Modeling and Computer Graphics},
+	pages={13--26},
+	year={1996},
+	publisher={SIGGRAPH},
+	annotation={Gives an overview over commonly used representations for surfaces as well as a rough classification. }
+}
+
+@thesis{bachelor,
+	author = {Gruber, Bernhard},
+	title = {GPGPU Accelerated Visualization of Complex Geometries},
+	type = {Bachelor Thesis, Part 2},
+	institution = {University of Applied Science Hagenberg},
+	date = {2013-09},
+	annotation={The author's bachelor thesis. Beside the first part about GPGPU computing with OpenCL, the second part covers the author's internship at RISC Software GmbH and his experiences with project Enlight. Apart several approaches for a ray casting visualization, Enlight's data model is described in detail, representing the foundations for the practical prototypes which will be developed with this thesis. }
+}
+
+@article{no_free_lunch,
+	title={No free lunch theorems for optimization},
+	author={Wolpert, David and Macready, William},
+	journal={Evolutionary Computation, IEEE Transactions on},
+	volume={1},
+	number={1},
+	pages={67--82},
+	year={1997},
+	publisher={IEEE},
+	annotation={The famous no free lunch theorem for optimization problems.}
+}
