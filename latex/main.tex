@@ -8,24 +8,28 @@ a4paper,
 % ====================================================================================================
 % ===   Packages                                                                                   ===
 % ====================================================================================================
+\usepackage{scrhack}
 \usepackage{graphicx}
-\usepackage[style=authoryear,backend=biber,urldate=iso8601]{biblatex}
+\usepackage[style=numeric,backend=biber,urldate=iso8601]{biblatex}
 \usepackage{listings}
-\usepackage{courier}
+\usepackage{xspace}
 \usepackage[iso]{datetime}
 \usepackage{pdfpages}
 
 
 % ====================================================================================================
-% ===   Latex config                                                                               ===
+% ===   Packages config                                                                            ===
 % ====================================================================================================
 
-
+%
 % biblatex
+%
 \addbibresource{references.bib}
 \let\cite\parencite
 
+%
 % graphics
+%
 \graphicspath{ {./images/} }
 
 % listings
@@ -52,6 +56,25 @@ a4paper,
 %	frame=single,
 % backgroundcolor=\color{lightgray}
 }
+
+%
+% e.g. i.e. etc. et al.
+%
+\newcommand*{\eg}{e.g.\@\xspace}
+\newcommand*{\ie}{i.e.\@\xspace}
+\newcommand*{\cf}{cf.\@\xspace}
+\makeatletter
+\newcommand*{\etc}{%
+	\@ifnextchar{.}%
+	{etc}%
+	{etc.\@\xspace}%
+}
+\newcommand*{\etal}{%
+	\@ifnextchar{.}%
+	{et al}%
+	{et al.\@\xspace}%
+}
+\makeatother
 
 \begin{document}
 % ====================================================================================================
