@@ -1,4 +1,26 @@
-\chapter{Previous work}
+\chapter{Previous work (VML)}
+\label{ch:previous_work}
+
+As part of project Enlight a method for modeling and visualizing dynamic geometry models has been developed.
+It was conducted for research by the RISC Software GmbH in Hagenberg im M\"uhlkreis, Austria.
+The project was funded by the political program Regio 13, which aimed to sustainably improve the contestability of regional companies, economic growth and employment inside of Upper Austria.
+Co-funded by the European Union as well as Land Ober\"osterreich the program ran from 2007 to 2013.
+
+The models in Enlight are defined by a set of triangle meshes which are combined using set operations (particularly subtraction).
+Applications of such a system are primarily found in simulations of material removal processes, a core discipline of machining, also referred to as subtractive manufacturing.
+A vital requirement of such systems is to support a large number of fine triangulated meshes (up to hundreds of millions of triangles) to deliver simulations of appropriate quality.
+Therefore, well-conceived space partitioning and triangle elimination strategies have been developed to deal with this amount of input.
+As a result the simulated model is described implicitly via subtraction of only subsets of the input triangles (volumes are no longer closed/water-tight).
+For visualization, this implicit model is sampled using an adapted ray casting approach \cite{enlight}.
+By applying a small set of rules, the surface can be recovered to retrieve an image of the model.
+Enlight's data model is described in detail in the author's bachelor thesis \cite{bachelor}.
+
+Simulation and visualization of material removal processes such as in Enlight are vital for verifying the correctness of a machining process.
+However, there exist numerous scenarios where an explicit surface model of the final product is required.
+Many of these situations occur in CAE such as stress, thermal and safety analyses as well as structural optimizations using finite element methods.
+Due to the importance for CAE for assuring quality in modern production processes it is highly desired to be able to retrieve an explicit surface mesh of the implicitly described model of Enlight.
+
+
 
 more or less practical background
 

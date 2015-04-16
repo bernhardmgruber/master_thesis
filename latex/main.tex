@@ -1,6 +1,7 @@
 \documentclass[
 10pt,
 a4paper,
+draft,
 %numbers=noenddot
 ]
 {scrreprt}
@@ -9,13 +10,14 @@ a4paper,
 % ===   Packages                                                                                   ===
 % ====================================================================================================
 \usepackage{scrhack}
-\usepackage{graphicx}
+\usepackage[final]{graphicx}
 \usepackage[style=numeric,backend=biber,urldate=iso8601]{biblatex}
 \usepackage{listings}
 \usepackage{xspace}
 \usepackage[iso]{datetime}
 \usepackage{pdfpages}
-
+\usepackage{lipsum}
+\usepackage{color}
 
 % ====================================================================================================
 % ===   Packages config                                                                            ===
@@ -57,9 +59,11 @@ a4paper,
 % backgroundcolor=\color{lightgray}
 }
 
-%
+% ====================================================================================================
+% ===   Macros                                                                                     ===
+% ====================================================================================================
+
 % e.g. i.e. etc. et al.
-%
 \newcommand*{\eg}{e.g.\@\xspace}
 \newcommand*{\ie}{i.e.\@\xspace}
 \newcommand*{\cf}{cf.\@\xspace}
@@ -75,6 +79,8 @@ a4paper,
 	{et al.\@\xspace}%
 }
 \makeatother
+
+\newcommand{\dummytext}[1]{\textcolor{red}{\lipsum[1-#1]}}
 
 \begin{document}
 % ====================================================================================================
@@ -110,9 +116,9 @@ a4paper,
 %\pagenumbering{arabic}
 
 \input{introduction}
-\input{previous_work}
-\input{background}
+\input{fundamentals}
 \input{state_of_the_art}
+\input{previous_work}
 \input{direct_intersection}
 \input{tri_dexel}
 \input{bpa}
