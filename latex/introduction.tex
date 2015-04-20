@@ -11,7 +11,7 @@ Furthermore, many scientific applications in fields like structural engineering,
 Additionally, triangle meshes are well established means to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
 
 
-However, despite their great suitability and acceptance, triangle-based representations also have their drawbacks and a numerous amount of problems can be addressed better using different, often implicit, methods or representations (\cf examples by Menon \cite{implicit_techniques} and Tukora \cite{virtual_machining_review}). %TODO write some examples down
+However, despite their great suitability and acceptance, triangle-based representations also have their drawbacks and a numerous amount of problems can be addressed better using different, often implicit, methods or representations (\eg CSG trees, dexel images or functional representations).
 In many of these situations efficient rendering is only a secondary requirement.
 Implicit models like functional and parametric surfaces shine in mathematical exactness, expressiveness and memory requirements.
 A sphere for example is easily expressed as an equation with radius and center as parameters, describing an exact surface.
@@ -33,7 +33,7 @@ The final work piece can be seen as subtraction of all swept volumes from the in
 
 
 Despite explicit and implicit representations for surfaces both having their specific usage scenarios, it is sometimes necessary to transform one into the other.
-A common scenario in CAD for example is to export an implicitly described model (\eg CSG tree) as an explicit triangle mesh.
+A common scenario in CAD for example is to export an implicitly described model (\eg CSG tree or dexel representation) as an explicit triangle mesh.
 This process is called tessellation or triangulation.
 The quality of the triangle approximation usually depends on a parameterized resolution which in many cases directly influences the number of generated triangles.
 Several algorithms exist trying to create meshes adaptively, using more and small triangles only where detail is necessary to preserve a models features.
@@ -54,7 +54,7 @@ Although the presented implementations are tailored to this application context,
 \section{Problem statement}
 \label{sec:problem}
 
-The focus of the implementations underlying this thesis is to find, evaluate and prototypically implement multiple strategies to extract a surface mesh from the data model used inside the VML.
+The focus of the implementations underlying this thesis is to find, evaluate and prototypically implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
 On top of these prototypes this thesis provides a comprehensive documentation, analysis and discussion of the implemented algorithms and strategies.
 In detail, the following questions will be answered:
 
@@ -76,7 +76,7 @@ In detail, the following questions will be answered:
 \section{Goal}
 \label{sec:goal}
 
-The goal of this thesis is to provide the reader with a state of the art overview over algorithms and methods used to reconstruct explicit triangle meshes from different kinds of implicit geometry models.
+The goal of this thesis is to provide the reader with a state of the art overview over algorithms and methods used to reconstruct explicit triangle meshes from different representations such as the one used inside the VML.
 In reference to the first problem statement, a categorization if the presented algorithms will be shown to group common concepts and compare the algorithms based on their approaches, area of application, supported data structures and restrictions.
 
 After this overview, the thesis will discuss the prototypic implementation of selected algorithms.
