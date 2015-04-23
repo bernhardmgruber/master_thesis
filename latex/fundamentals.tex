@@ -51,12 +51,12 @@ Tukora provides a comprehensive list with sketches and descriptions of the most 
 	
 	\begin{figure}[h]
 		\centering
-		\begin{subfigure}{0.4\textwidth}
+		\begin{subfigure}[b]{0.4\textwidth}
 			\includegraphics[width=\textwidth]{images/zmap}
 			\caption{Prism representation of a z-map}
 			\label{fig:zmap}
 		\end{subfigure}
-		\begin{subfigure}{0.4\textwidth}
+		\begin{subfigure}[b]{0.4\textwidth}
 			\includegraphics[width=\textwidth]{images/depth_image}
 			\caption{depth image}
 			\label{fig:depth_image}
@@ -113,6 +113,7 @@ Tukora provides a comprehensive list with sketches and descriptions of the most 
 		\caption{
 			Tri-dexel images of an octant of a centered unit sphere.
 			The left, blue image shows dexels along the x-axis, the centered, red image along the z-axis and the right, green image along the y-axis.
+			Images by Tukora \cite{virtual_machining_review}.
 		}
 		\label{fig:tri_dexel_image}
 	\end{figure}
@@ -133,7 +134,7 @@ Tukora provides a comprehensive list with sketches and descriptions of the most 
 	CSG trees can also be rendered directly using OpenGL or DirectX by making use of the GPU's depth and stencil buffers.
 	Well known algorithm's in this area include Goldfeather's algorithm \cite{goldfeather} and Nigel's Sequenced Convex Subtraction (SCS) algorithm \cite{scs}.
 	
-	\begin{figure}
+	\begin{figure}[h]
 		\centering
 		\includegraphics[width=\textwidth]{images/csg_tree}
 		\caption{
@@ -144,13 +145,45 @@ Tukora provides a comprehensive list with sketches and descriptions of the most 
 		\label{fig:csg_tree}
 	\end{figure}
 	
-	\item[Uniform spacial decomposition (USD)] \hfill \\
+	\item[Spacial decomposition] \hfill \\
+	The volume covered by a solid can also be represented by listing regions in 3-dimensional space which are occupied by the volume.
+	This representation is also commonly known as spacial occupancy enumeration.
+	To enumerate occupied regions, one must first decompose space into smaller regions.
+	This can be done in a uniform or hierarchical manner.
 	
+	Uniform spacial decomposition (USD) divides space into equally sized cells.
+	An example would be a regular grid with cubic cells.
+	This special case is known as voxel model, where a voxel (abbreviated from volume element) is a single cell of the regular grid.
+	Figure \ref{fig:spacial_decomposition}(b) shows a voxel model of a simple solid.
 	
+	USDs are simple to create and implement as they only require a three dimensional grid which stores for every cell whether it is occupied or not.
+	Boolean operations are also easily solved, as two uniform grids can be combined on a per cell basis similar to z-maps.
+	However, USDs are highly memory demanding to achieve a sufficient resolution to accurately represent a solid.
+	Furthermore, a high resolution may only be needed in certain regions of the solid (\ie features).
 	
-	\item[Hierarchical spacial decomposition (HSD)] \hfill \\
+	Hierarchical spacial decomposition (HSD) overcomes some shortcomings of USDs.
+	HSDs partition space in an adaptive way and increase their resolution only where detail is necessary.
+	Therefore, HSDs usually require less memory at the cost of increased complexity.
+	Figure \ref{fig:spacial_decomposition}(c) shows an example of a solid represented by a hierarchically decomposed space.
 	
+	A common representative of HSDs are octrees.
+	An octree on its highest level is a cube which is then recursively subdivided into eight half-sized cubes (\aka octants).
+	This subdivision is only done, where a finer decomposition of space is necessary.
+	Further examples of hierarchical decompositions are Binary Space Partitioning (BSP) and Bounding Volume Hierarchies (BVH).
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\textwidth]{images/spacial_decomposition}
+		\caption{
+			The solid on the left side can be described using spacial decomposition in either a uniform manner (middle image) or a hierarchical manner (right image).
+			Image by Tukora \cite{virtual_machining_review}. 
+		}
+		\label{fig:spacial_decomposition}
+	\end{figure}
+	
+
 	\item[Boundary representation (BRep)] \hfill \\
+	Boundary representations are 
 	
 	\item[Functional and implicit representation]
 	
