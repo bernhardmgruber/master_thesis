@@ -7,7 +7,7 @@
 \label{sec:surface_representations}
 
 CAD and CAM software use several different representations for final and intermediate geometric parts like cutter geometries, the manufactured workpiece or the current machining state.
-Tukora provides a comprehensive list with sketches and descriptions of the most commonly used representations \cite{virtual_machining_review}. These will be discussed in this section. 
+Tukora provides a comprehensive overview with sketches and descriptions of the most commonly used representations in the area of virtual machining on which the following section is based on \cite{virtual_machining_review}. 
 
 \begin{description}
 	\item[Vector clipping] \hfill \\
@@ -183,21 +183,52 @@ Tukora provides a comprehensive list with sketches and descriptions of the most 
 	
 
 	\item[Boundary representation (BRep)] \hfill \\
-	Boundary representations are 
+	Boundary representations, according to Tukora, are the most wide-spread representations used in modern CAD systems.
+	As the term suggests, BReps describe a solid by specifying its boundary surface.
+	This surface typically consists of faces (bounded surfaces), edges between those faces (bounded curves) and vertices (\ie points in 3-dimensional space) as well as their topology.
+	Faces can be specified using a variety of mathematical models from complex splines (BSpline, NURB) to simple polygons like triangles.
+	Figure \ref{fig:brep} shows an example of a BRep which represents a machining part using triangles as faces.
+	%
+	In the field of virtual machining, the faces of BReps are typically polygons which are connected by straight edges (\ie polyhedrons).
+	The most common case are triangle meshes, although quad meshes are also popular in CAD.
+	%
+	Boolean operations like subtraction are hard to perform on arbitrary BReps.
+	When considering only triangulated surfaces, the undertaking becomes doable, but still remains calculatively expensive and usually suffers from numerics.
+	Boolean operations on triangulated BReps are typically available in modern CAD kernels.
 	
-	\item[Functional and implicit representation]
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\textwidth]{images/brep}
+		\caption{
+			A boundary representation describes a machining part be specifying its boundary surface. A popular surface representation is a set of connected triangles. 
+			Image by Tukora \cite{virtual_machining_review}. 
+		}
+		\label{fig:brep}
+	\end{figure}
 	
-	%cf. wikipedia Solid_modeling
+	\item[Functional representation (FRep)] \hfill \\
+	From a more mathematical point of view, surfaces can also be represented using real-valued functions.
+	Pasko \etal give a good overview on this subject in the context of modeling and computer graphics \cite{frep}.
+	\Eg a sphere is defined analytically as the infinite set of points with the same distance (radius) to a distinct center point.
+	By defining a function for the distance of a point to the center, subtracting the radius and equating it with zero, we can construct a predicate that holds true for all points on the sphere's surface.
+	More generalized, an object can be specified by classifying all spatial points $P$ using a continuous, real-valued function $f$. For each point $p \in P$
+	\begin{align}
+		f(p) &> 0 \quad \text{if $p$ is inside the object,}               \notag \\
+		f(p) &= 0 \quad \text{if $p$ is on the surface of the object and} \notag \\
+		f(p) &< 0 \quad \text{if $p$ is outside the object.}              \notag
+	\end{align}
+	
+	Functional representations shine in exactness, expressiveness and memory requirements.
+	Additionally, some classes of problems are easier to solve on analytical models, \eg intersection tests.
+	Furthermore, boolean operations and manipulations like bending and twisting are easier to formulate on mathematical entities then on the other data structures discussed in this section.
+	
+	Many primitives used in CSG are easily typically described using FReps.
+	Several CAD kernels also use FReps internally to retain precision until the final result is exported where it is typically converted into a \eg a BRep.
 	
 \end{description}
 
-Implicit models may be composed of polygons, parametric surfaces and functional representations (iso surfaces).
 
-Furthermore, many and also different types of such surfaces may be aggregated, referred to as B-rep (boundary representation), or combined using set operations such as in CSG.
-
-
-
-\section{Triangulations}
+\section{Triangulation terms}
 \label{sec:definitions}
 
 \begin{description}
