@@ -4,18 +4,18 @@
 
 %TODO
 
-After a survey of existing approaches to surface reconstruction at least four different classes of algorithms have been identified:
+After a survey of existing approaches to surface reconstruction from models similar to the VML's at least four different classes of algorithms have been identified:
 
 \begin{description}
 	
 	\item[Direct intersection] \hfill \\
-	Directly intersecting each triangle of one volume with another is the most direct approach and described for example by Rosen to smooth the sharp intersection line between two meshes \cite{mesh_intersection}. Triangle-triangle intersection is described by M\"oller \cite{tri_tri_intersection_moller} as well as Tropp, Tal and Shimshoni \cite{tri_tri_intersection_2}. Each intersected triangle can then be re-triangulated based on the cut segments from other triangles (constraints). A possible algorithm is CDT (constrained Delaunay triangulation) and was first described by Chew \cite{CDT} and refined by Sloan \cite{CDT_fast}. After re-triangulating intersected triangles, all triangles not belonging to the new surface are removed. Gong demonstrates a very similar approach in his master thesis \cite{cutter_workpiece_engagement}.
+	Directly intersecting each triangle of one volume with another is the most direct approach and described for example by Rosen to smooth the sharp intersection line between two meshes \cite{mesh_intersection}. Triangle-triangle intersection is described by M\"oller \cite{tri_tri_intersection_moller} as well as Tropp, Tal and Shimshoni \cite{tri_tri_intersection_2}. Each intersected triangle can then be re-triangulated based on the cut segments from other triangles (constraints). A possible algorithm is CDT (constrained Delaunay triangulation) and was first described by Chew \cite{cdt} and refined by Sloan \cite{cdt_fast}. After re-triangulating intersected triangles, all triangles not belonging to the new surface are removed. Gong demonstrates a very similar approach in his master thesis \cite{cutter_workpiece_engagement}.
 	
 	\item[Point cloud based] \hfill \\
 	Point clouds are data structures where an object is approximated by a set of points with optional normal vectors. These points can be obtained \eg by sampling an implicit model. These point clouds can then be triangulated using different algorithms. 
 	Amenta, Bern and Kamvysselis present an algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees for \enquote{good} inputs \cite{vornoi_surface_reconstruction}.
 	Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface. The contour of this function is then traced by a marching cubes variant to extract an iso surface (triangle mesh) \cite{surface_reconstruction}.
-	Bernardini \etal describe the BPA (ball-pivoting algorithm) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{BPA}.
+	Bernardini \etal describe the BPA (ball-pivoting algorithm) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
 	
 	
 	\item[Voxel based] \hfill \\

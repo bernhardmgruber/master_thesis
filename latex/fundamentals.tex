@@ -1,41 +1,152 @@
 \chapter{Fundamentals} % and theoretical background (BASICS)
 \label{ch:fundamentals}
 
-%TODO: uniform names for "piece of geometry", "solid", "(geometric) model",  ...
-
 \section{Terms}
 \label{sec:definitions}
 
+The following is a list of definitions of common terms used in 3-D graphics, topology (branch of mathematics), CAD and CAM. The definitions are based on the lecture material provided by Shene \cite{mesh_basics} and Floater \cite{mesh_lecture10}.
+
 \begin{description}
 	\item[Solid] \hfill \\
+	A solid is a object in 3-dimensional Euclidean space with a closed surface, separating the space into two half-spaces.
+	One is inside the solid (the volume of the solid) and the other outside.
+	From a physical perspective, a solid is rigid and cannot be deformed (as opposed to \eg liquids).
+	Examples of solids are cubes, pyramids, a flowerpot or your desk.
 	
-	\item[Triangulation/Tesselation] \hfill \\
+	\item[Triangulation/Tessellation] \hfill \\
+	Although several representations exist to describe solids (\cf section \ref{sec:surface_representations}), triangle meshes are often the preferred one when exporting or distributing a solid.
+	The process of converting an alternative representation to a triangle mesh is called triangulation or tessellation.
+	A common scenario in CAD for example is to export a model described using a CSG tree or dexel image as a triangle mesh.
+	
 	
 	\item[Chord error] \hfill \\
+	Tessellation is usually subject to a defined resolution.
+	Some solids such as spheres cannot be represented accurately by triangles.
+	The difference between the exact surface and the triangle approximation is called chord error.
+	
 	
 	\item[Mesh] \hfill \\
+	In 3-dimensional computer graphics, a mesh usually refers to a polygonal surface mesh which is described by Shene in his corresponding lecture as follows \cite{mesh_basics}:
+	A mesh is a collection of faces (\ie polygons), edges between those faces (\ie lines) and vertices (\ie points in 3-dimensional space).
+	These mesh elements are described by a mesh's geometry and connectivity.
+	Whereas the geometry simply specifies attributes of the vertices, the connectivity describes the complete topology (\eg edges connected to a vertex, face to vertices relationship, \etc).
+	As a further aspect, Floater notes in his lecture slides that the intersection between any pair of faces must be either a shared edge, a shared vertex or nothing \cite{mesh_lecture10}.
+	In other words, faces can only connect to and not insect each other.
+	%
+	If a mesh is closed, it is a BRep (\cf section \ref{sec:surface_representations}) and therefore represents a solid.
 	
-	\item[Manifold] \hfill \\
+	Another type if meshes are volumetric meshes which also represent the contained volume in addition to the surface.
+	Volumetric meshes are used \eg in finite element methods for physics simulations.
 	
-	\item[Oriented] \hfill \\
 	
-	\item[Closed/water-tight] \hfill \\
+	\item[Manifold mesh] \hfill \\
+	A mesh is a manifold, if it locally maps to Euclidean space.
+	In case of 3-dimensional meshes, a mesh is a 2-manifold if it can locally be mapped into 2-dimensional Euclidean space (this mapping is called homeomorphism).
+	Speaking strictly of triangle meshes, this restriction becomes concrete.
+	A triangle mesh is a manifold if each edge is incident to only one or two faces and the faces incident to a vertex form an open or closed fan \cite{mesh_basics}.
+	Figure \ref{fig:manifold} shows examples following and violating this requirements.
+	
+	\begin{figure}[h]
+		\centering
+		\begin{subfigure}[b]{0.4\textwidth}
+			\includegraphics[width=\textwidth]{images/closed_fan}
+			\caption{Closed fan, manifold.}
+			\label{fig:closed_fan}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.4\textwidth}
+			\includegraphics[width=\textwidth]{images/open_fan}
+			\caption{Open fan, manifold.}
+			\label{fig:open_fan}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.3\textwidth}
+			\includegraphics[width=\textwidth]{images/non_manifold_edge}
+			\caption{Edge with three incident triangles, non-manifold.}
+			\label{fig:non_manifold_edge}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.3\textwidth}
+			\includegraphics[width=\textwidth]{images/non_manifold_vertex}
+			\caption{Vertex with a triangle fan an one additional triangle, non-manifold.}
+			\label{fig:non_manifold_vertex}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.3\textwidth}
+			\includegraphics[width=\textwidth]{images/t_vertex}
+			\caption{Vertex $E$ directly on edge $EC$. Either degenerate triangle $AEC$ (zero area) or triangle $ABC$ is a quadrilateral with $E$ and should be split along $EB$.}
+			\label{fig:t_vertex}
+		\end{subfigure}
+		\caption{
+			Top left and right shows a closed and opened fan of triangles incident to a vertex.
+			Each edge is connected to only one or two faces.
+			Both triangulations are 2-manifolds.
+			Bottom images show cases three incident triangles to an edge, non-fan triangles connected to a vertex and the T-vertex problem.
+			The bottom triangulations are non-manifolds.
+		}
+		\label{fig:manifold}
+	\end{figure}
+	
+	
+	\item[Orientable mesh] \hfill \\
+	Concerning the orientation of meshes, Shene defines the following terms \cite{mesh_basics}:
+	The orientation of a single face is the cyclic order of its vertices.
+	This order is also called winding order and determines the direction of the surface normal.
+	The orientation of two adjacent faces is said to be compatible if the two shared vertices on the shared edge are in opposite order.
+	A mesh is orientable if it is a manifold and any pair of adjacent faces are compatible.
+	
+	\begin{figure}[h]
+		\centering
+		\begin{subfigure}[b]{0.3\textwidth}
+			\includegraphics[width=\textwidth]{images/orientable}
+			\caption{Orientable mesh.}
+			\label{fig:orientable}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.3\textwidth}
+			\includegraphics[width=\textwidth]{images/not_orientable}
+			\caption{Not orientable mesh.}
+			\label{fig:not_orientable}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.3\textwidth}
+			\includegraphics[width=\textwidth]{images/klein_bottle}
+			\caption{The Klein bottle.}
+			\label{fig:klein_bottle}
+		\end{subfigure}
+		\caption{
+			The left and middle image shows an orientable and not orientable mesh.
+			A mesh is orientable if each pair of adjacent faces has a different vertex order on the shared edge.
+			A famous example of a not orientable mesh is the Klein bottle in the right image, for which one cannot determine a clear inside and outside.
+		}
+		\label{fig:orientable_mesh}
+	\end{figure}
+	
 	
 	\item[Boundary] \hfill \\
+	Edges of a mesh incident to only on face are called boundary edges.
+	Vertices with an open fan of triangles are boundary vertices and connected to two boundary edges.
+	A loop of connected boundary edges and vertices is called a boundary loop.
 	
-	\item[Voronoi] \hfill \\
 	
-	\item[Delaunay] \hfill \\
-	A triangulation is called Delaunay when the circumcircle of each triangle does not contain a vertex of another triangle.
+	\item[Closed/water-tight mesh] \hfill \\
+	If a manifold mesh does not contain any boundary edges, which means that each vertex is part of a closed triangle fan, the mesh is a closed manifold.
+	If a closed mesh is also orientable, it divides space into a half-space inside the mesh and one outside the mesh.
+	The mesh is therefore a solid.
+	The term water-tight is a common alias in CAM, meaning that a surface has no holes where water could enter or exit the solid represented by the mesh.
+	
+	
+	%\item[Voronoi] \hfill \\
+	
+	
+	\item[Delaunay triangulation] \hfill \\
+	Named after the Russian mathematician Boris Delaunay, a 2-dimensional triangulation is called Delaunay when the circumcircle of each triangle does not contain a vertex of another triangle.
+	The Delaunay triangulation is unique for each set of points as long as not more than three vertices lie on a circle (\eg a quad can be triangulated along any of the diagonals to be Delaunay).
+	The concept of 2-dimensional Delaunay triangulations can be extended to 3 dimensions where each triangle of a manifold mesh has an empty circumscribing sphere.
+	Such a triangle is sometimes also referred to as Gabriel 2-Simplex (G2S) \cite{g2s}.
 	Delaunay triangulations produce very regular and visually appealing triangle meshes.
 	
-	\item[Gabriel 2-Simplex] \hfill \\
 	
 	\item[Stock] \hfill \\
 	The stock is the original piece of material which is used as input for a milling machine.
 	Material is removed from the stock using cutters to shape the stock into a desired form.
 	This process is called subtractive manufacturing.
 	In virtual machining, the stock is a solid.
+	
 	
 	\item[Swept volume] \hfill \\
 	In the context virtual machining, a single move of a cutting tool along a path is called a sweep.
@@ -226,12 +337,13 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	\item[Boundary representation (BRep)] \hfill \\
 	Boundary representations, according to Tukora, are the most wide-spread representations used in modern CAD systems.
 	As the term suggests, BReps describe a solid by specifying its boundary surface.
-	This surface typically consists of faces (bounded surfaces), edges between those faces (bounded curves) and vertices (\ie points in 3-dimensional space) as well as their topology.
+	This surface typically consists of faces (bounded surfaces), edges between those faces (bounded curves) and vertices (3-dimensional points) as well as their topology.
+	BReps are therefore closed meshes.
 	Faces can be specified using a variety of mathematical models from complex splines (BSpline, NURB) to simple polygons like triangles.
 	Figure \ref{fig:brep} shows an example of a BRep which represents a machining part using triangles as faces.
 	%
 	In the field of virtual machining, the faces of BReps are typically polygons which are connected by straight edges (\ie polyhedrons).
-	The most common case are triangle meshes, although quad meshes are also popular in CAD.
+	The most common case are triangle meshes, although quadrilateral meshes are also popular in CAD.
 	%
 	Boolean operations like subtraction are hard to perform on arbitrary BReps.
 	When considering only triangulated surfaces, the undertaking becomes doable, but still remains calculatively expensive and usually suffers from numerics.
@@ -267,9 +379,3 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	Several CAD kernels also use FReps internally to retain precision until the final result is exported where it is typically converted into a \eg a BRep.
 	
 \end{description}
-
-
-\section{Surface reconstruction}
-\label{sec:surface_reconstruction}
-
-where is surface reconstruction used?
