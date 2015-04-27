@@ -7,11 +7,13 @@
 The following is a list of definitions of common terms used in 3-D graphics, topology (branch of mathematics), CAD and CAM. The definitions are based on the lecture material provided by Shene \cite{mesh_basics} and Floater \cite{mesh_lecture10}.
 
 \begin{description}
+	
 	\item[Solid] \hfill \\
 	A solid is a object in 3-dimensional Euclidean space with a closed surface, separating the space into two half-spaces.
 	One is inside the solid (the volume of the solid) and the other outside.
 	From a physical perspective, a solid is rigid and cannot be deformed (as opposed to \eg liquids).
 	Examples of solids are cubes, pyramids, a flowerpot or your desk.
+	
 	
 	\item[Triangulation/Tessellation] \hfill \\
 	Although several representations exist to describe solids (\cf section \ref{sec:surface_representations}), triangle meshes are often the preferred one when exporting or distributing a solid.
@@ -19,10 +21,10 @@ The following is a list of definitions of common terms used in 3-D graphics, top
 	A common scenario in CAD for example is to export a model described using a CSG tree or dexel image as a triangle mesh.
 	
 	
-	\item[Chord error] \hfill \\
-	Tessellation is usually subject to a defined resolution.
-	Some solids such as spheres cannot be represented accurately by triangles.
-	The difference between the exact surface and the triangle approximation is called chord error.
+	%\item[Chord error] \hfill \\
+	%Tessellation is usually subject to a defined resolution.
+	%Some solids such as spheres cannot be represented accurately by triangles.
+	%The difference between the exact surface and the triangle approximation is called chord error.
 	
 	
 	\item[Mesh] \hfill \\
@@ -46,31 +48,32 @@ The following is a list of definitions of common terms used in 3-D graphics, top
 	A triangle mesh is a manifold if each edge is incident to only one or two faces and the faces incident to a vertex form an open or closed fan \cite{mesh_basics}.
 	Figure \ref{fig:manifold} shows examples following and violating this requirements.
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
-		\begin{subfigure}[b]{0.4\textwidth}
+		\begin{subfigure}[b]{0.3\textwidth}
 			\includegraphics[width=\textwidth]{images/closed_fan}
 			\caption{Closed fan, manifold.}
 			\label{fig:closed_fan}
 		\end{subfigure}
-		\begin{subfigure}[b]{0.4\textwidth}
+		\begin{subfigure}[b]{0.3\textwidth}
 			\includegraphics[width=\textwidth]{images/open_fan}
 			\caption{Open fan, manifold.}
 			\label{fig:open_fan}
 		\end{subfigure}
-		\begin{subfigure}[b]{0.3\textwidth}
+		\\
+		\begin{subfigure}[t]{0.32\textwidth}
 			\includegraphics[width=\textwidth]{images/non_manifold_edge}
 			\caption{Edge with three incident triangles, non-manifold.}
 			\label{fig:non_manifold_edge}
 		\end{subfigure}
-		\begin{subfigure}[b]{0.3\textwidth}
+		\begin{subfigure}[t]{0.32\textwidth}
 			\includegraphics[width=\textwidth]{images/non_manifold_vertex}
 			\caption{Vertex with a triangle fan an one additional triangle, non-manifold.}
 			\label{fig:non_manifold_vertex}
 		\end{subfigure}
-		\begin{subfigure}[b]{0.3\textwidth}
+		\begin{subfigure}[t]{0.32\textwidth}
 			\includegraphics[width=\textwidth]{images/t_vertex}
-			\caption{Vertex $E$ directly on edge $EC$. Either degenerate triangle $AEC$ (zero area) or triangle $ABC$ is a quadrilateral with $E$ and should be split along $EB$.}
+			\caption{Vertex $E$ lies directly on edge $EC$. There is either a degenerate triangle $AEC$ (zero area) or triangle $ABC$ should be a quadrilateral with $E$ and should be split along $EB$.}
 			\label{fig:t_vertex}
 		\end{subfigure}
 		\caption{
@@ -91,7 +94,7 @@ The following is a list of definitions of common terms used in 3-D graphics, top
 	The orientation of two adjacent faces is said to be compatible if the two shared vertices on the shared edge are in opposite order.
 	A mesh is orientable if it is a manifold and any pair of adjacent faces are compatible.
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
 		\begin{subfigure}[b]{0.3\textwidth}
 			\includegraphics[width=\textwidth]{images/orientable}
@@ -138,8 +141,19 @@ The following is a list of definitions of common terms used in 3-D graphics, top
 	The Delaunay triangulation is unique for each set of points as long as not more than three vertices lie on a circle (\eg a quad can be triangulated along any of the diagonals to be Delaunay).
 	The concept of 2-dimensional Delaunay triangulations can be extended to 3 dimensions where each triangle of a manifold mesh has an empty circumscribing sphere.
 	Such a triangle is sometimes also referred to as Gabriel 2-Simplex (G2S) \cite{g2s}.
-	Delaunay triangulations produce very regular and visually appealing triangle meshes.
+	Delaunay triangulations produce very regular and visually appealing triangle meshes as triangles with larger interior angles are preferred.
 	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\textwidth]{images/delaunay_triangulation}
+		\caption{
+			Three different triangulations for the same set of points.
+			Only the left one is a conforming Delaunay triangulation.
+			Image by Kreveld and Loffler \cite{delaunay_image}.
+		}
+		\label{fig:delaunay_triangulation}
+	\end{figure}
+		
 	
 	\item[Stock] \hfill \\
 	The stock is the original piece of material which is used as input for a milling machine.
@@ -172,7 +186,7 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	Vectors with positive lengths mark areas where too less material has removed and vice versa.
 	The vector lengths are finally used to color the final workpiece where the color indicates the severity of the machining error. 
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{images/vector_clipping}
 		\caption{
@@ -201,7 +215,7 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	However, z-map representations have a fundamental drawback.
 	As each depth value can only store the distance to a single surface points, z-maps cannot represent solids with a back-face or covered surfaces.
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
 		\begin{subfigure}[b]{0.4\textwidth}
 			\includegraphics[width=\textwidth]{images/zmap}
@@ -240,9 +254,9 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	The more parallel the surface is to the grid, the smaller becomes the distance between two neighboring entry/exit points on the surface.
 	In case the surface is perpendicular to the grid, the dexels lie parallel to the surface and do not capture any intersections.
 		
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{images/dexels}
+		\includegraphics[width=0.8\textwidth]{images/dexels}
 		\caption{
 			Dexel image for a half sphere with a smaller, concentric half sphere drilled out.
 			Image adapted from Tukora \cite{virtual_machining_review}.
@@ -259,9 +273,9 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	This case of multi-dexel image is also referred to as triple- or tri-dexel image.
 	Figure \ref{fig:tri_dexel_image} shows a triple-dexel representation of an octant of a centered unit sphere.
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{images/tridexels}
+		\includegraphics[width=0.8\textwidth]{images/tridexels}
 		\caption{
 			Tri-dexel images of an octant of a centered unit sphere.
 			The left, blue image shows dexels along the x-axis, the centered, red image along the z-axis and the right, green image along the y-axis.
@@ -286,9 +300,9 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	CSG trees can also be rendered directly using OpenGL or DirectX by making use of the GPU's depth and stencil buffers.
 	Well known algorithm's in this area include Goldfeather's algorithm \cite{goldfeather} and Nigel's Sequenced Convex Subtraction (SCS) algorithm \cite{scs}.
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{images/csg_tree}
+		\includegraphics[width=0.8\textwidth]{images/csg_tree}
 		\caption{
 			A solid object modeled using CSG.
 			The final shape of the object at the top is the result of combining the primitives at the bottom using boolean operations.
@@ -306,31 +320,45 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	Uniform spacial decomposition (USD) divides space into equally sized cells.
 	An example would be a regular grid with cubic cells.
 	This special case is known as voxel model, where a voxel (abbreviated from volume element) is a single cell of the regular grid.
-	Figure \ref{fig:spacial_decomposition}(b) shows a voxel model of a simple solid.
+	Figure \ref{fig:spatial_decomposition_usd} shows a voxel model of a simple solid.
 	
 	USDs are simple to create and implement as they only require a three dimensional grid which stores for every cell whether it is occupied or not.
 	Boolean operations are also easily solved, as two uniform grids can be combined on a per cell basis similar to z-maps.
 	However, USDs are highly memory demanding to achieve a sufficient resolution to accurately represent a solid.
 	Furthermore, a high resolution may only be needed in certain regions of the solid (\ie features).
 	
-	Hierarchical spacial decomposition (HSD) overcomes some shortcomings of USDs.
+	Hierarchical spacial decomposition (HSD) overcomes the shortcomings of USDs.
 	HSDs partition space in an adaptive way and increase their resolution only where detail is necessary.
 	Therefore, HSDs usually require less memory at the cost of increased complexity.
-	Figure \ref{fig:spacial_decomposition}(c) shows an example of a solid represented by a hierarchically decomposed space.
+	Figure \ref{fig:spatial_decomposition_hsd} shows an example of a solid represented by a hierarchically decomposed space.
 	
 	A common representative of HSDs are octrees.
 	An octree on its highest level is a cube which is then recursively subdivided into eight half-sized cubes (\aka octants).
 	This subdivision is only done, where a finer decomposition of space is necessary.
 	Further examples of hierarchical decompositions are Binary Space Partitioning (BSP) and Bounding Volume Hierarchies (BVH).
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{images/spacial_decomposition}
+		\begin{subfigure}[b]{0.2\textwidth}
+			\includegraphics[width=\textwidth]{images/spatial_decomposition_solid}
+			\caption{Solid}
+			\label{fig:spatial_decomposition_solid}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.2\textwidth}
+			\includegraphics[width=\textwidth]{images/spatial_decomposition_usd}
+			\caption{USD}
+			\label{fig:spatial_decomposition_usd}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.2\textwidth}
+			\includegraphics[width=\textwidth]{images/spatial_decomposition_hsd}
+			\caption{HSD}
+			\label{fig:spatial_decomposition_hsd}
+		\end{subfigure}
 		\caption{
 			The solid on the left side can be described using spacial decomposition in either a uniform manner (middle image) or a hierarchical manner (right image).
 			Image by Tukora \cite{virtual_machining_review}. 
 		}
-		\label{fig:spacial_decomposition}
+		\label{fig:spatial_decomposition}
 	\end{figure}
 	
 
@@ -349,9 +377,9 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 	When considering only triangulated surfaces, the undertaking becomes doable, but still remains calculatively expensive and usually suffers from numerics.
 	Boolean operations on triangulated BReps are typically available in modern CAD kernels.
 	
-	\begin{figure}[h]
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{images/brep}
+		\includegraphics[width=0.8\textwidth]{images/brep}
 		\caption{
 			A boundary representation describes a machining part be specifying its boundary surface. A popular surface representation is a set of connected triangles. 
 			Image by Tukora \cite{virtual_machining_review}. 
