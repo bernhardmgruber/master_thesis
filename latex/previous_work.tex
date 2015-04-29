@@ -65,53 +65,111 @@ A triangle is therefore potentially referenced from multiple cells.
 When the mapping is complete, the affected cells are classified into one of three categories with respect to the newly added mesh.
 Cells which are occupied by triangles of the mesh's surface are surface cells.
 Cells inside and outside the mesh are inside and outside cells and contain no triangles.
-The sketch in Figure \ref{fig:classification_before} illustrates the classification of a single solid inside the grid (\ie stock).
+The sketches in figure \ref{fig:classification_before} and \ref{fig:classification_sv} illustrate the classification of a single solid inside the grid (\ie stock) as well as a swept volume before it is merged.
 
 \begin{figure}[h]
 	\centering
-	\begin{subfigure}[b]{0.4\textwidth}
-		\includegraphics[width=\textwidth]{images/classification_before}
-		\caption{Classification of the regular grid after a stock volume has been added.}
-		\label{fig:classification_before}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
-		\includegraphics[width=\textwidth]{images/classification_after}
-		\caption{Classification of the regular grid after a swept volume has been added to the stock.}
-		\label{fig:classification_after}
-	\end{subfigure}
+	\begin{tabular}{ccc}
+		\begin{subfigure}[t]{0.3\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/classification_before}
+			\caption{Classification of the regular grid with stock before a swept volume has been added.}
+			\label{fig:classification_before}
+		\end{subfigure}&
+		\begin{subfigure}[t]{0.3\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/classification_sv}
+			\caption{Classification of the regular grid with regard to the swept volume about to add.}
+			\label{fig:classification_sv}
+		\end{subfigure}&
+		\multirow{2}{*}{
+			\begin{subfigure}[c]{0.1\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{images/classification_legend}
+				\label{fig:classification_legend}
+			\end{subfigure}
+		}\\
+		\begin{subfigure}[t]{0.3\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/classification_after}
+			\caption{Classification of the regular grid after a swept volume has been added to the stock.}
+			\label{fig:classification_after}
+		\end{subfigure}&
+		\begin{subfigure}[t]{0.3\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/classification_after_removal}
+			\caption{After merging classifications is complete triangles inside outside cells can be removed.}
+			\label{fig:classification_after_removal}
+		\end{subfigure}&\\
+	\end{tabular}
 	\caption{Principle of classifying cells of a grid according to the added mesh. Only surface cells are relevant for ray casting. The sketch on the left side shows the classified stock solid. On the right side the classification result after adding a swept volume is shown.}
 	\label{fig:classification}
 \end{figure}
 
-When a new mesh is added to the grid, the mesh is again classified and merged into the existing cell classification. Limiting the modifiability of the scene by only allowing the addition of subtraction volumes simplifies the rules for merging a new mesh into the grid as shown in Table \ref{tbl:classification_rules}.
+When a new swept volume is added to the grid, its triangle mesh is classified itself and merged into the existing cell classification of the grid.
+By limiting the modifiability of the scene to only allowing subtraction volumes, a set of rules for merging a new mesh's classification into the grid's one can be derived and is shown in table \ref{tbl:classification_rules}.
 
 \begin{table}[h]
 	\centering
-	\begin{tabular}{|c|c|c|c|c|}
-		\hline
-		\multicolumn{2}{|c|}{\multirow{2}{*}{merge}} & \multicolumn{3}{c|}{Cell class of subtraction volume} \\
-		\cline{3-5}
-		\multicolumn{2}{|c|}{} & outside & surface & inside \\
-		\hline
-		\multirow{3}{*}{Cell class before} & outside & outside & outside & outside \\
-		\cline{2-5}
-		& surface & surface & surface & outside \\
-		\cline{2-5}
-		& inside & inside & surface & outside \\
-		\hline
+	\begin{tabular}{p{2cm}p{2cm}|p{2cm}p{2cm}p{2cm}}
+		&         & \multicolumn{3}{l}{Classification of subtraction volume} \\
+		&         & outside           & surface           & inside            \\ \hline
+		\multirow{3}{*}{\parbox{2cm}{Grid \\ classification \\ before}} & outside & outside           & outside           & outside           \\
+		& surface & surface           & surface           & outside           \\
+		& inside  & inside            & surface           & outside          
 	\end{tabular}
-	\caption{Table of different merge scenarios and their outcome.}
+	\caption{
+		Table containing the classification rules when a new subtraction volume is added to the grid.
+		On the left is the classification of a grid cell before the new volume has been added.
+		On the top is the classification of a grid cell with regard to the new volume.
+		The center of the table shows the outcome when these two classifications are merged.
+	}
 	\label{tbl:classification_rules}
 \end{table}
 
-Cells which are outside the added subtraction volume remain unchanged. Surface cells of the added volume become surface cells except they where outside cells before, and cells inside a subtraction volume always become outside cells, as they lie outside the resulting geometry. The result of merging a subtraction volume into the grid is visualized in the right sketch in Figure \ref{fig:classification}.
+When the subtraction volume about to add has been classified, it is merged into the grid's classification as follows:
+Grid cells which are outside the added subtraction volume remain unchanged.
+Surface cells of the added volume become surface cells except they where outside cells before.
+Cells inside a subtraction volume always become outside cells, as they are "cut away" by the subtraction volume.
+The result of merging a subtraction volume into the grid is visualized in figure \ref{fig:classification_after}.
+After classification is complete, all triangles in outside cells can be removed (\cf figure \ref{fig:classification_after_removal}).
 
-As we can see, cells which where surface cells before and contained triangles have now changed to outside cells and are therefore no longer relevant for ray casting. As a result, the increase of triangles in the surface cells by adding new volumes has been compensated by exclusion of some surface cells. This reduction of potential triangles for intersection with an increasing number of subtraction volumes is vital, as it enables scalability, allowing even scenes with thousands of subtraction volumes to be ray casted efficiently. In fact, some scenes can even be casted faster with an increasing number of subtraction volumes as the number of relevant surface cells and therefore triangles decreases.
+This strategy allows to keep the total number of triangles under control as the system should be able to support a large number of swept volumes (theoretically infinite if triangles are regularly eliminated).
+%
+However, this kind of reduction has a significant consequence.
+As the content of outside cells is simply deleted, the stored geometries are no longer closed meshes.
+Surface points can still be calculated as shown by the example of the raycast used for visualization in section \ref{sec:raycasting}.
 
-However, this kind of reduction has a significant consequence on the ray casting algorithm. As subtraction volumes are divided into grid cells and some of them discarded, the volumes are no longer water-tight. This is a problem for entry/exit counting ray casting algorithms such as the one discussed in chapter \ref{sec:boolean_raycasting}. Therefore, an adapted version of this algorithm has to be developed, capable of handling open volumes. Chapter \ref{sec:adapted_ray_casting} discusses a method of getting around this problem.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/cylinders_classification_before}
+		\caption{
+			Before classification and triangle elimination.
+		}
+		\label{fig:cylinders_classification_before}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/cylinders_classification_after}
+		\caption{
+			After classification and triangle elimination.
+		}
+		\label{fig:cylinders_classification_after}
+	\end{subfigure}
+	\caption{
+		Scene of a cylindrical stock with a smaller cylindrical subtraction volume.
+	}
+	\label{fig:cylinders_classification}
+\end{figure}
+
 
 \subsection{Visualization by raycasting}
 \label{sec:raycasting}
+
+The VML's regular grid with its open geometries resulting from classification can be visualized using a adapted raycasting approach.
+
 
 cell traversal using 3D DDA
 inside counting (secondary rays, etc.)
@@ -119,12 +177,50 @@ determining surface
 
 optimization by packet casting
 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.44\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/raycast_grid}
+		\caption{
+			Concept.
+		}
+		\label{fig:raycast_grid}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.44\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/raycast_inside_counter}
+		\caption{
+			Implementation.
+		}
+		\label{fig:raycast_inside_counter}
+	\end{subfigure}
+	\caption{
+		Interiors of the ray casting implementation.
+		Upon cell entry, the inside counter is determined.
+		Firstly, all intersections of the ray with structures inside the cell are calculated.
+		The primary ray hits the structures sub 0 and sub 2.
+		The surface normal of the nearest hit point with sub 2 points into a different half space than the ray direction.
+		Therefore, the ray is outside sub 2 upon entry.
+		The normal of the nearest hit point with sub 0 points into the same half space than the ray direction.
+		Thus, the ray is inside sub 0 at the entry point.
+		As the primary ray does not hit sub 1, a secondary ray is sent to a reference point on a triangle of sub 1.
+		As the normal of sub 1 points into a different half space than the secondary ray, the ray is outside sub 1.
+		Consequently, as the ray is only inside one structure (sub 0), the inside counter is initialized with -1.
+		Then, all previously calculated intersections of the primary ray are ordered ascendingly by distance to the cell entry point and iterated over.
+		At each intersection point, the surface normal is again compared with the ray direction.
+		If they point into the same half space the structure is exited, otherwise entered.
+		Entries decrease the inside counter and are marked with a yellow dot.
+		Exists increase the inside counter and are marked with a blue dot.
+		When the counter reaches zero, the surface point has been found.
+	}
+	\label{fig:raycast}
+\end{figure}
+
+
 
 %TODO
-
-
-A vital requirement of such systems is to support a large number of fine triangulated meshes (up to hundreds of millions of triangles) to deliver simulations of appropriate quality.
-Therefore, well-conceived space partitioning and triangle elimination strategies have been developed to deal with this amount of input.
 
 As a result the simulated model is described implicitly via subtraction of only subsets of the input triangles (volumes are no longer closed/water-tight).
 
