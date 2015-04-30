@@ -107,19 +107,19 @@ The sketches in figure \ref{fig:classification_before} and \ref{fig:classificati
 \end{figure}
 
 When a new swept volume is added to the grid, its triangle mesh is classified itself and merged into the existing cell classification of the grid.
-By limiting the modifiability of the scene to only allowing subtraction volumes, a set of rules for merging a new mesh's classification into the grid's one can be derived and is shown in table \ref{tbl:classification_rules}.
+By limiting the modifiability of the scene to only allow subtracting swept volumes, a set of rules for merging a new mesh's classification into the grid's one can be derived and is shown in table \ref{tbl:classification_rules}.
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{p{2cm}p{2cm}|p{2cm}p{2cm}p{2cm}}
-		&         & \multicolumn{3}{l}{Classification of subtraction volume} \\
+		&         & \multicolumn{3}{l}{Classification of swept volume} \\
 		&         & outside           & surface           & inside            \\ \hline
 		\multirow{3}{*}{\parbox{2cm}{Grid \\ classification \\ before}} & outside & outside           & outside           & outside           \\
 		& surface & surface           & surface           & outside           \\
 		& inside  & inside            & surface           & outside          
 	\end{tabular}
 	\caption{
-		Table containing the classification rules when a new subtraction volume is added to the grid.
+		Table containing the classification rules when a new swept volume is added to the grid.
 		On the left is the classification of a grid cell before the new volume has been added.
 		On the top is the classification of a grid cell with regard to the new volume.
 		The center of the table shows the outcome when these two classifications are merged.
@@ -127,11 +127,11 @@ By limiting the modifiability of the scene to only allowing subtraction volumes,
 	\label{tbl:classification_rules}
 \end{table}
 
-When the subtraction volume about to add has been classified, it is merged into the grid's classification as follows:
-Grid cells which are outside the added subtraction volume remain unchanged.
+When the swept volume about to add has been classified, it is merged into the grid's classification as follows:
+Grid cells which are outside the added swept volume remain unchanged.
 Surface cells of the added volume become surface cells except they where outside cells before.
-Cells inside a subtraction volume always become outside cells, as they are "cut away" by the subtraction volume.
-The result of merging a subtraction volume into the grid is visualized in figure \ref{fig:classification_after}.
+Cells inside a swept volume always become outside cells, as they are "cut away" by the swept volume.
+The result of merging a swept volume into the grid is visualized in figure \ref{fig:classification_after}.
 After classification is complete, all triangles in outside cells can be removed (\cf figure \ref{fig:classification_after_removal}).
 
 This strategy allows to keep the total number of triangles under control as the system should be able to support a large number of swept volumes (theoretically infinite if triangles are regularly eliminated).
@@ -159,7 +159,7 @@ Surface points can still be calculated as shown by the example of the raycast us
 		\label{fig:cylinders_classification_after}
 	\end{subfigure}
 	\caption{
-		Scene of a cylindrical stock with a smaller cylindrical subtraction volume.
+		Scene of a cylindrical stock with a smaller cylindrical swept volume.
 	}
 	\label{fig:cylinders_classification}
 \end{figure}
@@ -168,22 +168,75 @@ Surface points can still be calculated as shown by the example of the raycast us
 \subsection{Visualization by raycasting}
 \label{sec:raycasting}
 
-The VML's regular grid with its open geometries resulting from classification can be visualized using a adapted raycasting approach.
+The VML's regular grid with its open geometries resulting from classification can be visualized using an adapted raycasting approach.
+For this purpose a virtual camera is placed relative to the regular grid.
+The camera's position and orientation describes an image plane (rectangle) in front of the camera which will correspond to the final generated image.
+Originating from the camera's position a ray is then sent through each pixel of the image plane and sent into the scene.
+If an intersection occurs, the pixel through which the ray has been sent is colored according to properties of the intersected surface (color, normal, material \etc).
+Figure \ref{fig:raycasting_principle} shows the basic principle of raycasting inside the VML.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{raycasting}
+	\caption{
+		Principle of ray casting.
+		A ray is sent from an eye point (\ie camera position) through each pixel of an image plane and traversed through the scene.
+		If an intersection occurs, the pixel is colored according to the intersected surface (\protect\eg color of the surface, lighting using surface normal, \protect\etc).
+		%TODO source
+	}
+	\label{fig:raycasting_principle}
+\end{figure}
 
-cell traversal using 3D DDA
-inside counting (secondary rays, etc.)
-determining surface
+When the rays hit the regular grid, they have to be traversed through the grid's cells.
+A fast algorithm for traversing regular grids using a single ray is given by Amanatides and Woo \cite{3DDDA}.
+Their algorithm is a slight modification of the digital differential analyzer (DDA) which is used for the rasterization of lines.
+Figure \ref{fig:cell_traverser} shows a sketch of a single ray traversed cell by cell through the grid.
+%
+As neighboring rays typically take the same or a similar path through the grid, grouping rays into ray packets is a good optimization.
+This approach has been described extensively by Wald \etal \cite{packet_caster} and has been implemented for the VML using CPU SIMD vector extensions (SSE and AVX) \cite{enlight}.
+Figure \ref{fig:slice_traverser} shows a sketch of a ray packet traversed slice by slice through the grid.
 
-optimization by packet casting
+\begin{figure}
+	\centering
+	\begin{subfigure}[t]{0.44\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/cell_traverser}
+		\caption{
+			Traversing a single ray.
+		}
+		\label{fig:cell_traverser}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.44\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/slice_traverser}
+		\caption{
+			Traversing a ray packet.
+		}
+		\label{fig:slice_traverser}
+	\end{subfigure}
+	\caption{
+		Traversing a regular grid with a single ray (left image) and a ray packet (right image).
+	}
+	\label{fig:traverser}
+\end{figure}
 
-\begin{figure}[H]
+Cells classified as outside or inside are empty (\ie contain no triangles), but each surface cell contains triangles which can potentially intersect the ray.
+A surface cell also typically contains parts (meshes) of multiple swept volumes which are called structures in the context of a cell.
+Upon entry into a surface cell, it has to be determined inside how many structures (swept volumes) the ray is.
+This number is called the inside counter.
+The stock volume is handled specially during the raycast as it is inverted and turned into a swept volume itself to allow uniform handling.
+After the inside counter has been determined, all intersections of the ray with structures inside the cell are iterated from the nearest to the farthest.
+During this iterating the inside counter is modified on each structure entry or exit to constantly reflect the number of structures the ray is currently inside.
+If the counter becomes 0, the surface has been reached and a hit is reported with data from the hit triangle which is later used to color the final image of the scene.
+Figure \ref{fig:raycast} shows a detailed example of such an intersection procedure and explains the algorithmic steps to retrieve the surface hit.
+
+\begin{figure}
 	\centering
 	\begin{subfigure}[t]{0.44\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/raycast_grid}
 		\caption{
-			Concept.
+			Conceptual raycast.
 		}
 		\label{fig:raycast_grid}
 	\end{subfigure}
@@ -192,7 +245,7 @@ optimization by packet casting
 		\centering
 		\includegraphics[width=\textwidth]{images/raycast_inside_counter}
 		\caption{
-			Implementation.
+			Implementation of raycast.
 		}
 		\label{fig:raycast_inside_counter}
 	\end{subfigure}
@@ -217,19 +270,4 @@ optimization by packet casting
 	}
 	\label{fig:raycast}
 \end{figure}
-
-
-
-%TODO
-
-As a result the simulated model is described implicitly via subtraction of only subsets of the input triangles (volumes are no longer closed/water-tight).
-
-For visualization, this implicit model is sampled using an adapted ray casting approach \cite{enlight}.
-By applying a small set of rules, the surface can be recovered to retrieve an image of the model.
-Enlight's data model is described in detail in the author's bachelor thesis \cite{bachelor}.
-
-Simulation and visualization of material removal processes such as in Enlight are vital for verifying the correctness of a machining process.
-However, there exist numerous scenarios where an explicit surface model of the final product is required.
-Many of these situations occur in CAE such as stress, thermal and safety analyses as well as structural optimizations using finite element methods.
-Due to the importance for CAE for assuring quality in modern production processes it is highly desired to be able to retrieve an explicit surface mesh of the implicitly described model of Enlight.
 
