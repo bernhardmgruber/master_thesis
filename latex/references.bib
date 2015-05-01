@@ -128,7 +128,7 @@
 	year = {2015},
 }
 
-@book{surface_reconstruction,
+@book{sdf_surface_reconstruction,
 	title={Surface reconstruction from unorganized points},
 	author={Hoppe, Hugues and DeRose, Tony and Duchamp, Tom and McDonald, John and Stuetzle, Werner},
 	volume={26},
@@ -138,7 +138,7 @@
 	annotation={Demonstrates an algorithm for creating a triangulation approximating a given point cloud, where each point is near or on the surface. The algorithm does not need normal vectors for each point as it takes them from interpolated tangent planes. The surface is described as a signed distance function, estimating the distance of each sample point to the actual surface. This function is then sampled again by a marching cubes variant which emits the triangles of the surface. }
 }
 
-@inproceedings{vornoi_surface_reconstruction,
+@inproceedings{crust,
 	title={A new Voronoi-based surface reconstruction algorithm},
 	author={Amenta, Nina and Bern, Marshall and Kamvysselis, Manolis},
 	booktitle={Proceedings of the 25th annual conference on Computer graphics and interactive techniques},
@@ -329,4 +329,62 @@
 	pages = {3--10},
 	title = {A fast voxel traversal algorithm for ray tracing},
 	year = {1987}
+}
+
+@inproceedings{dual_contouring,
+	title={Dual contouring of hermite data},
+	author={Ju, Tao and Losasso, Frank and Schaefer, Scott and Warren, Joe},
+	booktitle={ACM Transactions on Graphics (TOG)},
+	volume={21},
+	number={3},
+	pages={339--346},
+	year={2002},
+	organization={ACM}
+}
+
+@article{openvdb,
+	title={VDB: High-resolution sparse volumes with dynamic topology},
+	author={Museth, Ken},
+	journal={ACM Transactions on Graphics (TOG)},
+	volume={32},
+	number={3},
+	pages={27},
+	year={2013},
+	publisher={ACM}
+}
+
+@inproceedings{power_crust,
+	title={The power crust},
+	author={Amenta, Nina and Choi, Sunghee and Kolluri, Ravi Krishna},
+	booktitle={Proceedings of the sixth ACM symposium on Solid modeling and applications},
+	pages={249--266},
+	year={2001},
+	organization={ACM}
+}
+
+@inproceedings{cocone,
+	title={A simple algorithm for homeomorphic surface reconstruction},
+	author={Amenta, Nina and Choi, Sunghee and Dey, Tamal K and Leekha, Naveen},
+	booktitle={Proceedings of the sixteenth annual symposium on Computational geometry},
+	pages={213--222},
+	year={2000},
+	organization={ACM}
+}
+
+@inproceedings{tight_cocone,
+	title={Tight cocone: a water-tight surface reconstructor},
+	author={Dey, Tamal K and Goswami, Samrat},
+	booktitle={Proceedings of the eighth ACM symposium on Solid modeling and applications},
+	pages={127--134},
+	year={2003},
+	organization={ACM}
+}
+
+@inproceedings{robust_cocone,
+	title={Provable surface reconstruction from noisy samples},
+	author={Dey, Tamal K and Goswami, Samrat},
+	booktitle={Proceedings of the twentieth annual symposium on Computational geometry},
+	pages={330--339},
+	year={2004},
+	organization={ACM}
 }
