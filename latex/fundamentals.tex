@@ -245,11 +245,12 @@ Tukora provides a comprehensive overview with sketches and descriptions of the m
 		}
 	\end{figure}
 	
-	
+
 	\item[Dexel images] \hfill \\
 	Dexel based representations have been proposed by Hook to circumvent the shortcomings of depth images \cite{dexel}.
 	Instead of a scalar value per pixel of a regular 2-dimensional grid (z-maps) a complex data element is stored, called a dexel (abbreviated from depth element).
 	A dexel is created by tracing a ray starting at a grid point perpendicular to the grid's plane through the workpiece and collecting all surface intersections.
+	Therefore, a 2-dimensional dexel image is sometimes also referred to as ray-rep (ray representation).
 	Each dexel stores a sorted list of these intersections, where an intersection is also called a dexel node.
 	A node basically contains the depth value of the intersection and can contain further informations such as a surface normal or a color value.
 	Pairs of dexel nodes where the first node has been an entry and the second an exit are called segments and always lie inside the workpiece.
