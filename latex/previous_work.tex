@@ -69,7 +69,7 @@ The sketches in figure \ref{fig:classification_before} and \ref{fig:classificati
 
 \begin{figure}[h]
 	\centering
-	\begin{tabular}{ccc}
+	\begin{tabular}{cc}
 		\begin{subfigure}[t]{0.3\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{images/classification_before}
@@ -81,14 +81,7 @@ The sketches in figure \ref{fig:classification_before} and \ref{fig:classificati
 			\includegraphics[width=\textwidth]{images/classification_sv}
 			\caption{Classification of the regular grid with regard to the swept volume about to add.}
 			\label{fig:classification_sv}
-		\end{subfigure}&
-		\multirow{2}{*}{
-			\begin{subfigure}[c]{0.1\textwidth}
-				\centering
-				\includegraphics[width=\textwidth]{images/classification_legend}
-				\label{fig:classification_legend}
-			\end{subfigure}
-		}\\
+		\end{subfigure}\\
 		\begin{subfigure}[t]{0.3\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{images/classification_after}
@@ -100,8 +93,9 @@ The sketches in figure \ref{fig:classification_before} and \ref{fig:classificati
 			\includegraphics[width=\textwidth]{images/classification_after_removal}
 			\caption{After merging classifications is complete triangles inside outside cells can be removed.}
 			\label{fig:classification_after_removal}
-		\end{subfigure}&\\
+		\end{subfigure}\\
 	\end{tabular}
+	\includegraphics[width=0.1\textwidth]{images/classification_legend}
 	\caption{Principle of classifying cells of a grid according to the added mesh. Only surface cells are relevant for ray casting. The sketch on the left side shows the classified stock solid. On the right side the classification result after adding a swept volume is shown.}
 	\label{fig:classification}
 \end{figure}
