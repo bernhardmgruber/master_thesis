@@ -2,7 +2,7 @@
 \label{ch:introduction}
 
 \section{Motivation and background}
-\label{ch:motivation}
+\label{sec:motivation}
 
 Many applications in different fields of science have to deal with the representation of geometries, their volumes and surfaces.
 As visualization often plays an important role, being able to efficiently render a piece of geometry becomes a decisive factor when choosing an appropriate data structure.
@@ -100,4 +100,12 @@ However, potential for optimizations will be discussed.
 \section{Chapter overview}
 \label{sec:chapter_overview}
 
-\dummytext{3}
+After this introduction, chapter \ref{ch:fundamentals} will continue with a coverage of the most important terms related to solid modeling, meshes and virtual machining as well as a comprehensive list of wide-spread representations used in CAD and CAM.
+
+Chapter \ref{ch:previous_work} will give background information on the VML on which the implementation of this thesis is based on.
+After a bit of history on this project, the VML's data model and a few core algorithms are elaborated to allow the reader a deeper understanding of various design aspects of the presented implementations. These include the VML's regular grid data structure, a triangle elimination strategy called classification and the ray casting subsystem used for visualization.
+
+Chapter \ref{ch:state_of_the_art} continues with literature review of existing algorithms and approaches which could be (partially) used to tackle the problem of surface reconstruction for the VML's data model.
+The presented references include means for direct triangle intersection, surface reconstruction from point clouds, triangulation of dexel based as well as voxel based representations.
+
+\dummytext{2}
