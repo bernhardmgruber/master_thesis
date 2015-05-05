@@ -1,17 +1,17 @@
 \chapter{Previous work}
 \label{ch:previous_work}
 
-As stated in the problem statement in section \ref{sec:problem} the focus of the implementations underlying this thesis is to implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
-To aid the reader in understanding the implementations present in this thesis, a short introduction to the VML and its data model is given.
-Parts of this description have been taken from the authors bachelor thesis where the data model has been previously described with the focus on visualization \cite{bachelor}.
+As written in the problem statement in section \ref{sec:problem} the focus of the implementations underlying this thesis is to implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
+To aid the reader in understanding the implementations presented in this thesis, a short introduction to the VML and its data model is given.
+Parts of this description have been taken from the authors bachelor thesis where the data model has been previously described with a focus on visualization \cite{bachelor}.
 
 \section{Project history}
 \label{sec:project_history}
 
-From mid 2011 until the end of 2013 project Enlight was conducted for research by the RISC Software GmbH in Hagenberg im M\"uhlkreis, Austria.
+From mid 2011 until the end of 2013 project Enlight was conducted for research by the RISC Software GmbH in Hagenberg im Mühlkreis, Austria.
 Enlight's goals were to develop a faster, scalable and numerically stable method for modeling and visualizing subtractive manufacturing.
 Enlight used a regular grid data structure to store a stock solid and add precomputed swept volumes.
-A triangle elimination strategy was employed to keep the total number of triangles held by the grid within manageable bounds.
+A triangle elimination strategy was employed to keep the total number of triangles held by the grid within manageable bounds (\cf classification in section \ref{sec:classification}).
 For visualization a customized ray casting approach was developed \cite{enlight} and accelerated using GPUs and many-core architectures.
 
 From the beginning to the end of 2014, the follow-up research project Engrave focused on solving swept volume computation for arbitrary cutter geometries and tool paths.
@@ -33,7 +33,7 @@ These cutting tools are solid triangle meshes loaded from disk which are moved a
 These swept volumes are then conceptually subtracted from the stock.
 In fact, swept volumes are stored side by side together with the stock and theoretically build up a specialized CSG tree as shown in figure \ref{fig:vml_csg}.
 A separate processing step is required to calculate the exact surface.
-For visualization, the data model is sampled using a raycast which calculates a point on the surface for each ray.
+For visualization, the data model is sampled using a raycast which calculates a point on the surface for each ray (\cf section \ref{sec:raycasting}).
 
 \begin{figure}
 	\centering
@@ -49,7 +49,7 @@ For visualization, the data model is sampled using a raycast which calculates a 
 
 The central data structure inside the VML which holds the current state of the simulation (\ie the workpiece) is a regular 3-dimensional grid.
 This data structure was chosen because, historically, it was directly used as acceleration structure for the raycasting subsystem.
-Although there is a wide variety of acceleration structures available (\eg kd-trees, octrees, binary space partitioning (BSP), bounding volume hierarchies (BVH), \etc), regular grid offer greater simplicity in organization and construction than the others.
+Although there is a wide variety of acceleration structures available (\eg kd-trees, octrees, binary space partitioning (BSP), bounding volume hierarchies (BVH), \etc), regular grids offer greater simplicity in organization and construction than the others.
 This is especially beneficial in cases where those data structures have to be updated regularly.
 Particularly animated scenes in computer-animated films or changing geometries as in virtual machining require frequent rebuilds or updates of those data structures.
 Due to their simplicity and regularity, regular grids provide viable candidates for these scenarios.
@@ -124,7 +124,7 @@ By limiting the modifiability of the scene to only allow subtracting swept volum
 When the swept volume about to add has been classified, it is merged into the grid's classification as follows:
 Grid cells which are outside the added swept volume remain unchanged.
 Surface cells of the added volume become surface cells except they where outside cells before.
-Cells inside a swept volume always become outside cells, as they are "cut away" by the swept volume.
+Cells inside a swept volume always become outside cells, as they are \enquote{cut away} by the swept volume.
 The result of merging a swept volume into the grid is visualized in figure \ref{fig:classification_after}.
 After classification is complete, all triangles in outside cells can be removed (\cf figure \ref{fig:classification_after_removal}).
 
@@ -165,7 +165,7 @@ Surface points can still be calculated as shown by the example of the raycast us
 The VML's regular grid with its open geometries resulting from classification can be visualized using an adapted raycasting approach.
 For this purpose a virtual camera is placed relative to the regular grid.
 The camera's position and orientation describes an image plane (rectangle) in front of the camera which will correspond to the final generated image.
-Originating from the camera's position a ray is then sent through each pixel of the image plane and sent into the scene.
+Originating from the camera's position a ray is then sent through each pixel of the image plane into the scene.
 If an intersection occurs, the pixel through which the ray has been sent is colored according to properties of the intersected surface (color, normal, material \etc).
 Figure \ref{fig:raycasting_principle} shows the basic principle of raycasting inside the VML.
 
@@ -182,7 +182,7 @@ Figure \ref{fig:raycasting_principle} shows the basic principle of raycasting in
 \end{figure}
 
 When the rays hit the regular grid, they have to be traversed through the grid's cells.
-A fast algorithm for traversing regular grids using a single ray is given by Amanatides and Woo \cite{3DDDA}.
+A fast algorithm for traversing regular grids using a single ray is given by Amanatides \etal \cite{3DDDA}.
 Their algorithm is a slight modification of the digital differential analyzer (DDA) which is used for the rasterization of lines.
 Figure \ref{fig:cell_traverser} shows a sketch of a single ray traversed cell by cell through the grid.
 %
@@ -196,7 +196,7 @@ Figure \ref{fig:slice_traverser} shows a sketch of a ray packet traversed slice 
 		\centering
 		\includegraphics[width=\textwidth]{images/cell_traverser}
 		\caption{
-			Traversing a single ray.
+			Traversing a single ray cell by cell.
 		}
 		\label{fig:cell_traverser}
 	\end{subfigure}
@@ -204,7 +204,7 @@ Figure \ref{fig:slice_traverser} shows a sketch of a ray packet traversed slice 
 		\centering
 		\includegraphics[width=\textwidth]{images/slice_traverser}
 		\caption{
-			Traversing a ray packet.
+			Traversing a ray packet slice by slice.
 		}
 		\label{fig:slice_traverser}
 	\end{subfigure}

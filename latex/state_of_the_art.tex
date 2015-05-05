@@ -1,5 +1,5 @@
 
-\chapter{State of the art} %TODO rename to related work?
+\chapter{Related work and state of the art}
 \label{ch:state_of_the_art}
 
 Algorithms for transforming solid representations as well as surface reconstruction algorithms are used in a variety of fields:
@@ -11,42 +11,52 @@ After a survey of existing approaches to surface reconstruction from models simi
 	
 	\item[Direct intersection] \hfill \\
 	Directly intersecting each volume with each other (triangle by triangle) is the most direct and theoretically exact approach of calculating the result of a series of boolean subtractions.
-	A good description of triangle mesh intersections is given by Rosen to smooth the sharp intersection line between two meshes \cite{mesh_intersection} for aesthetics in video games.
+	A good description of triangle mesh intersections is given by Rosen who tried to smooth the sharp intersection line between two meshes for aesthetics in video games \cite{mesh_intersection}.
 	Triangle-triangle intersection is described by Möller \cite{tri_tri_intersection_moller} as well as Tropp \etal \cite{tri_tri_intersection_2}.
-	Each intersected triangle can be split into polygons based on the cut segments from other triangles and retriangulated using the cutting segments as constraints.
+	To build a new surface mesh from two intersecting ones, each intersected triangle can be split into polygons based on the cut segments from other triangles and retriangulated using the cutting segments as constraints.
 	A possible solution for this retriangulation is the constrained Delaunay triangulation (CDT) and was first described by Chew \cite{cdt} and refined by Sloan \cite{cdt_fast}.
 	After retriangulating intersected triangles, all triangles not belonging to the new surface are removed.
-	A very similar approach is described by Gong in his master thesis \cite{cutter_workpiece_engagement}.
+	A very similar approach is described by Gong \cite{cutter_workpiece_engagement}.
 	
 	
 	\item[Point cloud based] \hfill \\
 	Point clouds are data structures where an object is approximated by a set of points with optional normal vectors.
-	These points can be obtained \eg by sampling a solid's surface.
+	These points can be obtained \eg by sampling a solid's surface, either virtually by \eg using a raycast or in reality by scanning an objects surface (\eg laster scans of buildings, sculptures \etc).
 	The VML already uses surface sampling of its data model via its raycast based visualization.
+	%
 	Point clouds can be triangulated using different algorithms:
-	Amenta \etal present the crust and power crust algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees for "good" inputs \cite{crust, power_crust}.
-	Amenta \etal further introduce the cocone algorithm \cite{cocone} with is extended by Dey \etal with tight cocone \cite{tight_cocone} and robust cocone \cite{robust_cocone}.
-	Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface.
-	The contour of this function is then traced by a marching cubes variant to extract an iso surface (triangle mesh) \cite{sdf_surface_reconstruction}.
-	Bernardini \etal describe the BPA (ball-pivoting algorithm) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
-	Based on the BPA, the G2S algorithm (named after the Gabriel 2-simplex criterion) further improved speed and triangle quality by assuming local surface continuity \cite{g2s}.
 	
+	Edelsbrunner \etal present a generalization of the convex hull called $\alpha$-shape \cite{alpha_shape} which constructs a Delaunay triangulation of the surface described by a set of points.
+	The algorithm is subject to a configured $\alpha$ which directly influences the amount of generated holes and the quality of features.
+	
+	Amenta \etal present the crust and power crust algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees (\eg water-tightness) for \enquote{good} inputs \cite{crust, power_crust}.
+	Amenta \etal further introduce the cocone algorithm \cite{cocone} with is extended by Dey \etal with tight cocone and robust cocone \cite{tight_cocone, robust_cocone}.
+	The crust and cocone families where originally designed to reconstruct surfaces from laser scans and can (partially) handle noise on the input data.
+	
+	Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface (functional representation).
+	The contour of this function is then traced by a marching cubes variant to extract an iso surface (triangle mesh) \cite{sdf_surface_reconstruction}.
+	Further algorithms of this class are Poisson \cite{poisson}, Moving least squares (MLS) \cite{mls} and radial basis function (RBF) \cite{rbf}.
+	As all of these approaches are based on fitting an implicit function into the point cloud, they are robust against noisy clouds (\eg from laser scans).
+	
+	Bernardini \etal describe the ball-pivoting algorithm (BPA) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
+	Based on the BPA, the G2S algorithm (named after the Gabriel 2-simplex criterion) further improved speed and triangle quality by assuming local surface continuity \cite{g2s}.
+	The BPA and its derivatives are region-growing based algorithms and typically provide good runtime performance, but may leave holes in the reconstructed mesh (no water-tight solids).
 		
 	\item[Dexel based] \hfill \\
-	Dexel representations are widely used in virtual machining.
+	Dexel representations are widely used in virtual machining as they allow  relatively easy boolean operations.
 	Although the VML's data model stores triangulated manifolds directly, a dexel representation can be easily created based on the existing raycasting system.
 	By casting parallel rays through the VML's regular grid from one side to the other and continuing after a surface intersection, a valid dexel image can be constructed.
 	When this process is done along the three axes of the Cartesian coordinate system, a tri-dexel image is obtained.
-	A feature conserving algorithm for converting such a representation (referred to as tri-dexel volumetric models in the corresponding paper) into polygon meshes is demonstrated by Ren \etal \cite{tridexel_reconstruction}.
+	A feature conserving algorithm for converting tri-dexel representations into polygon meshes is demonstrated by Ren \etal \cite{tridexel_reconstruction} and guarantees water-tightness.
 	
 	
 	\item[Voxel based] \hfill \\
 	As Enlight already uses a regular grid data structure to organize triangles and classify the grid's voxel as inside, outside and surface, algorithms can be used which can directly operate on these cells/voxels.
 	Although the sole utilization of the cell's classification leaves a lot of information untouched, reconstructing a surface along the surface cells would be a fast way of obtaining a coarse triangle mesh of the stored workpiece.
-	By using additional information inside each cell and on each grid point, well known algorithms like marching cubes can be used to retrieve a triangle mesh.
+	By using additional information inside each cell and on each grid point, well known algorithms like marching cubes (MC) can be used to retrieve a triangle mesh.
 	Kobbelt \etal propose a post-processing step to the marching cubes algorithm to extract/preserve features of the represented surface by making use of triangles, points and implicit functions inside each voxel to construct a scalar distance field sampled at each grid point \cite{extended_marching_cubes}.
-	DreamWorks Animation's OpenVDB library uses a similar approach for reconstructing triangle surfaces from large, sparse point clouds organized in octrees with fixed depth \cite{openvdb}.
 	This algorithm is sometimes also referred to as extended marching cubes.
+	DreamWorks Animation's OpenVDB library uses a similar approach for reconstructing triangle surfaces from large, sparse point clouds organized in octrees with fixed depth \cite{openvdb}.
 	The accuracy of this variant can even be further improved using dual contouring as described by Ju \etal \cite{dual_contouring}.
 
 \end{description}

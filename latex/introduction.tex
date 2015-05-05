@@ -11,25 +11,27 @@ Furthermore, many scientific applications in fields like structural engineering,
 Additionally, triangle meshes are well established means to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
 
 
-However, despite their great suitability and acceptance, triangle-based representations also have their drawbacks and a numerous amount of problems can be addressed better using different methods and representations (\eg CSG trees, dexel images or functional representations).
+However, despite their great suitability and acceptance, triangle-based representations also have their drawbacks and a numerous amount of problems can be addressed better using different representations. %(\eg CSG trees, dexel images or functional representations).
 In many of these situations efficient rendering is only a secondary requirement.
 Implicit models like functional and parametric surfaces shine in mathematical exactness, expressiveness and memory requirements.
 A sphere for example is easily expressed as an equation with radius and center as parameters, describing an exact surface.
 Triangle meshes are in most cases only approximations of such shapes and require an appropriate resolution (\ie triangle count) to achieve the desired visual quality.
-Exactness is vital in fields like CAD (computer-aided design) and CAM (computer-aided manufacturing).
 %
 Some kinds of problems may also benefit greatly in runtime when solved for implicit models.
 Questions like whether a point is inside a volume or if two volumes intersect can be more easily answered on a few mathematically defined shapes than on a large set of triangles.
 Applications range from ray tracing photo realistic images to collision detection in physics engines or milling machines.
+Boolean set operations are much easier calculated on representations like z-maps and dexel images.
+These are heavily used in virtual machining to simulate material removal (\eg milling) or addition (\eg 3-dimensional printing).
 %
 Sometimes representations other than triangle meshes are easier to create.
 An example would be CSG (constructive solid geometry) where a complex shape is constructed using set operations like union, intersection or subtraction on simple primitives (e.g. cubes, cylinders or spheres).
 The resulting model is described using a tree where each node is an operator and each leaf a primitive.
-CSG is supported by a wide range of modeling tools and CAD kernels.
-Another example are dexel images common in material removal scenarios like sculpturing and milling.
+CSG is supported by a wide range of modeling tools and CAD (computer-aided design) kernels.
+Another example are dexel images when used for material removal in sculpturing.
 %
 Finally, some surface descriptions are just inherently non-explicit (\eg described procedurally).
-Simulating material removal processes in CAM for example is often described as the subtraction of swept volumes (volumes swept by a cutting tool which are themselves described as the cutter's geometry moved along a specified path) from an initial volume.
+Simulating milling processes in CAM (computer-aided manufacturing) for example is often described as the subtraction of swept volumes from an initial volume.
+Swept volumes are volumes swept by a cutting tool which are themselves described as the cutter's geometry moved along a specified path.
 The final workpiece can be seen as subtraction of all swept volumes from the initial volume.
 
 
@@ -45,7 +47,7 @@ In CAE (computer-aided engineering) for example, after simulating the milling of
 
 \section{Previous work}
 
-Due to the broad field of surface representations and the authors previous experiences, this thesis will narrow its focus on models used in subtractive manufacturing simulations and focus solely on the transformation of these models into explicit triangle representations (triangle surface reconstruction).
+Due to the broad field of surface representations and the authors previous experience, this thesis will narrow its focus on models used in subtractive manufacturing simulations and focus solely on the transformation of these models into explicit triangle representations (triangle surface reconstruction).
 During the authors work at the RISC Software GmbH a visualization and solid modeling software has been developed during two research projects, Enlight and Engrave (\cf previous work in chapter \ref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
 Development is continued under the name VML (Virtual Machining Library) and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
 Although the presented implementations are tailored to this application context, the underlying algorithms are discussed as general as possible to explore broader usage scenarios.
@@ -63,21 +65,20 @@ In detail, the following questions will be answered:
 	Can these existing algorithms be categorized to identify common ideas, key concepts and restrictions?
 	Are the found algorithms generic enough to be suitable for other kinds of models (models apart from the VML, \cf)?
 	
-	\item After at least a prototypic implementation of selected algorithms, which algorithms excel in runtime, memory requirements, asymptotic complexity, visual quality, generated errors, divergence from exact solution, numerical stability, mesh quality (manifold, orientable, no boundary edges, Delaunay), feature preservation, adaptivity in triangle size/count, \etc? %TODO remove adaptivity
-	Can these algorithms be parallelized and potentially (maybe with restrictions) run in real-time?
+	\item After at least a prototypic implementation of selected algorithms, which algorithms excel in runtime, memory requirements, asymptotic complexity, visual quality, generated errors, divergence from exact solution, numerical stability, mesh quality (manifold, orientable, no boundary edges, Delaunay), feature preservation, adaptivity in triangle size/count, \etc?
+	How well can these algorithms be parallelized and how good do they scale?
 	
 	\item After intensive testing on selected models, can a \enquote{best} algorithm be identified?
-	Are there cases in which some algorithms perform better than others and vice-versa (\cf no free lunch theorem in optimization\footnote{The no free lunch theorem by Wolpert and Macready states that for any given optimization algorithm there will always be an optimization problem where this algorithm is outperformed by another one \cite{no_free_lunch}. })?
+	Are there cases in which some algorithms perform better than others and vice-versa (\cf no free lunch theorem in optimization\footnote{The no free lunch theorem by Wolpert and Macready states that for any given optimization algorithm there will always be an optimization problem where this algorithm is outperformed by another one \cite{no_free_lunch}.})?
 	What are the criteria that have to be satisfied for an algorithm to run \enquote{well}?
-	% Can a mechanism be developed to select the algorithm best suited for a given implicit model?
 \end{enumerate}
 
 
 \section{Goal}
 \label{sec:goal}
 
-The goal of this thesis is to provide the reader with a state of the art overview over algorithms and methods used to reconstruct explicit triangle meshes from different representations such as the one used inside the VML.
-In reference to the first problem statement, a categorization if the presented algorithms will be shown to group common concepts and compare the algorithms based on their approaches, area of application, supported data structures and restrictions.
+The goal of this thesis is to provide the reader with a state of the art overview of algorithms and methods used to reconstruct explicit triangle meshes from different representations such as the one used inside the VML.
+In reference to the first problem statement, a categorization of the presented algorithms will be shown to group common concepts and compare the algorithms based on their approaches, area of application, supported data structures and restrictions.
 
 After this overview, the thesis will discuss the prototypic implementation of selected algorithms.
 These implementations will be based on the data model used inside the VML.
@@ -93,7 +94,6 @@ Finally, this thesis will be able to give estimates and advices about which algo
 This thesis will not provide a detailed introduction into virtual machining, ray tracing nor computer graphics.
 Furthermore, all implementations of algorithms will be prototypes and may not be suitable for every kind of input nor for direct use in production.
 The presented algorithm are also not tuned for performance.
-%Optimization is a tedious task and requires a great deal of time which can be spent more effectively creating a broader spectrum of prototypes.
 However, potential for optimizations will be discussed.
 
 
