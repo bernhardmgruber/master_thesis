@@ -23,6 +23,57 @@ The computed swept volumes where directly imported into Enlight's data model.
 Both projects, Enlight and Engrave, were co-funded by the European Union as well as Land Oberösterreich within the political program Regio 13, which aimed to sustainably improve the contestability of regional companies, economic growth and employment inside of Upper Austria.
 %
 With the beginning of 2015 the prototype developed during Enlight and Engrave was rebranded to Virtual Machining Library (VML) and is currently further developed as a commercial product.
+Figure \ref{fig:vml_demo} shows a small demonstration of the VML.
+
+\begin{figure}[h]
+	\centering
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/hq_impeller_tool}
+			\caption{Ball-end cutter.}
+			\label{fig:hq_impeller_tool}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/hq_impeller_swept}
+			\caption{Swept volume.}
+			\label{fig:hq_impeller_swept}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/hq_impeller_complete}
+			\caption{Machined impeller.}
+			\label{fig:hq_impeller_complete}
+		\end{subfigure}
+		\\
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/turbine_tool}
+			\caption{Fir tree cutter.}
+			\label{fig:turbine_tool}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/turbine_swept}
+			\caption{Swept volume.}
+			\label{fig:turbine_swept}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{images/turbine_complete}
+			\caption{Machined turbine wheel.}
+			\label{fig:turbine_complete}
+		\end{subfigure}
+	\caption{
+		Demonstration of the VML's capabilities.
+		Cutter meshes (figure \ref{fig:hq_impeller_tool} and \ref{fig:turbine_tool}) are loaded and then transformed using a list of transformation matrices to calculate swept volumes (figure \ref{fig:hq_impeller_swept} and \ref{fig:turbine_swept}).
+		By applying a series of these swept volumes to a stock, the machining of a workpiece is simulated.
+		The result can be visualized using raycasting (figure \ref{fig:hq_impeller_complete} and \ref{fig:turbine_complete}).
+		Images by Alexander Leutgeb.
+	}
+	\label{fig:vml_demo}
+\end{figure}
+
 
 \section{VML data model}
 \label{sec:vml_data_model}
