@@ -86,7 +86,7 @@ In fact, swept volumes are stored side by side together with the stock and theor
 A separate processing step is required to calculate the exact surface.
 For visualization, the data model is sampled using a raycast which calculates a point on the surface for each ray (\cf section \ref{sec:raycasting}).
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/vml_csg}
 	\caption{
@@ -118,7 +118,7 @@ Cells which are occupied by triangles of the mesh's surface are surface cells.
 Cells inside and outside the mesh are inside and outside cells and contain no triangles.
 The sketches in figure \ref{fig:classification_before} and \ref{fig:classification_sv} illustrate the classification of a single solid inside the grid (\ie stock) as well as a swept volume before it is merged.
 
-\begin{figure}[h]
+\begin{figure}[!h]
 	\centering
 	\begin{tabular}{cc}
 		\begin{subfigure}[t]{0.3\textwidth}
@@ -185,7 +185,7 @@ However, this kind of reduction has a significant consequence.
 As the content of outside cells is simply deleted, the stored geometries are no longer closed meshes.
 Surface points can still be calculated as shown by the example of the raycast used for visualization in section \ref{sec:raycasting}.
 
-\begin{figure}[H]
+\begin{figure}[!h]
 	\centering
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
