@@ -4,59 +4,58 @@
 \section{Motivation and background}
 \label{sec:motivation}
 
-Many applications in different fields of science have to deal with the representation of geometries, their volumes and surfaces.
-As visualization often plays an important role, being able to efficiently render a piece of geometry becomes a decisive factor when choosing an appropriate data structure.
-Modern hardware architectures and well-established graphic APIs like OpenGL and DirectX are commonly optimized towards rasterization and require explicit, polygonal surface meshes (\eg triangle meshes).
-Furthermore, many scientific applications in fields like structural engineering, material science or fluid dynamics are based on finite element methods with rely on triangle meshes to approximate their underlying mathematical models.
-Additionally, triangle meshes are well established means to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
+Many scientific fields have to deal with the representation of geometries, their volumes and surfaces.
+As visualization is often vital, being able to efficiently render geometries becomes a decisive factor when choosing an appropriate data structure.
+Modern hardware architectures and well-established graphic APIs like OpenGL and DirectX are commonly optimized towards rasterization and require explicit, polygonal surface meshes, \eg triangle meshes.
+Furthermore, many scientific applications in fields like structural engineering, material science or fluid dynamics are based on finite element methods which rely on triangle meshes to approximate their underlying mathematical models.
+Additionally, triangle meshes are a well established way to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
 
 
 However, despite their great suitability and acceptance, triangle-based representations also have their drawbacks and a numerous amount of problems can be addressed better using different representations. %(\eg CSG trees, dexel images or functional representations).
 In many of these situations efficient rendering is only a secondary requirement.
-Implicit models like functional and parametric surfaces shine in mathematical exactness, expressiveness and memory requirements.
+Functional models like parametric surfaces or surfaces given implicitly by equations excel in mathematical exactness, expressiveness and memory requirements.
 A sphere for example is easily expressed as an equation with radius and center as parameters, describing an exact surface.
-Triangle meshes are in most cases only approximations of such shapes and require an appropriate resolution (\ie triangle count) to achieve the desired visual quality.
+Triangle meshes are in most cases only approximations to such shapes and require an appropriate resolution, \ie triangle count, to achieve the desired visual quality.
 %
-Some kinds of problems may also benefit greatly in runtime when solved for implicit models.
-Questions like whether a point is inside a volume or if two volumes intersect can be more easily answered on a few mathematically defined shapes than on a large set of triangles.
+Some problems can also be solved much faster and simpler using representations other than triangle meshes.
+Testing if a point is inside a volume or if two volumes intersect is more easily done on a few mathematically defined shapes than on a large set of triangles.
 Applications range from ray tracing photo realistic images to collision detection in physics engines or milling machines.
 Boolean set operations are much easier calculated on representations like z-maps and dexel images.
-These are heavily used in virtual machining to simulate material removal (\eg milling) or addition (\eg 3-dimensional printing).
+These are heavily used in virtual machining to simulate material removal, \eg in milling, or addition, \eg in 3-dimensional printing.
 %
 Sometimes representations other than triangle meshes are easier to create.
-An example would be CSG (constructive solid geometry) where a complex shape is constructed using set operations like union, intersection or subtraction on simple primitives (e.g. cubes, cylinders or spheres).
+An example would be constructive solid geometry (CSG) where a complex shape is constructed using set operations like union, intersection or subtraction on simple primitives, e.g. cubes, cylinders or spheres.
 The resulting model is described using a tree where each node is an operator and each leaf a primitive.
-CSG is supported by a wide range of modeling tools and CAD (computer-aided design) kernels.
+CSG is supported by a wide range of modeling tools and computer-aided design (CAD) kernels.
 Another example are dexel images when used for material removal in sculpturing.
 %
-Finally, some surface descriptions are just inherently non-explicit (\eg described procedurally).
-Simulating milling processes in CAM (computer-aided manufacturing) for example is often described as the subtraction of swept volumes from an initial volume.
-Swept volumes are volumes swept by a cutting tool which are themselves described as the cutter's geometry moved along a specified path.
-The final workpiece can be seen as subtraction of all swept volumes from the initial volume.
+Finally, some surface descriptions are just inherently non-explicit, \eg described procedurally.
+Simulating milling processes in computer-aided manufacturing (CAM) for example is usually described as the subtraction of swept volumes from an initial volume.
+Swept volumes are volumes swept by a cutting tool. They are therefore described as the cutter's geometry moved along a specified path.
+The final workpiece is obtained by subtraction of all swept volumes from the initial volume.
 
 
 Despite polygon-based and alternative representations for surfaces both having their specific usage scenarios, it is sometimes necessary to transform one into the other.
 A common scenario in CAD for example is to export an model described using a CSG tree or dexel image as a triangle mesh.
-The quality of the triangle approximation usually depends on a parameterized resolution which in many cases directly influences the number of generated triangles.
+The quality of the triangle approximation usually depends on a user-defined resolution which in many cases directly influences the number of generated triangles.
 Several algorithms exist trying to create meshes adaptively, using more and small triangles only where detail is necessary to preserve a models features.
 %
 The inverse process does also exist where algorithms try to recognize shapes in given triangle sets.
-An application might be to reconstruct shapes from a triangle set outputted by a simulation and measure parameters of the recognized shape.
-In CAE (computer-aided engineering) for example, after simulating the milling of a cylinder, a generated triangle set may be recognized again as a cylinder and parameters of the recognized shape (\eg radius, height) can be compared with the initial model put in the simulation to verify the correctness of the simulated machining process.
+An example is found in computer-aided engineering (CAE), specifically CAM verification: After simulating the milling of a cylinder, a generated triangle set may be recognized again as a cylinder. The parameters of this recognized shape, \eg radius and height, can be compared with the initial CAD model put in the simulation to verify the correctness of the simulated machining process.
 
 
 \section{Previous work}
 
-Due to the broad field of surface representations and the authors previous experience, this thesis will narrow its focus on models used in subtractive manufacturing simulations and focus solely on the transformation of these models into explicit triangle representations (triangle surface reconstruction).
-During the authors work at the RISC Software GmbH a visualization and solid modeling software has been developed during two research projects, Enlight and Engrave (\cf previous work in chapter \ref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
-Development is continued under the name VML (Virtual Machining Library) and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
+Due to the broad field of surface representations and the authors previous experience, this thesis will narrow its focus on models used in subtractive manufacturing simulations and focus solely on the transformation of these models into explicit triangle representations.
+During the authors work at the RISC Software GmbH a visualization and solid modeling software was developed during two research projects, Enlight and Engrave (\cf previous work in chapter \ref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
+Development is continued under the name virtual machining library (VML) and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
 Although the presented implementations are tailored to this application context, the underlying algorithms are discussed as general as possible to explore broader usage scenarios.
 
 
 \section{Problem statement}
 \label{sec:problem}
 
-The focus of the implementations underlying this thesis is to find, evaluate and prototypically implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
+The focus of the implementation underlying this thesis is to find, evaluate and prototypically implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
 On top of these prototypes this thesis provides a comprehensive documentation, analysis and discussion of the implemented algorithms and strategies.
 In detail, the following questions will be answered:
 
@@ -65,7 +64,7 @@ In detail, the following questions will be answered:
 	Can these existing algorithms be categorized to identify common ideas, key concepts and restrictions?
 	Are the found algorithms generic enough to be suitable for other kinds of models (models apart from the VML, \cf)?
 	
-	\item After at least a prototypic implementation of selected algorithms, which algorithms excel in runtime, memory requirements, asymptotic complexity, visual quality, generated errors, divergence from exact solution, numerical stability, mesh quality (manifold, orientable, no boundary edges, Delaunay), feature preservation, adaptivity in triangle size/count, \etc?
+	\item After at least a prototypic implementation of selected algorithms, which algorithms excel in runtime, memory requirements, asymptotic complexity, steamvisual quality, generated errors, divergence from exact solution, numerical stability, mesh quality (manifold, orientable, no boundary edges, Delaunay), feature preservation, adaptivity in triangle size/count, \etc?
 	How well can these algorithms be parallelized and how good do they scale?
 	
 	\item After intensive testing on selected models, can a \enquote{best} algorithm be identified?
