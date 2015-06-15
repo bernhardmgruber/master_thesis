@@ -46,7 +46,7 @@ An example is found in computer-aided engineering (CAE), specifically CAM verifi
 
 \section{Previous work}
 
-Due to the broad field of surface representations and the authors previous experience, this thesis will narrow its focus on models used in subtractive manufacturing simulations and focus solely on the transformation of these models into explicit triangle representations.
+Due to the broad field of surface representations and the authors previous experience, this thesis narrows its focus on models used in subtractive manufacturing simulations and focuses solely on the transformation of these models into explicit triangle representations.
 During the authors work at the RISC Software GmbH a visualization and solid modeling software was developed during two research projects, Enlight and Engrave (\cf previous work in chapter \ref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
 Development is continued under the name virtual machining library (VML) and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
 Although the presented implementations are tailored to this application context, the underlying algorithms are discussed as general as possible to explore broader usage scenarios.
@@ -56,19 +56,32 @@ Although the presented implementations are tailored to this application context,
 \label{sec:problem}
 
 The focus of the implementation underlying this thesis is to find, evaluate and prototypically implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
-On top of these prototypes this thesis provides a comprehensive documentation, analysis and discussion of the implemented algorithms and strategies.
-In detail, the following questions will be answered:
+The thesis on top of these prototypes provides a comprehensive documentation, analysis and discussion of the implemented algorithms and strategies.
+In detail, the following questions are answered:
 
 \begin{enumerate}
 	\item What is the state of the art in surface reconstruction from geometric data models similar to the VML's?
-	Can these existing algorithms be categorized to identify common ideas, key concepts and restrictions?
-	Are the found algorithms generic enough to be suitable for other kinds of models (models apart from the VML, \cf)?
+	What are common ideas, key concepts and restrictions of these existing algorithms and how can they be categorized?
+	Are these algorithms generic enough to be suitable for other kinds of models, \ie models apart from the VML?
 	
-	\item After at least a prototypic implementation of selected algorithms, which algorithms excel in runtime, memory requirements, asymptotic complexity, steamvisual quality, generated errors, divergence from exact solution, numerical stability, mesh quality (manifold, orientable, no boundary edges, Delaunay), feature preservation, adaptivity in triangle size/count, \etc?
-	How well can these algorithms be parallelized and how good do they scale?
+	\item After a prototypic implementation of selected algorithms, which excel in
+	\begin{itemize}
+		\item runtime,
+		\item memory requirements,
+		\item asymptotic complexity,
+		\item visual quality,
+		\item generated errors,
+		\item divergence from exact solution,
+		\item numerical stability,
+		\item mesh quality, \eg manifold, orientable, no boundary edges, Delaunay,
+		\item feature preservation,
+		\item adaptivity in triangle size/count,
+		\item \etc?
+	\end{itemize} 
+	Are these algorithms suitable for parallelization and how good do they scale?
 	
-	\item After intensive testing on selected models, can a \enquote{best} algorithm be identified?
-	Are there cases in which some algorithms perform better than others and vice-versa (\cf no free lunch theorem in optimization\footnote{The no free lunch theorem by Wolpert and Macready states that for any given optimization algorithm there will always be an optimization problem where this algorithm is outperformed by another one \cite{no_free_lunch}.})?
+	\item After intensive testing on selected models, is it possible to identify a \enquote{best} algorithm?
+	Are there cases in which some algorithms perform better than others and vice-versa, \cf no free lunch theorem in optimization\footnote{The no free lunch theorem by Wolpert and Macready states that for any given optimization algorithm there will always be an optimization problem where this algorithm is outperformed by another one \cite{no_free_lunch}.}?
 	What are the criteria that have to be satisfied for an algorithm to run \enquote{well}?
 \end{enumerate}
 
@@ -76,35 +89,35 @@ In detail, the following questions will be answered:
 \section{Goal}
 \label{sec:goal}
 
-The goal of this thesis is to provide the reader with a state of the art overview of algorithms and methods used to reconstruct explicit triangle meshes from different representations such as the one used inside the VML.
-In reference to the first problem statement, a categorization of the presented algorithms will be shown to group common concepts and compare the algorithms based on their approaches, area of application, supported data structures and restrictions.
+The goal of this thesis is to provide a state of the art overview of algorithms and methods used to reconstruct explicit triangle meshes from different representations such as the one used inside the VML.
+In reference to the first problem statement, a categorization of the presented algorithms is shown to group common concepts and compare the algorithms based on their approaches, area of application, supported data structures and restrictions.
 
-After this overview, the thesis will discuss the prototypic implementation of selected algorithms.
-These implementations will be based on the data model used inside the VML.
-Nevertheless, the author will point out how certain implementations may be adapted for different kind of data structures where possible.
-All algorithms will be compared using the aspects given in the second problem statement.
-Although time constrained surface extracting will not be focused, estimating each algorithms potential to be used in real-time scenarios will be tried, as this is an important sector of collision detection and avoidance during machining.
+After this overview, the thesis discusses the prototypic implementation of selected algorithms.
+These implementations are based on the data model used inside the VML.
+Nevertheless, adaptations to support different kinds of data structures are pointed out where possible.
+All algorithms are compared using the aspects given in the second problem statement.
+Although time constrained surface extracting is not focused, estimating the potential of each algorithm to be used in real-time scenarios has been tried, as this is an important scenario in collision detection and avoidance during machining.
 Furthermore, as modern hardware architectures become increasingly parallel and heterogeneous, this thesis provides hints and estimates about the suitability to parallelize the chosen algorithms.
 
 Additionally, a suite of representative test models has been created and used to benchmark the prototyped approaches.
-The primary goal thereby is to point out the strengths and limitations of the implemented prototypes and to compare them again on their success on various difficulties of the provided test scenes (\eg feature detection and errors).
-Finally, this thesis will be able to give estimates and advices about which algorithms and strategies work best for which kind of input.
+The primary goal thereby is to point out the strengths and limitations of the implemented prototypes on various difficulties of the provided test scenes, \eg feature detection and errors.
+Finally, estimates and advices are given about which algorithms and strategies work best for which kind of input.
 
-This thesis will not provide a detailed introduction into virtual machining, ray tracing nor computer graphics.
-Furthermore, all implementations of algorithms will be prototypes and may not be suitable for every kind of input nor for direct use in production.
-The presented algorithm are also not tuned for performance.
-However, potential for optimizations will be discussed.
+This thesis does not provide a detailed introduction into virtual machining, ray tracing nor computer graphics.
+Furthermore, all implementations of algorithms are prototypes and may not be suitable for all kinds of inputs nor for direct use in production.
+The presented algorithms are not optimized in terms of performance.
+However, the potential for optimizations is discussed.
 
 
 \section{Chapter overview}
 \label{sec:chapter_overview}
 
-After this introduction, chapter \ref{ch:fundamentals} will continue with a coverage of the most important terms related to solid modeling, meshes and virtual machining as well as a comprehensive list of wide-spread representations used in CAD and CAM.
+In chapter \ref{ch:fundamentals} a coverage of the most important terms related to solid modeling, meshes and virtual machining as well as a comprehensive list of wide-spread representations used in CAD and CAM are discussed.
 
-Chapter \ref{ch:previous_work} will give background information on the VML on which the implementation of this thesis is based on.
-After a bit of history on this project, the VML's data model and a few core algorithms are elaborated to allow the reader a deeper understanding of various design aspects of the presented implementations. These include the VML's regular grid data structure, a triangle elimination strategy called classification and the ray casting subsystem used for visualization.
+Chapter \ref{ch:previous_work} contains background information on the VML, the software this thesis is based on.
+After a bit of history on this project, the VML's data model and a few core algorithms are elaborated to allow a deeper understanding of various design aspects of the presented implementations. These include the VML's regular grid data structure, a triangle elimination strategy called classification and the ray casting subsystem used for visualization.
 
-Chapter \ref{ch:state_of_the_art} continues with literature review of existing algorithms and approaches which could be (partially) used to tackle the problem of surface reconstruction for the VML's data model.
+Chapter \ref{ch:state_of_the_art} provides a literature review of existing algorithms and approaches which could be, fully or partially, used to tackle the problem of surface reconstruction for the VML's data model.
 The presented references include means for direct triangle intersection, surface reconstruction from point clouds, triangulation of dexel based as well as voxel based representations.
 
 %\dummytext{2}
