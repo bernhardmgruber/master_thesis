@@ -2,7 +2,7 @@
 \label{ch:previous_work}
 
 As written in the problem statement in section \ref{sec:problem} the focus of the implementations underlying this thesis is to implement multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
-To aid the reader in understanding the implementations presented in this thesis, a short introduction to the VML and its data model is given.
+To ease the understanding of the implementations presented in this thesis, a short introduction to the VML and its data model is given.
 Parts of this description have been taken from the authors bachelor thesis where the data model has been previously described with a focus on visualization \cite{bachelor}.
 
 \section{Project history}
@@ -11,18 +11,17 @@ Parts of this description have been taken from the authors bachelor thesis where
 From mid 2011 until the end of 2013 project Enlight was conducted for research by the RISC Software GmbH in Hagenberg im Mühlkreis, Austria.
 Enlight's goals were to develop a faster, scalable and numerically stable method for modeling and visualizing subtractive manufacturing.
 Enlight used a regular grid data structure to store a stock solid and add precomputed swept volumes.
-A triangle elimination strategy was employed to keep the total number of triangles held by the grid within manageable bounds (\cf classification in section \ref{sec:classification}).
-For visualization a customized ray casting approach was developed \cite{enlight} and accelerated using GPUs and many-core architectures.
+A triangle elimination strategy was employed to keep the total number of triangles held by the grid within manageable bounds, \cf classification in section \ref{sec:classification}.
+For visualization, a customized ray casting approach was developed \cite{enlight} and accelerated using GPUs and many-core architectures.
 
 From the beginning to the end of 2014, the follow-up research project Engrave focused on solving swept volume computation for arbitrary cutter geometries and tool paths.
 Engrave basically allowed dynamic swept volume computation from a set of cutter solids and transformation lists.
-Swept volume computation was done by extruding a point cloud along the tool path and then reconstruction a closed triangle mesh from it using a parallel and highly optimized variant of the ball pivoting algorithm 
-\cite{engrave}.
+Swept volume computation was done by extruding a point cloud along the tool path and then reconstructing a closed triangle mesh from it using a parallel and highly optimized variant of the ball pivoting algorithm \cite{engrave}.
 The computed swept volumes where directly imported into Enlight's data model.
 
 Both projects, Enlight and Engrave, were co-funded by the European Union as well as Land Oberösterreich within the political program Regio 13, which aimed to sustainably improve the contestability of regional companies, economic growth and employment inside of Upper Austria.
 %
-With the beginning of 2015 the prototype developed during Enlight and Engrave was rebranded to Virtual Machining Library (VML) and is currently further developed as a commercial product.
+With the beginning of 2015, the prototype developed during Enlight and Engrave was rebranded to virtual machining library (VML) and is currently further developed as a commercial product.
 Figure \ref{fig:vml_demo} shows a small demonstration of the VML.
 
 \begin{figure}[h]
@@ -66,10 +65,9 @@ Figure \ref{fig:vml_demo} shows a small demonstration of the VML.
 		\end{subfigure}
 	\caption{
 		Demonstration of the VML's capabilities.
-		Cutter meshes (figure \ref{fig:hq_impeller_tool} and \ref{fig:turbine_tool}) are loaded and then transformed using a list of transformation matrices to calculate swept volumes (figure \ref{fig:hq_impeller_swept} and \ref{fig:turbine_swept}).
+		Cutter meshes, figure \ref{fig:hq_impeller_tool} and \ref{fig:turbine_tool}, are loaded and then transformed using a list of transformation matrices to calculate swept volumes, figure \ref{fig:hq_impeller_swept} and \ref{fig:turbine_swept}.
 		By applying a series of these swept volumes to a stock, the machining of a workpiece is simulated.
-		The result can be visualized using raycasting (figure \ref{fig:hq_impeller_complete} and \ref{fig:turbine_complete}).
-		Images by Alexander Leutgeb.
+		The result can be visualized using raycasting, figure \ref{fig:hq_impeller_complete} and \ref{fig:turbine_complete} \cite{engrave_report}.
 	}
 	\label{fig:vml_demo}
 \end{figure}
@@ -80,27 +78,27 @@ Figure \ref{fig:vml_demo} shows a small demonstration of the VML.
 
 The primary purpose of the VML is to model, simulate and visualize subtractive manufacturing.
 A typical workflow consists of loading a stock solid and then repeatedly sweeping various cutting tools over the stock.
-These cutting tools are solid triangle meshes loaded from disk which are moved along paths (list of transformation matrices) to create swept volumes (generated triangle meshes).
+These cutting tools are solid triangle meshes, loaded from disk, which are moved along paths, \ie list of transformation matrices, to create swept volumes, \ie triangle meshes.
 These swept volumes are then conceptually subtracted from the stock.
 In fact, swept volumes are stored side by side together with the stock and theoretically build up a specialized CSG tree as shown in figure \ref{fig:vml_csg}.
 A separate processing step is required to calculate the exact surface.
-For visualization, the data model is sampled using a raycast which calculates a point on the surface for each ray (\cf section \ref{sec:raycasting}).
+For visualization, the data model is sampled using a raycast which calculates a point on the surface for each ray, \cf section \ref{sec:raycasting}.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/vml_csg}
 	\caption{
-		The input model held by the VML can be seen as a linearized CSG tree.
+		The input model held by the VML is similar to a linearized CSG tree.
 		The initial stock solid is combined with a series of swept volumes using boolean subtraction.
-		The VML stores parts of the geometries of all leaves of this tree (\cf classification \ref{sec:classification}).
+		The VML stores parts of the geometries of all leaves of this tree, \cf classification \ref{sec:classification}.
 	}
 	\label{fig:vml_csg}
 \end{figure}
 
 
-The central data structure inside the VML which holds the current state of the simulation (\ie the workpiece) is a regular 3-dimensional grid.
+The central data structure inside the VML, which holds the current state of the simulation, \ie the workpiece, is a regular 3-dimensional grid.
 This data structure was chosen because, historically, it was directly used as acceleration structure for the raycasting subsystem.
-Although there is a wide variety of acceleration structures available (\eg kd-trees, octrees, binary space partitioning (BSP), bounding volume hierarchies (BVH), \etc), regular grids offer greater simplicity in organization and construction than the others.
+Although there is a wide variety of acceleration structures available, \eg kd-trees, octrees, binary space partitioning (BSP), bounding volume hierarchies (BVH), \etc, regular grids offer greater simplicity in organization and construction than the others.
 This is especially beneficial in cases where those data structures have to be updated regularly.
 Particularly animated scenes in computer-animated films or changing geometries as in virtual machining require frequent rebuilds or updates of those data structures.
 Due to their simplicity and regularity, regular grids provide viable candidates for these scenarios.
@@ -110,13 +108,13 @@ However, the VML's regular grid is also the basis for a triangle count optimizat
 \subsection{Classification}
 \label{sec:classification}
 
-Every time a solid triangle mesh (stock or swept volume) is added to the grid, the triangles of the mesh have to be mapped to the cells of the grid.
+Every time a solid triangle mesh, stock or swept volume, is added to the grid, the triangles of the mesh have to be mapped to the cells of the grid.
 Thereby, each triangle is added to each cell it intersects.
 A triangle is therefore potentially referenced from multiple cells.
 When the mapping is complete, the affected cells are classified into one of three categories with respect to the newly added mesh.
 Cells which are occupied by triangles of the mesh's surface are surface cells.
 Cells inside and outside the mesh are inside and outside cells and contain no triangles.
-The sketches in figure \ref{fig:classification_before} and \ref{fig:classification_sv} illustrate the classification of a single solid inside the grid (\ie stock) as well as a swept volume before it is merged.
+The sketches in figure \ref{fig:classification_before} and \ref{fig:classification_sv} illustrate the classification of a single solid inside the grid, \ie stock, as well as a swept volume before it is merged.
 
 \begin{figure}[!h]
 	\centering
@@ -124,30 +122,37 @@ The sketches in figure \ref{fig:classification_before} and \ref{fig:classificati
 		\begin{subfigure}[t]{0.3\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{images/classification_before}
-			\caption{Classification of the regular grid with stock before a swept volume has been added.}
+			\caption{Stock}
 			\label{fig:classification_before}
 		\end{subfigure}&
 		\begin{subfigure}[t]{0.3\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{images/classification_sv}
-			\caption{Classification of the regular grid with regard to the swept volume about to add.}
+			\caption{Swept volume}
 			\label{fig:classification_sv}
 		\end{subfigure}\\
 		\begin{subfigure}[t]{0.3\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{images/classification_after}
-			\caption{Classification of the regular grid after a swept volume has been added to the stock.}
+			\caption{Stock and swept volume}
 			\label{fig:classification_after}
 		\end{subfigure}&
 		\begin{subfigure}[t]{0.3\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{images/classification_after_removal}
-			\caption{After merging classifications is complete triangles inside outside cells can be removed.}
+			\caption{Triangle elimination}
 			\label{fig:classification_after_removal}
 		\end{subfigure}\\
 	\end{tabular}
 	\includegraphics[width=0.1\textwidth]{images/classification_legend}
-	\caption{Principle of classifying cells of a grid according to the added mesh. Only surface cells are relevant for ray casting. The sketch on the left side shows the classified stock solid. On the right side the classification result after adding a swept volume is shown.}
+	\caption{
+		Principle of classifying cells according to the added mesh.
+		Figure \ref{fig:classification_before} shows the classification of the regular grid with a stock mesh before a swept volume has been added.
+		Figure \ref{fig:classification_sv} shows the classification of the regular grid with regard to the swept volume about to add.
+		When the swept volume is added, both classifications are combined as shown in figure \ref{fig:classification_after}.
+		Finally, triangles in outside cells can be removed as shown in figure \ref{fig:classification_after_removal}, cutting down the total number of stored triangles.
+		For raycasting, only surface cells are relevant.
+		}
 	\label{fig:classification}
 \end{figure}
 
@@ -157,7 +162,7 @@ By limiting the modifiability of the scene to only allow subtracting swept volum
 \begin{table}[h]
 	\centering
 	\begin{tabular}{p{2cm}p{2cm}|p{2cm}p{2cm}p{2cm}}
-		&         & \multicolumn{3}{l}{Classification of swept volume} \\
+		&         & \multicolumn{3}{l}{Swept volume classification} \\
 		&         & outside           & surface           & inside            \\ \hline
 		\multirow{3}{*}{\parbox{2cm}{Grid \\ classification \\ before}} & outside & outside           & outside           & outside           \\
 		& surface & surface           & surface           & outside           \\
@@ -179,10 +184,11 @@ Cells inside a swept volume always become outside cells, as they are \enquote{cu
 The result of merging a swept volume into the grid is visualized in figure \ref{fig:classification_after}.
 After classification is complete, all triangles in outside cells can be removed (\cf figure \ref{fig:classification_after_removal}).
 
-This strategy allows to keep the total number of triangles under control as the system should be able to support a large number of swept volumes (theoretically infinite if triangles are regularly eliminated).
+This strategy allows to keep the total number of triangles under control as the system should be able to support a large number of swept volumes, theoretically infinite if triangles are regularly eliminated.
 %
 However, this kind of reduction has a significant consequence.
 As the content of outside cells is simply deleted, the stored geometries are no longer closed meshes.
+Figure \ref{fig:cylinders_classification} shows the effects of triangle elimination by example.
 Surface points can still be calculated as shown by the example of the raycast used for visualization in section \ref{sec:raycasting}.
 
 \begin{figure}[!h]
@@ -190,21 +196,20 @@ Surface points can still be calculated as shown by the example of the raycast us
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinders_classification_before}
-		\caption{
-			Before classification and triangle elimination.
-		}
+		\caption{Before elimination.}
 		\label{fig:cylinders_classification_before}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinders_classification_after}
-		\caption{
-			After classification and triangle elimination.
-		}
+		\caption{After elimination.}
 		\label{fig:cylinders_classification_after}
 	\end{subfigure}
 	\caption{
 		Scene of a cylindrical stock with a smaller cylindrical swept volume.
+		The left image shows both meshes before triangle elimination.
+		The right image shows the resulting geometry after triangle elimination.
+		Both meshes are no longer closed.
 	}
 	\label{fig:cylinders_classification}
 \end{figure}
@@ -213,11 +218,11 @@ Surface points can still be calculated as shown by the example of the raycast us
 \subsection{Visualization by raycasting}
 \label{sec:raycasting}
 
-The VML's regular grid with its open geometries resulting from classification can be visualized using an adapted raycasting approach.
+The VML's regular grid with its open geometries resulting from classification are visualized using an adapted raycasting approach.
 For this purpose a virtual camera is placed relative to the regular grid.
-The camera's position and orientation describes an image plane (rectangle) in front of the camera which will correspond to the final generated image.
-Originating from the camera's position a ray is then sent through each pixel of the image plane into the scene.
-If an intersection occurs, the pixel through which the ray has been sent is colored according to properties of the intersected surface (color, normal, material \etc).
+The camera's position and orientation describe an image plane, \ie a rectangle, in front of the camera which will correspond to the final generated image.
+Originating from the camera's position, a ray is then sent through each pixel of the image plane into the scene.
+If an intersection occurs, the pixel through which the ray has been sent is colored according to properties of the intersected surface, \eg color, normal, material, \etc.
 Figure \ref{fig:raycasting_principle} shows the basic principle of raycasting inside the VML.
 
 \begin{figure}
@@ -225,20 +230,20 @@ Figure \ref{fig:raycasting_principle} shows the basic principle of raycasting in
 	\includegraphics[width=0.6\textwidth]{raycasting}
 	\caption{
 		Principle of ray casting.
-		A ray is sent from an eye point (\ie camera position) through each pixel of an image plane and traversed through the scene.
-		If an intersection occurs, the pixel is colored according to the intersected surface (\protect\eg color of the surface, lighting using surface normal, \protect\etc).
+		A ray is sent from an eye point, \ie camera position, through each pixel of an image plane and is traversed through the scene.
+		If an intersection occurs, the pixel is colored according to the intersected surface, \protect\eg color of the surface, lighting using surface normal, \protect\etc.
 		%TODO source
 	}
 	\label{fig:raycasting_principle}
 \end{figure}
 
 When the rays hit the regular grid, they have to be traversed through the grid's cells.
-A fast algorithm for traversing regular grids using a single ray is given by Amanatides \etal \cite{3DDDA}.
-Their algorithm is a slight modification of the digital differential analyzer (DDA) which is used for the rasterization of lines.
+A fast algorithm for traversing regular grids using a single ray is found in literature \cite{3DDDA}.
+The algorithm is a slight modification of the digital differential analyzer (DDA) which is used for the rasterization of lines.
 Figure \ref{fig:cell_traverser} shows a sketch of a single ray traversed cell by cell through the grid.
 %
-As neighboring rays typically take the same or a similar path through the grid, grouping rays into ray packets is a good optimization.
-This approach has been described extensively by Wald \etal \cite{packet_caster} and has been implemented for the VML using CPU SIMD vector extensions (SSE and AVX) \cite{enlight}.
+As neighboring rays typically take the same or a similar path through the grid, grouping rays into ray packets has been proposed as a good optimization \cite{packet_caster}.
+This approach has been implemented for the VML using CPU SIMD vector extensions like SSE and AVX  \cite{enlight} and the Intel Xeon Phi many-core architecture.
 Figure \ref{fig:slice_traverser} shows a sketch of a ray packet traversed slice by slice through the grid.
 
 \begin{figure}
@@ -246,30 +251,26 @@ Figure \ref{fig:slice_traverser} shows a sketch of a ray packet traversed slice 
 	\begin{subfigure}[t]{0.44\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cell_traverser}
-		\caption{
-			Traversing a single ray cell by cell.
-		}
+		\caption{Single ray.}
 		\label{fig:cell_traverser}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.44\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/slice_traverser}
-		\caption{
-			Traversing a ray packet slice by slice.
-		}
+		\caption{Ray packet.}
 		\label{fig:slice_traverser}
 	\end{subfigure}
 	\caption{
-		Traversing a regular grid with a single ray (left image) and a ray packet (right image).
+		Traversing a regular grid with a single ray, cell by cell, left image, and a ray packet, slice by slice, right image.
 	}
 	\label{fig:traverser}
 \end{figure}
 
-Cells classified as outside or inside are empty (\ie contain no triangles), but each surface cell contains triangles which can potentially intersect the ray.
-A surface cell also typically contains parts (meshes) of multiple swept volumes which are called structures in the context of a cell.
-Upon entry into a surface cell, it has to be determined inside how many structures (swept volumes) the ray is.
+Cells classified as outside or inside are empty, \ie contain no triangles, but each surface cell contains triangles which can potentially intersect the ray.
+A surface cell also typically contains parts, \ie meshes, of multiple swept volumes which are called structures in the context of a cell.
+Upon entry into a surface cell, it has to be determined inside how many structures, \ie swept volumes, the ray is.
 This number is called the inside counter.
-The stock volume is handled specially during the raycast as it is inverted and turned into a swept volume itself to allow uniform handling.
+The stock volume is handled specially during the raycast, as it is inverted and turned into a swept volume itself to allow uniform handling.
 After the inside counter has been determined, all intersections of the ray with structures inside the cell are iterated from the nearest to the farthest.
 During this iterating the inside counter is modified on each structure entry or exit to constantly reflect the number of structures the ray is currently inside.
 If the counter becomes 0, the surface has been reached and a hit is reported with data from the hit triangle which is later used to color the final image of the scene.
@@ -280,30 +281,26 @@ Figure \ref{fig:raycast} shows a detailed example of such an intersection proced
 	\begin{subfigure}[t]{0.44\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/raycast_grid}
-		\caption{
-			Conceptual raycast.
-		}
+		\caption{Conceptual raycast.}
 		\label{fig:raycast_grid}
 	\end{subfigure}
 	~
 	\begin{subfigure}[t]{0.44\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/raycast_inside_counter}
-		\caption{
-			Implementation of raycast.
-		}
+		\caption{Implementation of raycast.}
 		\label{fig:raycast_inside_counter}
 	\end{subfigure}
 	\caption{
 		Interiors of the ray casting implementation.
 		Upon cell entry, the inside counter is determined.
 		Firstly, all intersections of the ray with structures inside the cell are calculated.
-		The primary ray hits the structures sub 0 and sub 2.
+		The ray hits the structures sub 0 and sub 2.
 		The surface normal of the nearest hit point with sub 2 points into a different half space than the ray direction.
 		Therefore, the ray is outside sub 2 upon entry.
 		The normal of the nearest hit point with sub 0 points into the same half space than the ray direction.
 		Thus, the ray is inside sub 0 at the entry point.
-		As the primary ray does not hit sub 1, a secondary ray is sent to a reference point on a triangle of sub 1.
+		As the ray does not hit sub 1, a secondary ray is sent to a reference point on a triangle of sub 1.
 		As the normal of sub 1 points into a different half space than the secondary ray, the ray is outside sub 1.
 		Consequently, as the ray is only inside one structure (sub 0), the inside counter is initialized with -1.
 		Then, all previously calculated intersections of the primary ray are ordered ascendingly by distance to the cell entry point and iterated over.
