@@ -5,14 +5,15 @@
 Algorithms for transforming solid representations as well as surface reconstruction algorithms are used in a variety of fields:
 From 3D artist tools for virtual sculpting and triangle exporters of CAD software to surface reconstruction from real world laser scans.
 In the context of this thesis, the scope of solid representation transformation and surface reconstruction is limited to the field of virtual machining and triangulated manifold outputs.
-After a survey of existing approaches to surface reconstruction from models similar to the VML's at least four different classes of algorithms have been identified:
+After a survey of existing approaches to surface reconstruction from models similar to the VML's, at least four different classes of algorithms have been identified:
 
 \begin{description}
 	
 	\item[Direct intersection] \hfill \\
-	Directly intersecting each volume with each other (triangle by triangle) is the most direct and theoretically exact approach of calculating the result of a series of boolean subtractions.
+	Directly intersecting each volume with each other, triangle by triangle, is the most direct and theoretically exact approach of calculating the result of a series of boolean subtractions.
 	A good description of triangle mesh intersections is given by Rosen who tried to smooth the sharp intersection line between two meshes for aesthetics in video games \cite{mesh_intersection}.
 	Triangle-triangle intersection is described by Möller \cite{tri_tri_intersection_moller} as well as Tropp \etal \cite{tri_tri_intersection_2}.
+	
 	To build a new surface mesh from two intersecting ones, each intersected triangle can be split into polygons based on the cut segments from other triangles and retriangulated using the cutting segments as constraints.
 	A possible solution for this retriangulation is the constrained Delaunay triangulation (CDT) and was first described by Chew \cite{cdt} and refined by Sloan \cite{cdt_fast}.
 	After retriangulating intersected triangles, all triangles not belonging to the new surface are removed.
@@ -21,7 +22,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 	
 	\item[Point cloud based] \hfill \\
 	Point clouds are data structures where an object is approximated by a set of points with optional normal vectors.
-	These points can be obtained \eg by sampling a solid's surface, either virtually by \eg using a raycast or in reality by scanning an objects surface (\eg laster scans of buildings, sculptures \etc).
+	These points can be obtained \eg by sampling a solid's surface, either virtually by \eg using a raycast or in reality by scanning an objects surface, \eg laster scans of buildings, sculptures \etc.
 	The VML already uses surface sampling of its data model via its raycast based visualization.
 	%
 	Point clouds can be triangulated using different algorithms:
@@ -29,18 +30,18 @@ After a survey of existing approaches to surface reconstruction from models simi
 	Edelsbrunner \etal present a generalization of the convex hull called $\alpha$-shape \cite{alpha_shape} which constructs a Delaunay triangulation of the surface described by a set of points.
 	The algorithm is subject to a configured $\alpha$ which directly influences the amount of generated holes and the quality of features.
 	
-	Amenta \etal present the crust and power crust algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees (\eg water-tightness) for \enquote{good} inputs \cite{crust, power_crust}.
-	Amenta \etal further introduce the cocone algorithm \cite{cocone} with is extended by Dey \etal with tight cocone and robust cocone \cite{tight_cocone, robust_cocone}.
-	The crust and cocone families where originally designed to reconstruct surfaces from laser scans and can (partially) handle noise on the input data.
+	Amenta \etal present the crust and power crust algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees, \eg water-tightness, for \enquote{good} inputs \cite{crust, power_crust}.
+	Amenta \etal further introduce the cocone algorithm \cite{cocone} which is extended by Dey \etal with tight cocone and robust cocone \cite{tight_cocone, robust_cocone}.
+	The crust and cocone families where originally designed to reconstruct surfaces from laser scans and can, partially, handle noise on the input data.
 	
-	Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface (functional representation).
-	The contour of this function is then traced by a marching cubes variant to extract an iso surface (triangle mesh) \cite{sdf_surface_reconstruction}.
+	Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface, \ie functional representation.
+	The contour of this function is then traced by a marching cubes variant to extract an iso surface, \ie triangle mesh \cite{sdf_surface_reconstruction}.
 	Further algorithms of this class are Poisson \cite{poisson}, Moving least squares (MLS) \cite{mls} and radial basis function (RBF) \cite{rbf}.
-	As all of these approaches are based on fitting an implicit function into the point cloud, they are robust against noisy clouds (\eg from laser scans).
+	As all of these approaches are based on fitting an implicit function into the point cloud, they are robust against noisy clouds, \eg from laser scans.
 	
 	Bernardini \etal describe the ball-pivoting algorithm (BPA) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
-	Based on the BPA, the G2S algorithm (named after the Gabriel 2-simplex criterion) further improved speed and triangle quality by assuming local surface continuity \cite{g2s}.
-	The BPA and its derivatives are region-growing based algorithms and typically provide good runtime performance, but may leave holes in the reconstructed mesh (no water-tight solids).
+	Based on the BPA, the G2S algorithm, named after the Gabriel 2-simplex criterion, further improved speed and triangle quality by assuming local surface continuity \cite{g2s}.
+	The BPA and its derivatives are region-growing based algorithms and typically provide good runtime performance, but may leave holes in the reconstructed mesh and therefore cannot guarantee water-tight solids.
 		
 	\item[Dexel based] \hfill \\
 	Dexel representations are widely used in virtual machining as they allow  relatively easy boolean operations.

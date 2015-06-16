@@ -182,7 +182,7 @@ Grid cells which are outside the added swept volume remain unchanged.
 Surface cells of the added volume become surface cells except they where outside cells before.
 Cells inside a swept volume always become outside cells, as they are \enquote{cut away} by the swept volume.
 The result of merging a swept volume into the grid is visualized in figure \ref{fig:classification_after}.
-After classification is complete, all triangles in outside cells can be removed (\cf figure \ref{fig:classification_after_removal}).
+After classification is complete, all triangles in outside cells can be removed, \cf figure \ref{fig:classification_after_removal}.
 
 This strategy allows to keep the total number of triangles under control as the system should be able to support a large number of swept volumes, theoretically infinite if triangles are regularly eliminated.
 %
@@ -302,7 +302,7 @@ Figure \ref{fig:raycast} shows a detailed example of such an intersection proced
 		Thus, the ray is inside sub 0 at the entry point.
 		As the ray does not hit sub 1, a secondary ray is sent to a reference point on a triangle of sub 1.
 		As the normal of sub 1 points into a different half space than the secondary ray, the ray is outside sub 1.
-		Consequently, as the ray is only inside one structure (sub 0), the inside counter is initialized with -1.
+		Consequently, as the ray is only inside one structure, sub 0, the inside counter is initialized with -1.
 		Then, all previously calculated intersections of the primary ray are ordered ascendingly by distance to the cell entry point and iterated over.
 		At each intersection point, the surface normal is again compared with the ray direction.
 		If they point into the same half space the structure is exited, otherwise entered.
