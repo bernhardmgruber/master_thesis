@@ -78,7 +78,7 @@ Figure \ref{fig:vml_demo} shows a small demonstration of the VML.
 
 The primary purpose of the VML is to model, simulate and visualize subtractive manufacturing.
 A typical workflow consists of loading a stock solid and then repeatedly sweeping various cutting tools over the stock.
-These cutting tools are solid triangle meshes, loaded from disk, which are moved along paths, \ie list of transformation matrices, to create swept volumes, \ie triangle meshes.
+These cutting tools are solid triangle meshes, loaded from disk, which are moved along paths, \ie lists of transformation matrices, to create swept volumes, \ie triangle meshes.
 These swept volumes are then conceptually subtracted from the stock.
 In fact, swept volumes are stored side by side together with the stock and theoretically build up a specialized CSG tree as shown in figure \ref{fig:vml_csg}.
 A separate processing step is required to calculate the exact surface.
@@ -313,3 +313,37 @@ Figure \ref{fig:raycast} shows a detailed example of such an intersection proced
 	\label{fig:raycast}
 \end{figure}
 
+
+\subsection{Regular grid interface}
+\label{sec:vml_implementation}
+
+To allow the extraction methods presented in this thesis to interface with the regular grid data structure, a few implementation details are needed.
+This information conceptually reflects the actual implementation, providing a simplified but sufficient abstraction.
+%
+The regular grid data structure relies on a few classes which are shown in figure \ref{fig:vml_datamodel}.
+The \lstinline!RegularGrid! class basically stores a bit of meta data together with a large set of cells.
+The meta data consists of the grid's axis-aligned bounding box (AABB), \lstinline!aabb!, the size of a cell in one dimension, \lstinline!cellSize!, as well as the number of cells in each dimension, \lstinline!cellCount!.
+The grid's cells are stored linearized in a flat array.
+%
+An axis-aligned bounding box is represented by the \lstinline!Extends! class.
+It stores two vertices, \lstinline!lower! and \lstinline!upper!, which contain the minimum and maximum values for each Cartesian coordinate axis.
+%
+The cells of the regular grid are modeled by the \lstinline!Cell! class.
+Each cell contains its own bounding box, \lstinline!aabb!, the classification of the cell, \lstinline!classification!, and an array of the triangles contained within this cell, \lstinline!triangles!.
+%
+Each triangle, described by the class \lstinline!Triangle!, stores its three vertices in counterclockwise order in the member \lstinline!vertices!.
+Additionally, the normal of the triangle is stored in \lstinline!normal!, computed from the triangle's vertices for performance reasons.
+Especially intersection tests, \eg during ray casting or classification, read this field very frequently and benefit from precomputation.
+Each triangle also stores an unsigned integer, \lstinline!structure!, referencing the swept volume/structure this triangle belongs to.
+This field is used to group triangles inside a cell by the swept volume they originated from.
+%
+Finally, the \lstinline!Vertex! class represents a simple 3-dimensional spatial point, storing the coordinates in its \lstinline!values! member.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{vml_datamodel}
+	\caption{
+		Simplified UML diagram of the VML data model.
+	}
+	\label{fig:vml_datamodel}
+\end{figure}
