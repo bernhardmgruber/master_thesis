@@ -14,6 +14,7 @@ draft,
 %\usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage[final]{graphicx}
 \usepackage{subcaption}
 \usepackage[style=numeric,backend=biber,urldate=iso8601]{biblatex}
@@ -28,6 +29,8 @@ draft,
 \usepackage{chngcntr}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage[plain]{algorithm}
+\usepackage[noend]{algpseudocode}
 
 
 % ====================================================================================================
@@ -45,7 +48,9 @@ draft,
 %
 \graphicspath{ {./images/} }
 
+%
 % listings
+%
 \lstdefinelanguage{CPP}[ISO]{C++}
 {
 	morekeywords={size_t},
@@ -70,10 +75,23 @@ draft,
 % backgroundcolor=\color{lightgray}
 }
 
+%
+% algorithm
+%
+\algnewcommand{\Not}{\textbf{not}\xspace}
+\newcommand{\var}[1]{\mathit{#1}}
+
+%
+% chngcntr
+%
 \counterwithout{figure}{chapter}
 \counterwithout{table}{chapter}
 
-\linespread{1.6}
+%
+% misc
+%
+% Increase line spacing for wbackfrieder for corrections
+%\linespread{1.6}
 
 % ====================================================================================================
 % ===   Macros                                                                                     ===
