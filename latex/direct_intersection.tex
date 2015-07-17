@@ -17,8 +17,7 @@ Thus, regular CAD kernels cannot be used to intersect the meshes maintained by t
 Every time a swept volume is added to the VML, a unique id is generated and assigned to each of the swept volume's triangles before they are mapped to the cells of the regular grid.
 As the stock is internally treated as a swept volume, by inverting the surface normals, all stock triangles are also assigned a unique id.
 These ids allow to separate the triangles contained in the regular grid into the previous swept volumes, referred to as structures.
-Due to the regular grid's classification, \cf section \ref{sec:classification}, triangles might have been removed and, consequently, the structures put together from the regular grid's cells may no longer be closed meshes.
-The separated structures are then processed in pairs.
+The separated structures are processed in pairs.
 Each pair is united into a new structure.
 The union of the two structure meshes is calculated by intersecting each triangle of one mesh with each triangle of the other mesh.
 If two triangles intersect, the intersection line is recorded for both triangles.
@@ -85,6 +84,11 @@ Figure \ref{fig:cube2} demonstrates this workflow by the example of intersecting
 	\label{fig:cube2}
 \end{figure}
 
+
+\section{Implementation}
+\label{sec:direct_intersection_implementation}
+
+Due to the regular grid's classification, \cf section \ref{sec:classification}, triangles might have been removed and, consequently, the structures put together from the regular grid's cells may no longer be closed meshes.
 As it turns out, the test whether a triangle is inside another structure may fail if the tested structure is not a closed mesh, a common case.
 An example of such an issue is shown in figure \ref{fig:inside_test_error}.
 %
@@ -101,7 +105,7 @@ An example of such an issue is shown in figure \ref{fig:inside_test_error}.
 %
 A triangle is tested against a structure by using a ray.
 This ray is shot from an arbitrary point on the triangle, which does not lie on an edge, \eg the triangle's centroid, to an arbitrary point on a triangle of the other structure.
-If the ray does not intersecting the other structure on its way, a comparison of the ray's direction with the normal of the targeted triangle determines whether the ray's origin, the tested triangle, is inside the other structure or not.
+If the ray does not intersect the other structure on its way, a comparison of the ray's direction with the normal of the targeted triangle determines whether the ray's origin, \ie the centroid of the tested triangle, is inside the other structure or not.
 However, as classification might eliminate triangles, the ray could potentially intersect triangles of the structure which have been removed, \cf left ray in figure \ref{fig:inside_test_error}.
 The regular grid only guarantees closed meshes within a cell.
 To circumvent this issue, the inside test for a triangle must be conducted within a cell.
@@ -114,10 +118,13 @@ To avoid duplicates or overlapping triangles when combining results from neighbo
 This step can be done before or after intersecting the structures of a cell, but always before starting to eliminate triangles against the opposite structure.
 
 An abstracted algorithm of this reconstruction approach is shown in algorithm \ref{alg:direct_intersection}.
+The following sections discuss details of this algorithms and follow the order of subroutines/functions which are not yet defined.
+The only exception is the \textproc{SeparateStructures} routine, which only groups the incoming triangles by their structure id.
+It returns a list of structures, where each structure is a set of triangles.
 
 \begin{algorithm}
 	\centering
-	\begin{algorithmic}
+	\begin{algorithmic}[1]
 		\Function{DirectIntersection}{$\var{grid}$}
 			\State $\var{result} \gets \varnothing$
 			\ForAll{$\var{c} \in \var{grid.cells}$}
@@ -142,7 +149,7 @@ An abstracted algorithm of this reconstruction approach is shown in algorithm \r
 			\ForAll{$\var{s} \in \{\var{s_1}, \var{s_2\}}$}
 				\State $s \gets \Call{ClipStructure}{\var{s}, \var{cellBox}}$
 			\EndFor
-			\State $\var{lines} \gets \{ (\var{t}, \varnothing) \mid \var{t} \in \var{s_1} \cup \var{s_2} \}$ \Comment{maps each triangle to a set of lines}
+			\State $\var{lines} \gets \var{map()}$ \Comment{maps each triangle to a set of lines}
 			\ForAll{$(\var{t_1}, \var{t_2}) \in \var{s_1} \times \var{s_2}$}
 				\State $\var{l} \gets \Call{IntersectTriangles}{\var{t_1}, \var{t_2}}$
 				\If{$\var{l}$} \Comment{no intersection line may be found}
@@ -175,17 +182,58 @@ An abstracted algorithm of this reconstruction approach is shown in algorithm \r
 \end{algorithm}
 
 
+\subsection{Clipping}
+\label{sec:clipping}
 
-\section{Implementation}
-\label{sec:direct_intersection_implementation}
+Clipping triangles against the bounding box of a cell is necessary to avoid duplicated or invalid surfaces.
+In cases where triangles span multiple cells, the VML duplicates each triangle into each cell it encompasses.
+During intersection, only a triangle's intersections with structures of the current cell are recorded, although the triangle might be intersected by additional geometry in neighboring cells.
+Therefore, after splitting, parts of the triangle which are outside the current cell are never split, might pass the inside test as a whole and remain as additional triangles outside the actual surface or remain colinear with surface triangles from neighboring cells.
+To circumvent these issues, all triangles of a cell have to be clipped either before or after intersecting the two structures in \textproc{UnionStructure}.
+
+Algorithms for clipping triangles against a bounding box are found in literature.
+....
 
 
-all the gory details
+Sutherland–Hodgman algorithm for clipping polygons \cite{polygon_clipping}
+
+
+\subsection{Triangle intersection}
+\label{sec:triangle_intersection}
+	
+Möller paper
+	
+\subsection{Triangle splitting}
+\label{sec:triangle_splitting}
+
+CDT
+list available libraries
+reference crytec paper
+
+\subsection{Triangle inside structure test}
+\label{sec:triangle_inside_test}
+
+
+
+\subsection{Numeric improvements}
+\label{sec:numeric_improvements}
+
+mostly makeRobustChains()
+
+
+\subsection{Parallelization}
+\label{sec:parallelization}
+
+
+per cell is easy.
+at cell level, structure union is a tree-shaped reduction
+at union level, triangle-triangle intersections may run fully parallel for each triangle pair, elimination may run fully parallel
+
+
+
 
 \section{Results}
 \label{sec:direct_intersection_results}
-
-
 
 Why it does not work on larger meshes?
 Run time complexity
