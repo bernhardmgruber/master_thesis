@@ -131,7 +131,7 @@ It returns a list of structures, where each structure is a set of triangles.
 				\If{$\var{c.classification} = \var{surface}$}
 					\State $\var{structures} \gets \Call{SeparateStructures}{\var{c.triangles}}$
 					\If{$\left\vert{\var{structures}}\right\vert = 1$}
-						\State $\var{result} \gets \var{result} \cup \Call{ClipStructure}{\var{structures.pop()}}$
+						\State $\var{result} \gets \var{result} \cup \Call{ClipStructure}{\var{structures.pop()}, \var{c.aabb}}$
 					\ElsIf{$\left\vert{\var{structures}}\right\vert > 1$}
 						\State $\var{acc} \gets \var{structures.pop()}$
 						\While{$\left\vert{\var{structures}}\right\vert > 0$}
@@ -192,10 +192,62 @@ Therefore, after splitting, parts of the triangle which are outside the current 
 To circumvent these issues, all triangles of a cell have to be clipped either before or after intersecting the two structures in \textproc{UnionStructure}.
 
 Algorithms for clipping triangles against a bounding box are found in literature.
-....
+A well-known examples is the Sutherland-Hodgeman algorithm for polygon clipping \cite{polygon_clipping}.
+Although further algorithms exist, \eg Weiler-Artherton, Vatti or Greiner-Hormann, which are either faster, more robust or have fewer restrictions on their input, the Sutherland-Hodgeman algorithm is characteristically simple.
+In particular, it clips any polygon against any convex clip polygon by iteratively clipping it against infinitely extended lines along each edge of the clip polygon.
+Despite being initially designed for 2 dimensions, the algorithm easily extends to higher dimensions.
 
+For clipping triangles against the bounding box of a cell, a 3-dimensional version of the Sutherland-Hodgeman algorithm is needed.
 
-Sutherland–Hodgman algorithm for clipping polygons \cite{polygon_clipping}
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{ClipStructure}{$\var{s}, \var{aabb}$}
+			\State $\var{s'} \gets \varnothing$
+			\ForAll{$\var{t} \in \var{s}$}
+				\State $\var{s'} \gets \var{s'} \cup \Call{ClipPolygonAABB}{\var{t.vertices}, \var{aabb}}$
+			\EndFor
+			\State \Return $\var{s'}$
+		\EndFunction
+		\\
+		\Function{ClipPolygonAABB}{$\var{vertices}, \var{aabb}$}
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 1, 0, 0), \var{aabb.lower.x}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}(-1, 0, 0), \var{aabb.upper.x}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 1, 0), \var{aabb.lower.y}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0,-1, 0), \var{aabb.upper.y}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0, 1), \var{aabb.lower.z}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0,-1), \var{aabb.upper.z}}$
+			\State \Return $\var{vertices}$
+		\EndFunction
+		\\
+		\Function{ClipPolygonPlane}{$\var{vertices}, \var{normal}, \var{d}$}
+			std::vector<Vertex> result;
+			result.reserve(vertices.size() * 2);
+			auto prev = vertices.size() - 1;
+			auto prevDistance = plane.calculateDistance(vertices[prev]);
+			for(auto i = 0; i < vertices.size(); ++i) {
+				const auto distance = plane.calculateDistance(vertices[i]);
+				if((distance < 0.0 && prevDistance >= 0.0) || (distance >= 0.0 && prevDistance < 0.0)) {
+					auto edge = vertices[i] - vertices[prev];
+					const auto scale = distance / (plane * edge);
+					edge *= scale;
+					auto v = vertices[i] - edge;
+					v[axis] = plane.normal()[axis] * plane.distance(); // make coordinate numerically stable
+					result.push_back(v);
+				}
+				if(distance >= 0.0) result.push_back(vertices[i]);
+				prev = i;
+				prevDistance = distance;
+			}
+			vertices = std::move(result);
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		A Sutherland-Hodgeman algorithm variant for clipping polygons against a bounding box in 3 dimensions.
+	}
+	\label{alg:clip}
+\end{algorithm}
+
 
 
 \subsection{Triangle intersection}
