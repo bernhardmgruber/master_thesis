@@ -167,7 +167,7 @@ It returns a list of structures, where each structure is a set of triangles.
 			\State $\var{result} \gets \varnothing$
 			\ForAll{$(\var{s}, \var{s'}) \in \{(\var{s_1}, \var{s_2}), (\var{s_2}, \var{s_1})\}$}
 				\ForAll{$\var{t} \in \var{s}$}
-					\If{\Not $\Call{IsTriangleInsideStructure}{\var{t}, \var{s'}}$}
+					\If{$\neg \Call{IsTriangleInsideStructure}{\var{t}, \var{s'}}$}
 						\State $\var{result} \gets \var{result} \cup \{\var{t}\}$
 					\EndIf
 				\EndFor
@@ -198,6 +198,8 @@ In particular, it clips any polygon against any convex clip polygon by iterative
 Despite being initially designed for 2 dimensions, the algorithm easily extends to higher dimensions.
 
 For clipping triangles against the bounding box of a cell, a 3-dimensional version of the Sutherland-Hodgeman algorithm is needed.
+Algorithm \ref{alg:clip} shows a pseudocode implementation of the \textproc{ClipStructure} routine which is based on the Sutherland-Hodgeman algorithm to clip all structure triangles against the bounding box of a cell.
+ 
 
 \begin{algorithm}
 	\centering
@@ -217,29 +219,39 @@ For clipping triangles against the bounding box of a cell, a 3-dimensional versi
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0,-1, 0), \var{aabb.upper.y}}$
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0, 1), \var{aabb.lower.z}}$
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0,-1), \var{aabb.upper.z}}$
-			\State \Return $\var{vertices}$
+			\State \Return $\Call{Trianglulate}{\var{vertices}}$
 		\EndFunction
 		\\
-		\Function{ClipPolygonPlane}{$\var{vertices}, \var{normal}, \var{d}$}
-			std::vector<Vertex> result;
-			result.reserve(vertices.size() * 2);
-			auto prev = vertices.size() - 1;
-			auto prevDistance = plane.calculateDistance(vertices[prev]);
-			for(auto i = 0; i < vertices.size(); ++i) {
-				const auto distance = plane.calculateDistance(vertices[i]);
-				if((distance < 0.0 && prevDistance >= 0.0) || (distance >= 0.0 && prevDistance < 0.0)) {
-					auto edge = vertices[i] - vertices[prev];
-					const auto scale = distance / (plane * edge);
-					edge *= scale;
-					auto v = vertices[i] - edge;
-					v[axis] = plane.normal()[axis] * plane.distance(); // make coordinate numerically stable
-					result.push_back(v);
-				}
-				if(distance >= 0.0) result.push_back(vertices[i]);
-				prev = i;
-				prevDistance = distance;
-			}
-			vertices = std::move(result);
+		\Function{ClipPolygonPlane}{$\var{vertices}, \var{n}, \var{d}$}
+			\State $\var{result} \gets \var{array}()$
+			\State $\var{prev} \gets |\var{vertices}| - 1$
+			\State $\var{prevDist} \gets \var{vertices_{prev}} * \var{n} - \var{d};$
+			\For{$\var{i} \gets 0, \dots, |\var{vertices}| - 1$}
+				\State $\var{dist} \gets \var{vertices_i} * \var{n} - \var{d}$;
+				\If{$(\var{dist} < 0 \wedge \var{prevDist} \geq 0) \vee (\var{dist} \geq 0 \wedge \var{prevDist} < 0)$}
+					\State $\var{edge} \gets (\var{vertices_i} - \var{vertices_{prev}})$
+					\State $\var{edge} \gets \var{edge} * \frac{\var{dist}}{\var{n} * \var{edge}}$
+					\State $\var{v} \gets \var{vertices_i} - \var{edge}$
+					\State $\var{result.add}(\var{v})$
+				\EndIf
+				\If{$\var{dist} \geq 0$}
+					\State $\var{result.add}(\var{vertices_i});$
+				\EndIf
+				\State $\var{prev} \gets i$;
+				\State $\var{prevDist} \gets \var{dist}$;
+			\EndFor
+			\State \Return $\var{result}$
+		\EndFunction
+		\\
+		\Function{Triangulate}{$\var{vertices}$}
+			\State $\var{result} \gets \varnothing$
+			\If{$|vertices| \geq 3$}
+				\State $\var{c} \gets \var{loop_0}$
+				\For{$\var{i} \gets 2, \dots, |\var{vertices}| - 1$}
+					\State $\var{result} \gets \var{result} \cup \{\var{Triangle}(\var{c}, \var{vertices_{i - 1}}, \var{vertices_i})\}$
+				\EndFor
+			\EndIf
+			\State \Return $\var{result}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
