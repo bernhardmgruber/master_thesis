@@ -199,7 +199,31 @@ Despite being initially designed for 2 dimensions, the algorithm easily extends 
 
 For clipping triangles against the bounding box of a cell, a 3-dimensional version of the Sutherland-Hodgeman algorithm is needed.
 Algorithm \ref{alg:clip} shows a pseudocode implementation of the \textproc{ClipStructure} routine which is based on the Sutherland-Hodgeman algorithm to clip all structure triangles against the bounding box of a cell.
- 
+%
+When clipping a structure against a bounding box, each individual triangle of the structure is clipped separately.
+The result of clipping a single triangle may be the same triangle, a set of new triangles or even no triangle at all.
+The resulting triangles after clipping, if any, are collected to form the new, clipped structure.
+
+The Sutherland-Hodgeman algorithm clips against a convex polygon, or its equivalent in higher dimensions, \ie a polytope, by iteratively clipping against each side.
+In case of a bounding box, the input polygon has to be clipped against each of the six sides of the cell.
+These sides are extended and described as planes by specifying a normal vector and the plane's distance to the origin.
+The six planes built from a cell's bounding box are given in the \textproc{ClipPolygonAABB} function of algorithm \ref{alg:clip}.
+The input polygon itself is represented as an ordered list of vertices, where each pair of adjacent vertices form an edge of the polygon, including the last and the first vertex as a pair.
+The order of the vertices remains the sames during the clipping process, but vertices may be removed or additional ones added.
+The final vertex list, after clipping against all planes, needs to be triangulated again.
+As the clipping volume, \ie the cell's bounding box, is convex, the resulting clipped polygon is also convex.
+Therefore, the list of vertices can be simply triangulated into a fan by selecting one vertex and emitting a triangle for every adjacent pair of vertices excluding the selected vertex, where each triangle is built from the pair and the selected vertex.
+Note that in some edge cases, duplicate vertices may be generated.
+Thus, duplicates should be removed from the result vertex list before passing it to the triangulation subroutine.
+
+The core routine of the clipping procedure is clipping the list of vertices against a single plane.
+Initially, an empty list of result vertices is created.
+For each of the polygon's vertices, the signed distance to the clipping plane is calculated.
+The distance of each vertex is compared with the distance of its preceding vertex.
+If the signs of the distances are different, the edge represented by the current vertex and its predecessor intersects the clipping plane.
+In this case, the intersection point with the clipping plane is calculated, \cf algorithm \ref{alg:clip} for details, and the point is added to the result list.
+If the distance of the current vertex is positive, the vertex itself is inside the clipping volume and is also added to the result list.
+After all vertices have been processed, the result list is return, representing the clipped polygon again as an ordered list of its vertices.
 
 \begin{algorithm}
 	\centering
@@ -219,7 +243,8 @@ Algorithm \ref{alg:clip} shows a pseudocode implementation of the \textproc{Clip
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0,-1, 0), \var{aabb.upper.y}}$
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0, 1), \var{aabb.lower.z}}$
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0,-1), \var{aabb.upper.z}}$
-			\State \Return $\Call{Trianglulate}{\var{vertices}}$
+			
+			\State \Return $\Call{Trianglulate}{\Call{Unique}{\var{vertices}}}$
 		\EndFunction
 		\\
 		\Function{ClipPolygonPlane}{$\var{vertices}, \var{n}, \var{d}$}

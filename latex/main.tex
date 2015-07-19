@@ -31,6 +31,7 @@ draft,
 \usepackage{hyperref}
 \usepackage[plain]{algorithm}
 \usepackage[noend]{algpseudocode}
+\usepackage{fixltx2e}
 
 
 % ====================================================================================================
@@ -79,6 +80,7 @@ draft,
 % algorithm
 %
 \newcommand{\var}[1]{\mathit{#1}}
+\MakeRobust{\Call} % to allow nesting \Call, see: http://tex.stackexchange.com/questions/16046/how-to-nest-call-in-algorithmicx
 
 %
 % chngcntr
