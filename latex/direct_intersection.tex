@@ -318,7 +318,19 @@ The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct
 	\label{alg:triangle_intersection}
 \end{algorithm}
 
-
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{tri_intersect}
+	\caption{
+		Intersection line calculation in Möller's triangle intersection test.
+		The image shows intervals on the intersection line between two triangle's planes.
+		The green line is the intersection line of both planes.
+		Blue parts of the intersection line are intervals of one triangle.
+		The red part is the overlap of both triangle's line intervals, \ie the triangle's intersection.
+		Image modeled after \cite[p757]{tri_tri_intersection_moller_image}.
+	}
+	\label{fig:tri_intersect}
+\end{figure}
 
 \subsection{Triangle splitting}
 \label{sec:triangle_splitting}
