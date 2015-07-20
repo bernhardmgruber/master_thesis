@@ -289,9 +289,37 @@ After all vertices have been processed, the result list is return, representing 
 
 \subsection{Triangle intersection}
 \label{sec:triangle_intersection}
-	
-Möller paper
-	
+
+Every time the union surface of two structures is calculated, each triangle of one structure has to be intersected with each triangle of the other structure.
+Triangle-triangle intersection is a common problem in collision detection and has been solved numerous times.
+The intersection test of Möller \cite{tri_tri_intersection_moller}, despite being older and marginally slower than more recent developments \cite{tri_tri_intersection_2}, is also available as public domain C code on the authors website \cite{tri_tri_intersection_moller_code}.
+As only a few adaptations were necessary, Möller's code was taken and thoroughly refactored to fit a modern C++ style without changing its behavior.
+The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct_intersection} is thus merely a small adapter calling into Möller's code and is given in algorithm \ref{alg:triangle_intersection}.
+
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{IntersectTriangles}{$\var{t_1}, \var{t_2}$}
+			\State $\var{isCoplanar}, \var{p_1}, \var{p_2}$ \Comment{Uninitialized variables}
+			\State $\var{hasIntersected} =$ \Call{tri\_tri\_intersect\_with\_isectline}{$\hfill\break
+				% the phantoms at the line starts make sure all hspaces start at the same position
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t_1.vertices_0}, \var{t_1.vertices_1}, \var{t_1.vertices_2},\hfill\break
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t_2.vertices_0}, \var{t_2.vertices_1}, \var{t_2.vertices_2},\hfill\break
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{coplanar}, \var{p_1}, \var{p_2}$}
+			\If{$hasIntersected \wedge \neg isCoplanar$}
+				\State \Return $(\var{p_1}, \var{p_2})$ \Comment{Otherwise return nothing}
+			\EndIf
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Adapter to the Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
+		Calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p_1}$ and $\var{p_2}$ as output parameters.
+	}
+	\label{alg:triangle_intersection}
+\end{algorithm}
+
+
+
 \subsection{Triangle splitting}
 \label{sec:triangle_splitting}
 
