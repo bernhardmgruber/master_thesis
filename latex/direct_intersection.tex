@@ -294,6 +294,7 @@ Every time the union surface of two structures is calculated, each triangle of o
 Triangle-triangle intersection is a common problem in collision detection and has been solved numerous times.
 The intersection test of Möller \cite{tri_tri_intersection_moller}, despite being older and marginally slower than more recent developments \cite{tri_tri_intersection_2}, is also available as public domain C code on the authors website \cite{tri_tri_intersection_moller_code}.
 As only a few adaptations were necessary, Möller's code was taken and thoroughly refactored to fit a modern C++ style without changing its behavior.
+Since the code is quite long and freely available on Möller's website, an implementation/algorithm is not included here.
 The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct_intersection} is thus merely a small adapter calling into Möller's code and is given in algorithm \ref{alg:triangle_intersection}.
 
 \begin{algorithm}
@@ -318,6 +319,20 @@ The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct
 	\label{alg:triangle_intersection}
 \end{algorithm}
 
+The triangle intersection test itself starts with an early exit test by computing the plane equation parameters, \ie normal and distance, for both triangles.
+Then, the signed plane distance of each vertex of one triangle to the plane of the other triangle is calculated.
+If the signs of these three values is the same for one triangle, it completely lies on one side of the plane and therefore does not intersect the other triangle.
+This test is run for both triangles.
+Afterwards, the intersection line between the two planes is calculated by crossing the planes' normal vectors.
+Figure \ref{fig:tri_intersect} shows the intersection line of the two triangle planes in green and is used to discuss the remaining part of the algorithm.
+Now, the intervals of the line which lie inside the triangle have to be calculated.
+For each pair of vertices of a triangle, \ie each triangle's edges, the two signed distances of the vertices to the plane of the other triangle are compared.
+If they have a different sign, this edge intersects the other triangle's plane and therefore crosses the intersection line of both planes.
+The intersection point splits the edge with the same ratio as the signed distances of both vertices.
+For each triangle, two intersecting edges are found, thus yielding an interval for each triangle, \cf blue segments of the line in figure \ref{fig:tri_intersect}.
+If these two intervals overlap, the triangles intersect and their intersection line is the overlapping segment of the planes' intersection line, \cf red segment in figure \ref{fig:tri_intersect}.
+Otherwise, there is no intersection.
+
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\textwidth]{tri_intersect}
@@ -331,6 +346,12 @@ The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct
 	}
 	\label{fig:tri_intersect}
 \end{figure}
+
+Extending beyond this concept, a further optimization is to do not use the planes' intersection line to project the triangle's intervals onto, but to use the coordinate system's axis where the intersection line's direction has the largest magnitude.
+This greatly simplifies several calculations except the actual points of the intersection segment.
+Furthermore, Möller's code additionally handles the case when both triangles are coplanar, \ie the signed distances of the vertices of one triangle to the other triangle's plane are almost zero.
+
+
 
 \subsection{Triangle splitting}
 \label{sec:triangle_splitting}
