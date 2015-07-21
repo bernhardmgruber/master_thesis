@@ -178,11 +178,23 @@ The following is a list of definitions of common terms used in 3-dimensional com
 		\includegraphics[width=0.9\textwidth]{images/delaunay_triangulation}
 		\caption{
 			Three different triangulations for the same set of points.
-			Only the left one is a conforming Delaunay triangulation \cite{delaunay_image}.
+			Only the left one is a conforming Delaunay triangulation.
+			The image in the middle is a constrained Delaunay triangulation with respect to the red constraints.
+			Image adapted from \cite{delaunay_image}.
 		}
 		\label{fig:delaunay_triangulation}
 	\end{figure}
 		
+	
+	\item[Constrained Delaunay triangulation] \hfill \\
+	Sometimes, predefined edges, \ie constraints or constrained edges, have to be respected when triangulating a point cloud into a Delaunay triangulation.
+	The resulting triangulation is called a constrained Delaunay triangulation (CDT).
+	Each triangle of the mesh satisfies the Delaunay condition, \ie an empty circumcircle, except for triangles containing a constrained edge.
+	A CDT is therefore as Delaunay as possible.
+	Figure \ref{fig:delaunay_triangulation} shows a constrained Delaunay triangulation on the middle and the corresponding Delaunay triangulation on the left image.
+	Constraints are colored red.
+	By splitting the constrained edges using additional vertices, \ie Steiner points, a CDT can be further refined into a fully conforming constrained Delaunay triangulation.
+	
 	
 	\item[Stock] \hfill \\
 	The stock is the original piece of material which is used as input for a milling machine.

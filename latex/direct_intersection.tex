@@ -9,7 +9,7 @@ Boolean operations on triangle meshes are already available in most CAD kernels.
 However, these kernels usually require the meshes to be closed.
 Due to the triangle elimination strategy using cell classification, \cf section \ref{sec:classification}, the meshes stored in the regular grid are no longer closed.
 Thus, regular CAD kernels cannot be used to intersect the meshes maintained by the VML and a custom mesh intersection algorithm has been developed.
-
+The idea of this approach is based on a paper about finding and deforming the intersection between two meshes as well as applying textures to those regions to increase the realism in computer graphics, \ie computer games \cite{mesh_intersection}.
 
 \section{Concept}
 \label{sec:direct_intersection_concept}
@@ -356,9 +356,43 @@ Furthermore, Möller's code additionally handles the case when both triangles ar
 \subsection{Triangle splitting}
 \label{sec:triangle_splitting}
 
-CDT
-list available libraries
-reference crytec paper
+After two structures have been intersected and all intersection lines per triangle have been recorded, the triangles can be split.
+The result of splitting a triangle must be a new set of triangles in order to create a new structure from these which can be put into the \textproc{UnionStructure} routine again.
+Hence, an algorithm for triangulating a triangle with respect to a set of lines is needed.
+In the context of triangulations, this set of lines is usually called constraints or constrained edges and the according algorithm a constrained triangulation (CT).
+Initially, a manually written CT was used.
+Even though it was capable of triangulating simple cases, it suffered severely from numerical instability and poor output quality.
+A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the paper giving the initial idea to this approach \cite{mesh_intersection}.
+However, as CDT algorithms are quite hard to implement regarding speed and robustness, using an established and tested library is highly recommended.
+A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}.
+
+\renewcommand{\arraystretch}{1.5} % row spacing
+\begin{table}[h]
+	\centering
+	\begin{tabular}{p{3cm} l l p{2.1cm} p{3.9cm}}
+		Library & & Language & License & Notes \\
+		\hline
+		poly2tri & \cite{poly2tri} & C++ & BSD & Constrains via polylines must not touch each other \\
+		Triangle & \cite{triangle_lib} & C & Custom, free for non-commercial use & Difficult interface and memory management \\
+		Computational Geometry Algorithms Library (CGAL) & \cite{cgal_triangulation} & C++ & LGPL, GPL or commercial & Huge functionality, de-facto standard in academics \\
+		Fade2D & \cite{fade2d} & C++ & Commercial, free for scientific research & Closed source \\
+		Triangulation Template Library (TTL) & \cite{ttl} & C++ & GPL & Supports usage of own data structures via C++ templates \\
+		GNU Triangulated Surface Library (GTS) & \cite{gts} & C & LGPL & object-oriented design using GLib\\
+		Geometric Tools Engine (GTE) & \cite{gte} & C++ & Boost License & modern C++11, SIMD and GPGPU support, high standard documentation \\
+		
+	\end{tabular}
+	\caption{
+		Table containing several libraries offering a constrained Delaunay triangulation.
+	}
+	\label{tbl:delaunay_libs}
+\end{table}
+\renewcommand{\arraystretch}{1.0}
+
+.......
+suggested by mesh intersection paper \cite{mesh_intersection}
+
+Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
+As output they generate a Delaunay mesh, with the convex hull of the point cloud as boundary.
 
 \subsection{Triangle inside structure test}
 \label{sec:triangle_inside_test}
