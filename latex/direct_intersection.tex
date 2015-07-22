@@ -364,7 +364,9 @@ Initially, a manually written CT was used.
 Even though it was capable of triangulating simple cases, it suffered severely from numerical instability and poor output quality.
 A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the paper giving the initial idea to this approach \cite{mesh_intersection}.
 However, as CDT algorithms are quite hard to implement regarding speed and robustness, using an established and tested library is highly recommended.
-A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}.
+A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}. Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
+Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
+As output they generate a Delaunay mesh, with the convex hull of the point cloud as boundary.
 
 \renewcommand{\arraystretch}{1.5} % row spacing
 \begin{table}[h]
@@ -374,11 +376,11 @@ A list of C/C++ libraries offering constrained Delaunay triangulations is given 
 		\hline
 		poly2tri & \cite{poly2tri} & C++ & BSD & Constrains via polylines must not touch each other \\
 		Triangle & \cite{triangle_lib} & C & Custom, free for non-commercial use & Difficult interface and memory management \\
+		Geometric Tools Engine (GTE) & \cite{gte} & C++ & Boost License & modern C++11, SIMD and GPGPU support, high standard documentation \\
 		Computational Geometry Algorithms Library (CGAL) & \cite{cgal_triangulation} & C++ & LGPL, GPL or commercial & Huge functionality, de-facto standard in academics \\
 		Fade2D & \cite{fade2d} & C++ & Commercial, free for scientific research & Closed source \\
 		Triangulation Template Library (TTL) & \cite{ttl} & C++ & GPL & Supports usage of own data structures via C++ templates \\
 		GNU Triangulated Surface Library (GTS) & \cite{gts} & C & LGPL & object-oriented design using GLib\\
-		Geometric Tools Engine (GTE) & \cite{gte} & C++ & Boost License & modern C++11, SIMD and GPGPU support, high standard documentation \\
 		
 	\end{tabular}
 	\caption{
@@ -388,11 +390,63 @@ A list of C/C++ libraries offering constrained Delaunay triangulations is given 
 \end{table}
 \renewcommand{\arraystretch}{1.0}
 
-.......
-suggested by mesh intersection paper \cite{mesh_intersection}
+The poly2tri library requires constraints to be specified as polylines which may not touch each other.
+This is a problem as constraints may touch the boundary of the original triangle.
+%
+The Triangle library has been used for exactly this purpose in another paper \cite{mesh_intersection}.
+Nevertheless, it has a very difficult C interface which tries to mimic a command line with text arguments even on API level.
+Furthermore, passing in and returning geometric data structures requires extensive care regarding memory management.
+The library did work for most of the cases but crashed several times, \eg on every 1000\textsuperscript{th} triangle.  
+%
+The Geometric Tools Engine (GTE) is a rather modern library with an excellent C++ interface.
+The algorithms' precision may be configured via templates.
+The library runs outstandingly stable with only a few troubles in cases where the input was numerically problematic, \eg contained points with differences only at the last few digits representable with double precision.
+However, these issues can be fixed with appropriate preprocessing of the input, \cf section \ref{sec:numeric_improvements}.
+Furthermore, the GTE library is licensed under the Boost License and therefore perfectly usable in commercial products like the VML.
+%
+The remaining libraries have not been further tested, mainly for the reason that the VML is a commercial product and the use of these libraries would require to drop the code again later.
+%
+The integration of the GTE's CDT is given in algorithm \ref{alg:triangle_splitting}.
 
-Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
-As output they generate a Delaunay mesh, with the convex hull of the point cloud as boundary.
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{SplitTriangle}{$\var{t}, \var{lines}$}
+			\State $\var{points} \gets \{\var{t.a}, \var{t.b}, \var{t.c}\}$ \Comment{Order of elements must remain}
+			\ForAll{$\var{(p_1, p_2)} \in \var{lines}$}
+				\State $\var{points} \gets \var{points} \cup \{\var{p_1}, \var{p_2}\}$
+			\EndFor
+			\State $\var{cdt} \gets \var{ConstrainedDelaunay2()}$
+			\ForAll{$(\var{p_1}, \var{p_2}) \in \var{lines}$}
+				\State $\var{cdt.Insert}((\var{points.indexof}(\var{p_1}), \var{points.indexof}(\var{p_2})), \dots)$
+			\EndFor
+			\State $\var{cdt}(|\var{points}|, \var{points}, \epsilon)$
+			
+			\State $\var{indices} \gets \var{cdt.GetIndices()}$
+			\State $\var{triangles} \gets \varnothing$
+			\For{$\var{i} \gets 0,\dots,\frac{|\var{indices}|}{3} - 1$}
+				\State $\var{f} \gets \var{triangle()}$
+				\For{$\var{j} \gets 0,1,2$}
+					\State $\var{index} \gets \var{indices_{i * 3 + j}}$
+					\State $\var{f_j} = \var{points_{index}}$
+				\EndFor
+				%\If{$\var{f.normal} * \var{t.normal} < 0$}
+				%	\State $\var{swap}(\var{f.a}, \var{f.b})$ \Comment{Swap two vertices to reverse winding}
+				%\EndIf
+				\State $\var{triangles} \gets \var{triangles} \cup \{\var{f}\}$
+			\EndFor
+			\State \Return $\var{triangles}$
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Adapter to the constrained Delaunay triangulation routine provided by the GTE library.
+	}
+	\label{alg:triangle_splitting}
+\end{algorithm}
+
+
+
+
 
 \subsection{Triangle inside structure test}
 \label{sec:triangle_inside_test}
