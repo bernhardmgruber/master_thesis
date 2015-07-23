@@ -88,34 +88,13 @@ Figure \ref{fig:cube2} demonstrates this workflow by the example of intersecting
 \section{Implementation}
 \label{sec:direct_intersection_implementation}
 
-Due to the regular grid's classification, \cf section \ref{sec:classification}, triangles might have been removed and, consequently, the structures put together from the regular grid's cells may no longer be closed meshes.
-As it turns out, the test whether a triangle is inside another structure may fail if the tested structure is not a closed mesh, a common case.
-An example of such an issue is shown in figure \ref{fig:inside_test_error}.
-%
-\begin{figure}
-	\centering
-	\includegraphics[width=0.8\textwidth]{inside_test_error}
-	\caption{
-		Testing if a triangle of one structure is inside another structure using a ray.
-		Due to triangle elimination, the ray can miss removed structures, \eg when traversing outside cells, causing the inside test to fail, \cf left ray.
-		As structures are guaranteed to be closed within a cell, this test is only valid within a cell, \cf right ray.
-	}
-	\label{fig:inside_test_error}
-\end{figure}
-%
-A triangle is tested against a structure by using a ray.
-This ray is shot from an arbitrary point on the triangle, which does not lie on an edge, \eg the triangle's centroid, to an arbitrary point on a triangle of the other structure.
-If the ray does not intersect the other structure on its way, a comparison of the ray's direction with the normal of the targeted triangle determines whether the ray's origin, \ie the centroid of the tested triangle, is inside the other structure or not.
-However, as classification might eliminate triangles, the ray could potentially intersect triangles of the structure which have been removed, \cf left ray in figure \ref{fig:inside_test_error}.
-The regular grid only guarantees closed meshes within a cell.
-To circumvent this issue, the inside test for a triangle must be conducted within a cell.
-
 In general, intersecting each triangle of a structure against each other triangle of another structure is an expensive undertaking.
 The cost of this operation is $\mathcal{O}(n^2)$, assuming both structures have $n$ triangles.
 Intersecting the structures at the level of each cell greatly reduces the value of $n$.
 Unfortunately, many triangles usually span the bounding box of a cell and are duplicated in each encompassed cell.
 To avoid duplicates or overlapping triangles when combining results from neighboring cells, all triangles of a cell have to be clipped against the cell's bounding box.
 This step can be done before or after intersecting the structures of a cell, but always before starting to eliminate triangles against the opposite structure.
+There is also a second reason why this direct intersection approach must be run on a cell level which is discussed in section \ref{sec:triangle_inside_test}.
 
 An abstracted algorithm of this reconstruction approach is shown in algorithm \ref{alg:direct_intersection}.
 The following sections discuss details of this algorithms and follow the order of subroutines/functions which are not yet defined.
@@ -364,7 +343,8 @@ Initially, a manually written CT was used.
 Even though it was capable of triangulating simple cases, it suffered severely from numerical instability and poor output quality.
 A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the paper giving the initial idea to this approach \cite{mesh_intersection}.
 However, as CDT algorithms are quite hard to implement regarding speed and robustness, using an established and tested library is highly recommended.
-A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}. Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
+A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}.
+Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
 Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
 As output they generate a Delaunay mesh, with the convex hull of the point cloud as boundary.
 
@@ -405,23 +385,29 @@ However, these issues can be fixed with appropriate preprocessing of the input, 
 Furthermore, the GTE library is licensed under the Boost License and therefore perfectly usable in commercial products like the VML.
 %
 The remaining libraries have not been further tested, mainly for the reason that the VML is a commercial product and the use of these libraries would require to drop the code again later.
-%
-The integration of the GTE's CDT is given in algorithm \ref{alg:triangle_splitting}.
 
+The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which is given in algorithm \ref{alg:triangle_splitting}.
+%
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
 		\Function{SplitTriangle}{$\var{t}, \var{lines}$}
-			\State $\var{points} \gets \{\var{t.a}, \var{t.b}, \var{t.c}\}$ \Comment{Order of elements must remain}
+			\State $\var{points} \gets \{\var{t.a}, \var{t.b}, \var{t.c}\}$ \Comment{Ordered set}
 			\ForAll{$\var{(p_1, p_2)} \in \var{lines}$}
 				\State $\var{points} \gets \var{points} \cup \{\var{p_1}, \var{p_2}\}$
 			\EndFor
+			\State $\var{axis_0} \gets \Call{LargestAxis}{t.normal}$
+			\State $\var{axis_1} \gets (axis_0 + 1) \bmod 3$ 
+			\State $\var{axis_2} \gets (axis_0 + 2) \bmod 3$
+			\State $\var{points2} \gets \varnothing$ \Comment{Project 3D to 2D points, order must remain}
+			\ForAll{$\var{p} \in points$}
+				\State $\var{points2} \gets \var{points2} \cup \{\var{Vector2}(\var{p_{axis1}}, \var{p_{axis2}})\}$
+			\EndFor
 			\State $\var{cdt} \gets \var{ConstrainedDelaunay2()}$
-			\ForAll{$(\var{p_1}, \var{p_2}) \in \var{lines}$}
+			\ForAll{$(\var{p_1}, \var{p_2}) \in \var{lines}$} \Comment{Add constraints}
 				\State $\var{cdt.Insert}((\var{points.indexof}(\var{p_1}), \var{points.indexof}(\var{p_2})), \dots)$
 			\EndFor
-			\State $\var{cdt}(|\var{points}|, \var{points}, \epsilon)$
-			
+			\State $\var{cdt}(|\var{points2}|, \var{points2}, \epsilon)$ \Comment{Compute CDT}
 			\State $\var{indices} \gets \var{cdt.GetIndices()}$
 			\State $\var{triangles} \gets \varnothing$
 			\For{$\var{i} \gets 0,\dots,\frac{|\var{indices}|}{3} - 1$}
@@ -437,20 +423,102 @@ The integration of the GTE's CDT is given in algorithm \ref{alg:triangle_splitti
 			\EndFor
 			\State \Return $\var{triangles}$
 		\EndFunction
+		\\
+		\Function{LargestAxis}{$\var{v}$}
+			\If{$\var{v.x} > \var{v.y}$}
+				\If{$\var{v.x} > \var{v.z}$}
+					\State \Return $0$
+				\Else
+					\State \Return $2$
+				\EndIf
+			\Else 
+				\If{$\var{v.y} > \var{v.z}$}
+					\State \Return $1$
+				\Else
+					\State \Return $2$
+				\EndIf
+			\EndIf
+		\EndFunction
 	\end{algorithmic}
 	\caption{
-		Adapter to the constrained Delaunay triangulation routine provided by the GTE library.
+		Adapter to the CDT routine provided by the GTE library.
+		Uses the $\var{ConstrainedDelaunay2}$ class template to generate a CDT for a given triangle and a set of constrained edges.
+		The resulting triangulation is returned.
 	}
 	\label{alg:triangle_splitting}
 \end{algorithm}
+%
+A few preparations are necessary before the CDT subroutine can be called.
+All points used by constrained edges must be part of the input point cloud and are therefore added to the point cloud formed by the input triangle's vertices.
 
-
-
+Furthermore, as the CDT only runs in 2 dimensions, all vertices are projected onto the plane spanned by the two coordinate system axes with the smaller magnitude in the triangle's normal vector.
+This operation is simple as it only requires the selection of two components of each point and no calculation.
+As all constraints as well as the resulting triangulation are specified using indexes into the point cloud, the list containing the 2-dimensional, projected vertices must have the same order as the original point list.
+Before starting the triangulation, the constrained edges have to be specified.
+Each constraint is inserted by supplying a pair of indexes into the point cloud.
+Afterwards, the CDT can be calculated.
+The resulting triangulation is specified using a list of indexes.
+The length of this list is a multiple of 3 and each consecutive 3 indexes form a triangle of the result.
+When these indexes are resolved by indexing into the original point cloud, the vertices for the final triangles are obtained.
+These triangles are finally returned.
 
 
 \subsection{Triangle inside structure test}
 \label{sec:triangle_inside_test}
 
+After all triangles of two intersecting structures have been split on their intersection lines, all triangles which do not contribute to the union surface, \ie are inside the other structure, have to be removed.
+Due to the regular grid's classification, \cf section \ref{sec:classification}, triangles might have been removed and, consequently, structures put together from multiple cells of the regular grid may no longer be closed meshes.
+As it turns out, the test whether a triangle is inside another structure may fail if the tested structure is not a closed mesh, a common case.
+An example of such an issue is shown in figure \ref{fig:inside_test_error}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{inside_test_error}
+	\caption{
+		Testing if a triangle of one structure is inside another structure using a ray.
+		Due to triangle elimination, the ray can miss removed structures, \eg when traversing outside cells, causing the inside test to fail, \cf left ray.
+		As structures are guaranteed to be closed within a cell, this test is only valid within a cell, \cf right ray.
+	}
+	\label{fig:inside_test_error}
+\end{figure}
+%
+A triangle is tested against a structure by using a ray.
+This ray is shot from an arbitrary point on the triangle, which does not lie on an edge, \eg the triangle's centroid, to an arbitrary point on a triangle of the other structure.
+If the ray does not intersect the other structure on its way, a comparison of the ray's direction with the normal of the targeted triangle determines whether the ray's origin, \ie the centroid of the tested triangle, is inside the other structure or not.
+However, as classification might eliminate triangles, the ray could potentially intersect triangles of the structure which have been removed, \cf left ray in figure \ref{fig:inside_test_error}.
+The regular grid only guarantees closed meshes within a cell.
+To circumvent this issue, the inside test for a triangle must be conducted within a cell.
+
+An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algorithm \ref{alg:triangle_inside_test}. 
+%
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{IsTriangleInsideStructure}{$\var{t}, \var{s}$}
+			\State $\var{origin} \gets \frac{\var{t.a} + \var{t.b} + \var{t.c}}{3}$ \Comment{Origin is triangle center}
+			\State $\var{target} \gets \frac{\var{s_0.a} + \var{s_0.b} + \var{s_0.c}}{3}$ \Comment{Target ray at center of $\var{s_0}$}
+			\State $\var{ray} \gets \var{target} - \var{origin}$
+			\State $\var{d_{nearest}} \gets \var{ray.length}()$
+			\State $\var{n_{nearest}} \gets \var{s_0.normal}$
+			\State $\var{raydir} \gets \var{ray.normalized()}$
+			\ForAll{$\var{f} \in \var{s} \setminus \{\var{s_0}\}$} \Comment{Retarget ray at closer triangle if intersected}
+				\State $\var{d}, \var{u}, \var{v}$
+				\If{$\Call{IntersectRayTriangle}{\var{origin}, \var{raydir}, \var{f}, \var{d}, \var{u}, \var{v}}$}
+					\If{$\var{d} > 0 \wedge \var{d} < \var{d_{nearest}}$}
+						\State $\var{d_{nearest}} \gets \var{d}$
+						\State $\var{n_{nearest}} \gets \var{f.normal}$
+					\EndIf
+				\EndIf
+			\EndFor
+			\State \Return $\var{n_{nearest}} * \var{rayDir} \geq 0$
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Algorithm for testing whether a triangle is inside another structure.
+	}
+	\label{alg:triangle_inside_test}
+\end{algorithm}
+%
 
 
 \subsection{Numeric improvements}
