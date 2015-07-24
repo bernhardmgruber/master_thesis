@@ -512,13 +512,73 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algo
 			\EndFor
 			\State \Return $\var{n_{nearest}} * \var{rayDir} \geq 0$
 		\EndFunction
+		\\
+		\Function{IntersectRayTriangle}{$origin, direction, t, d, u, v$}
+			\State $\var{vertex_0} \gets \var{t.a}$
+			\State $\var{edge_1} \gets \var{t.b} - \var{t.a}$
+			\State $\var{edge_2} \gets \var{t.c} - \var{t.a}$
+			\State $\var{tVec} \gets \var{origin} - \var{vertex_0}$
+			\State $\var{pVec} \gets \var{direction} \times \var{edge_2}$
+			\State $\var{det} \gets \var{edge_1} \cdot \var{pVec}$
+			\State $\var{u} \gets \var{tVec} \cdot \var{pVec}$
+			\State $\var{qVec} \gets \var{tVec} \times \var{edge_1}$
+			\State $\var{v} \gets \var{qVec} *\cdot \var{direction}$
+			\State $\var{invDet} \gets \frac{1}{\var{det}}$
+			\State $\var{distance} \gets \var{edge_2} \cdot \var{qVec} \cdot \var{invDet}$
+			\State $\var{u} \gets \var{u} \cdot \var{invDet}$
+			\State $\var{v} \gets \var{v} \cdot \var{invDet}$
+			\State \Return $(\var{u} \geq 0) \wedge (\var{v} \geq 0) \wedge (\var{u} + \var{v} \leq 1)$
+		\EndFunction
 	\end{algorithmic}
 	\caption{
 		Algorithm for testing whether a triangle is inside another structure.
+		The \textproc{IntersectRayTriangle} function is a branch-free version of the famous Möller-Trumbore ray-triangle intersection test \cite{ray_triangle_intersection_moller}.
 	}
 	\label{alg:triangle_inside_test}
 \end{algorithm}
 %
+The function starts by calculating the origin and target point for the test ray.
+The ray originates the center of the tested triangle and initially targets the center of the first triangle of the other structure.
+Distance and normal of the targeted triangle are stored.
+Then, all other triangles of the structure are tested for intersection with the created ray.
+If an intersection happens and the distance to the newly intersected triangle is shorter than the distance to the currently targeted triangle, the distance and normal are updated to the new triangle, \ie the ray now targets the new triangle.
+This procedure ensures that after all triangles have been tested for intersection, the maintained distance and normal store the values of the closest intersection of the ray.
+The normal of the closest intersected triangle of the other structure is then finally compared to the ray's direction.
+If they point into the same half space, the ray's origin and therefore the tested triangle is inside the tested structure.
+
+For ray-triangle intersection the famous Möller-Trumbore intersection test is used \cite{ray_triangle_intersection_moller}.
+An implementation of their algorithm in C is already given in the corresponding paper.
+The original version has a few early exit tests on $u$ and $v$, which might save some work in case the ray misses the triangle.
+However, branching is becoming increasingly expensive on modern hardware architectures, especially in vectorized code paths or GPU code.
+A branch-free version of Möller-Trumbore's code, which is currently used and performs slightly better, is shown in algorithm \ref{alg:triangle_inside_test}.
+
+The idea of the algorithm is shown in figure \ref{fig:ray_triangle_intersect}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{moeller_trumbore}
+	\begin{equation*}
+		\left[-D, V_1 - V_0, V_2 - V_0 \right] \left[ \begin{array}{c} t \\ u \\ v \end{array} \right] = O - V_0
+	\end{equation*}
+	\caption{
+		Principle of the famous Möller-Trumbore ray-triangle intersection test \cite{enlight_demo_workshop}.
+	}
+	\label{fig:ray_triangle_intersect}
+\end{figure}
+%
+The intersection test relies on the idea that with a simple transformation, the problem can be represented in a coordinate system where the solution is almost given.
+This transformation should put the origin of the coordinate system at one vertex of the triangle.
+The axes of the new system are the two triangle edges as well as the inverted ray direction.
+If the problem is represented in this space, the ray's origin holds the values of the $u$ and $v$ barycentric coordinate of the intersection point on the triangle as well as the distance $t$ of the triangle to the origin in multiples of the ray direction vector's length.
+$u$ and $v$ are used to test whether the intersection point lies within the triangle and $t$ can be used as parameter in the line equation of the ray, $X = O + D \cdot t$, to retrieve the point of intersection.
+The transformation necessary consists of two steps.
+The first is a translation of $O$ by $-V_0$ to move the coordinate system's origin to a triangle vertex.
+The second step is a change of basis with $\left[-D, V_1 - V_0, V_2 - V_0 \right]$ as base matrix.
+This is done by multiplying with the inverse base matrix.
+The result vector $\left[ t,  u,  v \right]$ then contains the desired values.
+By moving the multiplication with the inversed base matrix to the other side, the equation in figure \ref{fig:ray_triangle_intersect} is obtained.
+This system of equations in matrix form is solved by Möller and Trumbore's algorithm using Cramer's rule.
+This allows to calculate the values of the solution vector incrementally to allow early exits.
 
 
 \subsection{Numeric improvements}
