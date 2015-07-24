@@ -577,14 +577,45 @@ The second step is a change of basis with $\left[-D, V_1 - V_0, V_2 - V_0 \right
 This is done by multiplying with the inverse base matrix.
 The result vector $\left[ t,  u,  v \right]$ then contains the desired values.
 By moving the multiplication with the inversed base matrix to the other side, the equation in figure \ref{fig:ray_triangle_intersect} is obtained.
-This system of equations in matrix form is solved by Möller and Trumbore's algorithm using Cramer's rule.
+Möller and Trumbore solve this system of equations in matrix form using Cramer's rule and by calculating the determinant of a matrix using a cross and a dot product.
 This allows to calculate the values of the solution vector incrementally to allow early exits.
 
 
 \subsection{Numeric improvements}
 \label{sec:numeric_improvements}
 
-mostly makeRobustChains()
+If the method described in this chapter would be tested on various scenes now, it would barely work for not even modest scenarios.
+The problem is mainly numeric instability and the iterative nature of the approach.
+Each calculation with a fixed precision is effected by small rounding errors when the result is stored back into a register or to memory.
+This especially becomes a problem when theoretically equal calculations should practically yield equal results.
+When two incident triangles for example intersect with a third triangle, the shared edge of the first two triangles should intersect at the same point on triangle three.
+Depending on the order of operations this is not guaranteed.
+The result may be different if, \eg, the two points representing the edge are swapped.
+%
+The triangle splitting algorithm for example can only hold its guarantees if the intersecting edges are true polylines with no gaps between the segments and their ends are exactly at the triangle edges.
+Otherwise, degenerated triangles may be created between intersecting edges or at the triangle edges.
+%
+Another problem are algorithms which create very small numbers in intermediary calculations.
+If a triangle is really thin, the dot product between the edges at the smallest corner is almost zero and might suffer severely from numerics.
+The cross product and therefore the normal vector also becomes instable.
+Calculations depending on these values might then critically misjudge a situation and \eg create intersection lines outside a triangle or falsely report a triangle as inside-a-structure based on a degenerated normal.
+The problem with errors on such hard decisions is that they escalate with the number of iterations, which might be several hundreds or thousands.
+If two structures are united but a wrongly discarded triangle left a hole, all following inside tests are affected and may fail.
+Several improvements to mitigate degeneration and numeric errors are discussed in this section.
+
+
+collapse near points in structures
+flush values close to zero to zero
+
+if a triangle intersection is recorded, test each point of the line if it is on the triangle using a raycast with the point as origin and the triangle normal as ray direction. use epsilon for u and v.
+
+after all cutting segments have been recorded for each triangle: make robust chains.
+collapse cutting edges' vertices with structure vertices
+collapse near points in cutting edges
+ensure unique cutting edges
+
+hull constrains to avoid degenerates at the convex hull
+still check for degenerate triangles and remove them, if dot of angle at any triangle corner is below epsilon.
 
 
 \subsection{Parallelization}
