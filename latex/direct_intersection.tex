@@ -603,19 +603,71 @@ The problem with errors on such hard decisions is that they escalate with the nu
 If two structures are united but a wrongly discarded triangle left a hole, all following inside tests are affected and may fail.
 Several improvements to mitigate degeneration and numeric errors are discussed in this section.
 
+\begin{description}
+	% TODO: add drawings
+	
+	\item[Collapse near points in structures] \hfill \\
+	At the beginning of the \textproc{UnionStructure} algorithm almost no guarantees are given on the two input structures.
+	As very thin or degenerated triangles are numerically problematic during the following algorithmic steps, \eg intersection, inside test, \etc, filtering them may avoid some of those problems.
+	Therefore, all vertices which are closer than a defined small epsilon distance are collapsed to their mean.
+	Thus, no holes are created in the structure, only degenerated triangles.
+	These are easy to filter in a post-processing step by removing all triangles where two or more vertices are equal.
+	
 
-collapse near points in structures
-flush values close to zero to zero
-
-if a triangle intersection is recorded, test each point of the line if it is on the triangle using a raycast with the point as origin and the triangle normal as ray direction. use epsilon for u and v.
-
-after all cutting segments have been recorded for each triangle: make robust chains.
-collapse cutting edges' vertices with structure vertices
-collapse near points in cutting edges
-ensure unique cutting edges
-
-hull constrains to avoid degenerates at the convex hull
-still check for degenerate triangles and remove them, if dot of angle at any triangle corner is below epsilon.
+	\item[Flush tiny values to zero] \hfill \\
+	Floating point values with tiny exponents, \eg $10^{-15}$ and below, tend to make some calculations unstable, especially when collapsing vertices with such coordinates.
+	Collapsed vertices with such values might still not compare equal afterwards which breaks subsequent calls to the CDT algorithm.
+	The reason therefore is unfortunately not clear.
+	However, flushing such small values to zero eliminates the problem.
+	
+	
+	\item[Verify intersection line] \hfill \\
+	In situations where two triangles are quite thin, the Möller-Trumbore intersection test may report an intersection and calculate an intersection line which lies outside one or both of the triangles.
+	Subsequent CDTs will then generate additional triangles outside the triangle which should be split as CDT routines usually triangulate the convex hull of the input point set.
+	This issue is avoided by an additional test run after the call to \textproc{IntersectTriangles}.
+	If a triangle intersection is recorded, test each point of the line if it lies on each of the triangles using a raycast with the point as origin and each triangle normal as ray direction.
+	Only if the resulting $u$ and $v$ coordinates for both points are within their bounds including a small epsilon, \ie $-\epsilon \leq u \leq 1+\epsilon \wedge -\epsilon \leq v \leq 1+\epsilon \wedge u + v \leq 1 + \epsilon$, the intersection is accepted.
+	
+	
+	\item[Collapse constraint vertices with structure vertices] \hfill \\
+	Some of the intersection lines on a triangle might be very close to the triangle's vertices.
+	To avoid creating degenerated triangles during CDT, all constraints' vertices are checked against the triangle's vertices to ensure a minimum distance.
+	If a distance is less than a specified minimum, the affected vertex is set to the corresponding vertex of the triangle.
+	
+	
+	\item[Collapse near points in constraints per triangle] \hfill \\
+	This correction is the most important one.
+	After all intersection lines have been recorded, collapse all constraint vertices which are closer than a defined epsilon distance.
+	This routine ensures that each pair of incident triangles intersecting another triangle produce an incident pair of constraints.
+	In other words, constrained edges which are not connected to each other because of numerical issues in the intersection routine are rejoined again to form closed polylines.
+	Furthermore, tiny constraints collapse to points and are removed.
+	This matter is important for correct splittings after running the CDT.
+	
+	
+	\item[Ensure unique constraints] \hfill \\
+	Constraint uniqueness is a small and simple check.
+	The test is required as duplicated constraints impose a problem for some CDT libraries.
+	
+	
+	\item[Specify hull constraints] \hfill \\
+	Most CDT libraries triangulate a given point cloud within the convex hull of the cloud.
+	Identifying the edges belonging to the convex hull is usually deterministic if the points are in what is called general position, \ie no coincident or collinear points.
+	However, the vertices of a triangle and a set of constraints where many constraints end at the triangle's edges contain a lot of collinear points.
+	To order to help the CDT in finding the right hull, it is recommended to specify the hull manually via additional constraints.
+	These hull constraints are constructed from the triangle's vertices and the constraint vertices touching an edge of the triangle.
+	The latter are identified by counting the number of constraints incident to each vertex of a point set formed by all constraints' vertices.
+	Vertices with only one incident constraint must lie at the triangle's border and are therefore hull vertices.
+	Together with the triangle's vertices, the hull vertices are ordered cyclical around their center of mass.
+	The hull constraints are then formed from each adjacent pair of the ordered hull vertices including the constraint from the last to the first hull vertex.
+	These hull constraints are appended to the constraints created by the intersection lines as input to the CDT.
+	
+	
+	\item[Remove degenerate triangles after CDT] \hfill \\
+	Despite good preparation of the input, it might still be the case that tiny or degenerated triangles are generated by the CDT routine, especially along the hull.
+	The vertices of such triangles are apart far enough to pass vertex collapse in a following iteration.
+	A check on the triangle's angles is therefore preferred.
+	If the dot product of any pair of incident, normalized edges of the triangle is approaching zero, \ie is below a defined epsilon, the triangle is removed from the triangulation result.
+\end{description}
 
 
 \subsection{Parallelization}
