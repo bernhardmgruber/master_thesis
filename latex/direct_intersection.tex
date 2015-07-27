@@ -673,12 +673,34 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 \subsection{Parallelization}
 \label{sec:parallelization}
 
+By choosing to solve the intersections of all structures per cell, the main routine in algorithm \ref{alg:direct_intersection} became embarrassingly parallel.
+As the regular grid usually consists of a larger number of cells, \eg $100 \times 100 \times 100$ is quite common, scheduling each cell in parallel is probably the best option for parallelization.
+However, a good scheduling strategy is needed as the workload per cell is highly diverse.
+Most of the cells are empty because they are either inside or outside cells and require no processing.
+But also the amount of triangles and structures in each surface cell varies drastically between a few triangles and several thousands.
 
-per cell is easy.
-at cell level, structure union is a tree-shaped reduction
-at union level, triangle-triangle intersections may run fully parallel for each triangle pair, elimination may run fully parallel
+If all structures would be closed, \ie triangle elimination by classification would be disabled, and there would be no subdivision into cells, the iterative creation of the union structure could be parallelized instead.
+Always combining two elements of a set of elements until only one left is an algorithm known as reduction, fold or accumulate.
+Reductions are usually parallelized as tree.
+Each independent pair of elements can be reduced into one in parallel.
+However, tree-shaped parallel reduction offers suboptimal parallelism, especially against the end where only a few parallel pairs remain.
+Parallelizing the reduction of all surfaces into one in addition to a cell-based parallelization is probably superfluous as the still high number of surface cells provide enough parallel work to saturate most workstation or even server CPUs.
 
+Most routines inside the \textproc{UnionStructure} algorithm are also viable candidates for parallelization, although the workload is significantly smaller.
+A structure inside a cell usually does not consist of more than 50 - 100 triangles.
+These routines would probably benefit from data parallelism and SIMD constructs, \ie vectorization.
+Especially the \textproc{ClipPolygonAABB}, \textproc{IntersectTriangles} and \textproc{IsTriangleInsideStructure} algorithms contain only a few branches and operate on simple data structures, \ie arrays.
 
+Considering alternative hardware architectures like GPUs or similar accelerators, \eg Intel's Xeon Phi coprocessor, a parallelization based on the regular grid's cells is recommended.
+The reason is that the number of cells is known at the beginning of the whole calculation which allows static scheduling of the entire work size.
+This property is mandatory when programming for GPUs, but has been softened in recent years by the introduction of dynamic parallelism in CUDA 5.0 and OpenCL 2.0.
+Furthermore, as most GPU architectures rely on either vectorization or execution of thread groups in lockstep\footnote{
+	Most GPUs usually schedule groups of threads, called warps with 32 threads by NVIDA and wavefronts with 64 threads by AMD.
+	These threads are tied together and executed instruction-wise, meaning all threads execute the same instruction on their individual data in parallel.
+	This behavior is also called lockstep execution.
+	If some threads branch differently than others, \eg if, while or for statements, all threads execute both branches, but some of them are masked out to avoid changes by the executed instructions.
+	Intel's on-chip GPUs rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.},
+the uneven work loads in all loops, \eg number of structures per cell, number of triangles per structure, number of intersections, \etc, especially hurt these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
 
 
 \section{Results}
