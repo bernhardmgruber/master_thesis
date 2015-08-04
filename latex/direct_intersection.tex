@@ -706,6 +706,91 @@ the uneven work loads in all loops, \eg number of structures per cell, number of
 \section{Results}
 \label{sec:direct_intersection_results}
 
+Finally, the direct intersection approach described in this chapter has been tested on several scenes with various complexity.
+The test scenes and their configurations are shown in table \ref{tbl:test_scenes}.
+%
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lrrrrrrrrr}
+		Scene          & SVs  & cells & surf. & t\textsubscript{max} & t\textsubscript{avg} & s\textsubscript{max} & s\textsubscript{avg} & t\textsubscript{out} & time \\
+		\hline
+		cube2          &    1 &   1k & 47 \% &    5 &   1.6 &  2 & 1.1 &    1k &   1ms \\
+		cylinders\_d   &    1 &   1k & 22 \% &   58 &  31.3 &  2 & 1.1 &   10k &   6ms \\
+		cylinders      &    1 &   1k & 22 \% &  128 &  17.8 &  2 & 1.1 &    7k &   9ms \\
+		cylinder\_head &   20 &  75k & 21 \% &   70 &   5.1 &  3 & 1.2 &  149k & 229ms \\
+		impeller       & 2383 & 400k & 16 \% & 2574 & 135.9 & 64 & 5.5 & 1677k &  21s  \\
+		impeller\_2    & 1191 & 400k & 13 \% & 2563 &  88.5 & 64 & 3.6 & 1296k &  11s  \\
+		turbine        &  480 & 200k & 17 \% & 2930 & 473.7 &  6 & 2.3 &  752k & 280s  \\
+	\end{tabular}
+	\caption{
+		Table containing the selected test scenes and several parameters of them.
+		It lists the name of a scene, the number of swept volumes, the total number of cells of the regular grid, the amount of surface cells in the grid, \ie cells which have to be processed, the maximum and average amount of triangles in a cell, the maximum and average amount of structures in a cell, the number of triangles of the reconstructed surface mesh as well as the time needed for reconstruction.
+	}
+	\label{tbl:test_scenes}
+\end{table}
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/c_hist}
+		\caption{cube2}
+		\label{fig:cube2_histogram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/ch_hist}
+		\caption{cylinder\_head}
+		\label{fig:cylinder_head_histogram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/cy_hist}
+		\caption{cylinders}
+		\label{fig:cylinders_histogram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/cyd_hist}
+		\caption{cylinders\_d}
+		\label{fig:cylinders_d_histogram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/hq_hist}
+		\caption{impeller}
+		\label{fig:impeller_histogram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/hq2_hist}
+		\caption{impeller\_2}
+		\label{fig:impeller_2_histogram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{../spreadsheets/tr_hist}
+		\caption{turbine}
+		\label{fig:turbine_histogram}
+	\end{subfigure}
+	\caption{
+		Histograms showing the distribution of triangle counts per cell for the selected test scenes in table \ref{tbl:test_scenes}.
+	}
+	\label{fig:histograms}
+\end{figure}
+%
+The cube2 scene is a simple intersection between a cubic stock and a cuboid swept volume.
+It has already been used as an example when discussing the concept of the direct intersection approach at the beginning of this chapter in figure \ref{fig:cube2}.
+But instead of no grid, a small one with a resolution of $10\times10\times10$ cells is used.
+%
+The cylinders and cylinders\_d scenes each consist of a broader cylindrical stock with a smaller cylindrical swept volume drilled out.
+The cylinders in the cylinders\_d scene are Delaunay triangulated whereas the cylinders in the other scene contain many thin triangles.
+Both scenes also use the same small grid resolution as the cube2 scene.
+The cylinders\_d scene, due to the Delaunay triangulation, contains roughly equally sized triangles which are evenly distributed.
+These properties show themselves in the maximum and average number of triangles per cell, t\textsubscript{max} and t\textsubscript{avg}.
+The cylinders scene uses fewer triangles 
+
+
 Why it does not work on larger meshes?
 Run time complexity
 Numerical robustness
