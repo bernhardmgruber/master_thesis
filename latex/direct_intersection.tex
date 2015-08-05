@@ -703,92 +703,211 @@ Furthermore, as most GPU architectures rely on either vectorization or execution
 the uneven work loads in all loops, \eg number of structures per cell, number of triangles per structure, number of intersections, \etc, especially hurt these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
 
 
-\section{Results}
-\label{sec:direct_intersection_results}
+\section{Test scenes}
+\label{sec:direct_intersection_test_scenes}
 
-Finally, the direct intersection approach described in this chapter has been tested on several scenes with various complexity.
+For testing the direct intersection approach and the further surface reconstruction algorithms shown in succeeding chapters, a few test scenes have been created.
 The test scenes and their configurations are shown in table \ref{tbl:test_scenes}.
 %
 \begin{table}[h]
 	\centering
-	\begin{tabular}{lrrrrrrrrr}
-		Scene          & SVs  & cells & surf. & t\textsubscript{max} & t\textsubscript{avg} & s\textsubscript{max} & s\textsubscript{avg} & t\textsubscript{out} & time \\
+	\begin{tabular}{lrrrrrrr}
+		Scene          & SVs  & cells & surf. & tri. & s\textsubscript{max} & s\textsubscript{avg} \\
 		\hline
-		cube2          &    1 &   1k & 47 \% &    5 &   1.6 &  2 & 1.1 &    1k &   1ms \\
-		cylinders\_d   &    1 &   1k & 22 \% &   58 &  31.3 &  2 & 1.1 &   10k &   6ms \\
-		cylinders      &    1 &   1k & 22 \% &  128 &  17.8 &  2 & 1.1 &    7k &   9ms \\
-		cylinder\_head &   20 &  75k & 21 \% &   70 &   5.1 &  3 & 1.2 &  149k & 229ms \\
-		impeller       & 2383 & 400k & 16 \% & 2574 & 135.9 & 64 & 5.5 & 1677k &  21s  \\
-		impeller\_2    & 1191 & 400k & 13 \% & 2563 &  88.5 & 64 & 3.6 & 1296k &  11s  \\
-		turbine        &  480 & 200k & 17 \% & 2930 & 473.7 &  6 & 2.3 &  752k & 280s  \\
+		cube2          &    1 &   1k & 47 \% &   0.8k &  2 & 1.1 \\
+		cylinders\_d   &    1 &   1k & 22 \% &     7k &  2 & 1.1 \\
+		cylinders      &    1 &   1k & 22 \% &     4k &  2 & 1.1 \\
+		cylinder\_head &   20 &  75k & 21 \% &    80k &  3 & 1.2 \\
+		impeller       & 2383 & 400k & 16 \% &  6000k & 64 & 5.5 \\
+		impeller\_2    & 1191 & 400k & 13 \% &  3000k & 64 & 3.6 \\
+		turbine        &  480 & 200k & 17 \% & 16000k &  6 & 2.3 \\
 	\end{tabular}
 	\caption{
 		Table containing the selected test scenes and several parameters of them.
-		It lists the name of a scene, the number of swept volumes, the total number of cells of the regular grid, the amount of surface cells in the grid, \ie cells which have to be processed, the maximum and average amount of triangles in a cell, the maximum and average amount of structures in a cell, the number of triangles of the reconstructed surface mesh as well as the time needed for reconstruction.
+		It lists the name of a scene, the number of swept volumes, the total number of cells of the regular grid, the amount of surface cells in the grid, \ie cells which have to be processed, the total amount of triangles in the grid as well as the maximum and average amount of structures in a cell.
 	}
 	\label{tbl:test_scenes}
 \end{table}
+%
+The cube2 scene is a simple intersection between a cubic stock and a cuboid swept volume.
+It has already been used as an example when discussing the concept of the direct intersection approach at the beginning of this chapter in figure \ref{fig:cube2}.
+But instead of no grid, a small one with a resolution of $10\times10\times10$ cells is used.
+This scene is used as a proof of concept for each surface reconstruction algorithm in this thesis.
+%
+The cylinders and cylinders\_d scenes each consist of a broader cylindrical stock with a smaller cylindrical swept volume drilled out.
+The cylinders in the cylinders\_d scene are triangulated into smaller and more regular triangles by constraining the edge lengths of the output triangles.
+The cylinders in the other scene contain longer and thiner triangles.
+The cylinders\_d scene requires more triangles to approximate the cylinders 
+Both scenes also use the same small grid resolution as the cube2 scene.
+These two scenes should have an almost identical visual outcome but quite different stress on the numeric robustness of the extraction.
+%
+The cylinder\_head scene was the initial test scene when the ray casting subsystem was developed, \cf chapter \ref{ch:previous_work}.
+It is the smallest and easiest of the practical scenes used for benchmarking.
+The cylinder\_head uses a medium sized grid of $50\times50\times30$ cells with a moderate, but still little, number of triangles and swept volumes.
+%
+The impeller scene provide a good real world example of a typical machining scenario.
+It contains a few thousand swept volumes organized in a larger grid of $100\times100\times40$ cells.
+With 6 million stored triangles and a lot more structures in each cell, the impeller scene should already pose a serious workload for the tested algorithms.
+To analyze the effect of the number of swept volumes, a second version of the impeller scene has been created, where only half the number of swept volumes have been loaded.
+%
+Finally, the turbine scene depicts a further practical example.
+The scene was initially conceived to stress the swept volume computation by its complex cutting tool, a fir-tree cutter.
+The fine tessellation of the cutter mesh results in high resolution swept volumes and the largest amount of triangles stored in a test scene.
+
+The amount of triangles in each grid cell varies greatly between the test scenes and also in the scenes themselves.
+This property is interesting as it has the largest impact on algorithms which have to iterate on the triangles of a cell.
+Furthermore, largely divergent triangle counts inside cells challenge schedulers in parallel processing of cells and increase branch divergence on GPU architectures.
+An optimal distribution would be an almost empty histogram with a peak at a certain location, meaning all surface cell contain roughly the same number of triangles.
+Figure \ref{fig:histograms} shows histograms of the triangles per cell distribution for the test scenes of table \ref{tbl:test_scenes}.
 %
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/c_hist}
+		\includegraphics[width=\textwidth]{c_hist}
 		\caption{cube2}
 		\label{fig:cube2_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/ch_hist}
+		\includegraphics[width=\textwidth]{ch_hist}
 		\caption{cylinder\_head}
 		\label{fig:cylinder_head_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/cy_hist}
+		\includegraphics[width=\textwidth]{cy_hist}
 		\caption{cylinders}
 		\label{fig:cylinders_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/cyd_hist}
+		\includegraphics[width=\textwidth]{cyd_hist}
 		\caption{cylinders\_d}
 		\label{fig:cylinders_d_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/hq_hist}
+		\includegraphics[width=\textwidth]{hq_hist}
 		\caption{impeller}
 		\label{fig:impeller_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/hq2_hist}
+		\includegraphics[width=\textwidth]{hq2_hist}
 		\caption{impeller\_2}
 		\label{fig:impeller_2_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{../spreadsheets/tr_hist}
+		\includegraphics[width=\textwidth]{tr_hist}
 		\caption{turbine}
 		\label{fig:turbine_histogram}
 	\end{subfigure}
 	\caption{
 		Histograms showing the distribution of triangle counts per cell for the selected test scenes in table \ref{tbl:test_scenes}.
+		The horizontal axis shows the number of triangles per cell.
+		The vertical axis is logarithmic and shows the number of cells with a specific triangle count.
 	}
 	\label{fig:histograms}
 \end{figure}
 %
-The cube2 scene is a simple intersection between a cubic stock and a cuboid swept volume.
-It has already been used as an example when discussing the concept of the direct intersection approach at the beginning of this chapter in figure \ref{fig:cube2}.
-But instead of no grid, a small one with a resolution of $10\times10\times10$ cells is used.
+The cube2 scene contains few triangles in general.
+Most cells contain only 1 or 2 triangles and probably not more than 1 structure.
+Larger cells contain 4 or 5 triangles occur infrequent.
+In general, the distribution is quite compact.
 %
-The cylinders and cylinders\_d scenes each consist of a broader cylindrical stock with a smaller cylindrical swept volume drilled out.
-The cylinders in the cylinders\_d scene are Delaunay triangulated whereas the cylinders in the other scene contain many thin triangles.
-Both scenes also use the same small grid resolution as the cube2 scene.
-The cylinders\_d scene, due to the Delaunay triangulation, contains roughly equally sized triangles which are evenly distributed.
-These properties show themselves in the maximum and average number of triangles per cell, t\textsubscript{max} and t\textsubscript{avg}.
-The cylinders scene uses fewer triangles 
+The cylinder\_head is characterized by a quite divergent distribution, although the range is still modest from many cells with a small triangle count to only a few cells with 40 to 70 triangles.
+%
+Considering the cylinders scenes, the histograms show the difference in the total number of triangles.
+As the cylinders\_d scene contains more, smaller and more regular triangles, its cells are also occupied by more triangles.
+Whereas the cylinders scene holds mostly between 5 and 20 triangles, the cylinders\_d scene's cells contain mostly between 20 and 45 triangles.
+Nevertheless, despite their lower triangle counts, there is a peek of triangles in the cylinders scene at 128 triangles, which are cells at the cylinder's center.
+%
+The impeller scene shows a quite good but broad distribution with many cells containing between 1 and 100 triangles.
+A further lot of cells then store up to around 500 triangles.
+Unfortunately, the impeller scene contains several cells with extraordinary high quantities of triangles up to 2574 triangles in a single cell, 2563 for the impeller\_2 scene.
+%
+Finally, the turbine scene attracts attention by its smooth distribution of triangle counts.
+Despite its uniformity, such distributions are unfortunately rather disadvantages as the workload per cell is highly diverse.
+Furthermore, the triangle counts per cell are quite high with amounts of up to 2000 triangles per cell occurring quite often.
+Cells with even more triangles exist only marginally.
+
+For visual reference, figure \ref{fig:raycasted_scenes} shows images of the selected test scenes raycasted using the VML.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{cube2_raycasted}
+		\caption{cube2}
+		\label{fig:cube2_raycasted}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{cylinder_head_raycasted}
+		\caption{cylinder\_head}
+		\label{fig:cylinder_head_raycasted}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{cylinders_raycasted}
+		\caption{cylinders}
+		\label{fig:cylinders_raycasted}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{cylinders_d_raycasted}
+		\caption{cylinders\_d}
+		\label{fig:cylinders_d_raycasted}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{impeller_raycasted}
+		\caption{impeller}
+		\label{fig:impeller_raycasted}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{impeller_2_raycasted}
+		\caption{impeller\_2}
+		\label{fig:impeller_2_raycasted}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{turbine_raycasted}
+		\caption{turbine}
+		\label{fig:turbine_raycasted}
+	\end{subfigure}
+	\caption{
+		Raycasted images of the test scenes given in table \ref{tbl:test_scenes}.
+	}
+	\label{fig:raycasted_scenes}
+\end{figure}
+
+\section{Results}
+\label{sec:direct_intersection_results}
+
+Finally, the direct intersection approach described in this chapter has been tested on several scenes with various complexity.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{lrr}
+		Scene          & t\textsubscript{out} & time \\
+		\hline
+		cube2          &    1k &   1ms \\
+		cylinders\_d   &   10k &   6ms \\
+		cylinders      &    7k &   9ms \\
+		cylinder\_head &  149k & 229ms \\
+		impeller       & 1677k &  21s  \\
+		impeller\_2    & 1296k &  11s  \\
+		turbine        &  752k & 280s  \\
+	\end{tabular}
+	\caption{
+		Test results for the direct intersection surface extraction approach.
+	}
+	\label{tbl:direct_intersection_results}
+\end{table}
 
 
 Why it does not work on larger meshes?
