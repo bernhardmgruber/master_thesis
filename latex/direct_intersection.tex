@@ -704,15 +704,15 @@ the uneven work loads in all loops, \eg number of structures per cell, number of
 
 
 \section{Test scenes}
-\label{sec:direct_intersection_test_scenes}
+\label{sec:test_scenes}
 
 For testing the direct intersection approach and the further surface reconstruction algorithms shown in succeeding chapters, a few test scenes have been created.
 The test scenes and their configurations are shown in table \ref{tbl:test_scenes}.
 %
 \begin{table}[h]
 	\centering
-	\begin{tabular}{lrrrrrrr}
-		Scene          & SVs  & cells & surf. & tri. & s\textsubscript{max} & s\textsubscript{avg} \\
+	\begin{tabular}{lrrrrrrrr}
+		Scene          & SVs  & cells & surf. & tri. & tri./SV & s\textsubscript{max} & s\textsubscript{avg} \\
 		\hline
 		cube2          &    1 &   1k & 47 \% &   0.8k &  2 & 1.1 \\
 		cylinders\_d   &    1 &   1k & 22 \% &     7k &  2 & 1.1 \\
@@ -728,7 +728,7 @@ The test scenes and their configurations are shown in table \ref{tbl:test_scenes
 	}
 	\label{tbl:test_scenes}
 \end{table}
-%
+
 The cube2 scene is a simple intersection between a cubic stock and a cuboid swept volume.
 It has already been used as an example when discussing the concept of the direct intersection approach at the beginning of this chapter in figure \ref{fig:cube2}.
 But instead of no grid, a small one with a resolution of $10\times10\times10$ cells is used.
@@ -835,45 +835,45 @@ Cells with even more triangles exist only marginally.
 
 For visual reference, figure \ref{fig:raycasted_scenes} shows images of the selected test scenes raycasted using the VML.
 %
-\begin{figure}
+\begin{figure}[h]
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{cube2_raycasted}
 		\caption{cube2}
 		\label{fig:cube2_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{cylinder_head_raycasted}
 		\caption{cylinder\_head}
 		\label{fig:cylinder_head_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{cylinders_raycasted}
 		\caption{cylinders}
 		\label{fig:cylinders_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{cylinders_d_raycasted}
 		\caption{cylinders\_d}
 		\label{fig:cylinders_d_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{impeller_raycasted}
 		\caption{impeller}
 		\label{fig:impeller_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{impeller_2_raycasted}
 		\caption{impeller\_2}
 		\label{fig:impeller_2_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
+	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{turbine_raycasted}
 		\caption{turbine}
@@ -888,26 +888,139 @@ For visual reference, figure \ref{fig:raycasted_scenes} shows images of the sele
 \section{Results}
 \label{sec:direct_intersection_results}
 
-Finally, the direct intersection approach described in this chapter has been tested on several scenes with various complexity.
-
+Finally, the direct intersection approach described in this chapter has been tested on the scenes described in section \ref{sec:test_scenes}.
+Table \ref{tbl:direct_intersection_results} contains the runtime and output size of the test runs.
+%
 \begin{table}[h]
 	\centering
-	\begin{tabular}{lrr}
-		Scene          & t\textsubscript{out} & time \\
+	\begin{tabular}{lrrrr}
+		Scene          & SVs  & t\textsubscript{in} & t\textsubscript{out} & time \\
 		\hline
-		cube2          &    1k &   1ms \\
-		cylinders\_d   &   10k &   6ms \\
-		cylinders      &    7k &   9ms \\
-		cylinder\_head &  149k & 229ms \\
-		impeller       & 1677k &  21s  \\
-		impeller\_2    & 1296k &  11s  \\
-		turbine        &  752k & 280s  \\
+		cube2          &    1 &   0.8k &    1k &   1ms \\
+		cylinders\_d   &    1 &     7k &   10k &   6ms \\
+		cylinders      &    1 &     4k &    7k &   9ms \\
+		cylinder\_head &   20 &    80k &  149k & 229ms \\
+		impeller       & 2383 &  6000k & 1677k &  21s  \\
+		impeller\_2    & 1191 &  3000k & 1296k &  11s  \\
+		turbine        &  480 & 16000k &  752k & 280s  \\
 	\end{tabular}
 	\caption{
 		Test results for the direct intersection surface extraction approach.
+		Runtime is averaged over 10 runs.
 	}
 	\label{tbl:direct_intersection_results}
 \end{table}
+%
+The timings vary a lot from 1ms for the simple cube2 scene up to 280s for the turbine scene.
+The runtime depends on multiple characteristics of the input.
+The number of swept volumes increase the runtime linearly, as seen when comparing the timings of the impeller and impeller\_2 scene.
+This consequence can also be derived from algorithm \ref{alg:direct_intersection} where the \textproc{DirectIntersection} function performs a pairwise reduction of all structures of a single cell, a linear operation.
+All other parameters influence the runtime in less easily comprehensible ways.
+The turbine scene for example has a little more than 3 times the triangles to process than the impeller scene and a lot less swept volumes, but requires more then 10 times the computation time.
+What causes the big difference in this case is mostly the triangle density per structure.
+When dividing the number of totally stored triangles by the number of swept volumes, we can get a rough idea of the complexity of a single swept volume.
+This number is roughly 2500 for the impeller scenes and 33000 for the turbine scene.
+As the grid resolution is almost identical in these scenes, the parts of a swept volumes assigned to each cell, \ie the structures, are substantially larger.
+An increase in the number of triangles per structure, raises the runtime quadratically in several sub-algorithms.
+Having a look on the basic structure of the direct intersection approach in algorithm \ref{alg:direct_intersection}, the \textproc{ClipStructure} and the \textproc{SplitTriangle} functions run linearly with the number of triangles per structure, whereas the \textproc{IntersectTriangle} and \textproc{IsTriangleInsideStructure} form nested loops on all triangles of the structure, \ie require quadratic time.
+Considering the additional code required to increase numeric stability discussed in section \ref{sec:numeric_improvements}, the collapsing of near points of a structure is also a quadratic operation.
+The algorithms with quadratic runtime also light up in profiling sessions with \textproc{IntersectTriangle} consuming 38\%, near points collapsing 26\% and \textproc{IsTriangleInsideStructure} 18\% of the total runtime.
+The grid resolution affects the runtime by partitioning the whole problem into smaller parts.
+A finer grid causes structures to be smaller and the output to contain fewer errors as cells contain fewer structures and triangles.
+Especially the quadratic functions benefit from smaller structures.
+However, as a consequence of a finer grid, more cells have to be processed in total.
+As processing cells is a linear operation, \cf algorithm \ref{alg:direct_intersection}, increasing the grid resolution is usually beneficial.
+Nevertheless, maintaining the grid and related data structures requires time and especially memory, thus restricting its granularity.
+Resolutions between 100 and 150 cells in one dimensions usually proofed to be good choices for real world scenarios.
+
+The amount of exploitable parallelism has already been discussed in section \ref{sec:parallelization}.
+The topmost loop of the \textproc{DirectIntersection} function has been parallelized in the implementation using Microsoft's Parallel Patterns Library (PPL) and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
+The CPU utilization during an single run of the direct intersection approach is shown in figure \ref{fig:di_cpu}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{di_hq_impeller_cpu}
+	\caption{
+		CPU utilization during a run of the direct intersection algorithm to reconstruct the surface of the impeller scene.
+	}
+	\label{fig:di_cpu}
+\end{figure}
+%
+
+
+Figure \ref{fig:direct_intersection_results} contains renderings of the resulting triangle meshes.
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_cube2}
+		\caption{cube2}
+		\label{fig:di_cube2}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_cylinder_head}
+		\caption{cylinder\_head}
+		\label{fig:di_cylinder_head}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_cylinders}
+		\caption{cylinders}
+		\label{fig:di_cylinders}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_cylinders_delaunay}
+		\caption{cylinders\_d}
+		\label{fig:di_cylinders_d}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_hq_impeller}
+		\caption{impeller}
+		\label{fig:di_impeller}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_hq_impeller_2}
+		\caption{impeller\_2}
+		\label{fig:di_impeller_2}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{di_turbine}
+		\caption{turbine}
+		\label{fig:di_turbine}
+	\end{subfigure}
+	\caption{
+		Renderings of the result meshes using MeshLab after applying the direct intersection reconstruction approach on the selected test scenes \ref{tbl:test_scenes}.
+	}
+	\label{fig:direct_intersection_results}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{di_hq_impeller_detail}
+		\caption{impeller}
+		\label{fig:di_impeller_detail}
+	\end{subfigure}\\
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{di_turbine_detail}
+		\caption{turbine}
+		\label{fig:di_turbine_detail}
+	\end{subfigure}
+	\caption{
+		Renderings of details of the impeller and turbine scene result meshes using MeshLab after applying the direct intersection reconstruction approach.
+	}
+	\label{fig:di_scenes_artifacts}
+\end{figure}
+
 
 
 Why it does not work on larger meshes?
