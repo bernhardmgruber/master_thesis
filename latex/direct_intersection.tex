@@ -935,7 +935,7 @@ Resolutions between 100 and 150 cells in one dimensions usually proofed to be go
 
 The amount of exploitable parallelism has already been discussed in section \ref{sec:parallelization}.
 The topmost loop of the \textproc{DirectIntersection} function has been parallelized in the implementation using Microsoft's Parallel Patterns Library (PPL) and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
-The CPU utilization during an single run of the direct intersection approach is shown in figure \ref{fig:di_cpu}.
+The CPU utilization during an single run of the direct intersection approach on the impeller scene is shown in figure \ref{fig:di_cpu}.
 %
 \begin{figure}
 	\centering
@@ -946,11 +946,16 @@ The CPU utilization during an single run of the direct intersection approach is 
 	\label{fig:di_cpu}
 \end{figure}
 %
+The CPU cores are almost perfectly utilized for the first 20 seconds.
+Afterwards, the workload drops done to zero within the last 3 seconds of the run.
+The PPL's default scheduler already does a pretty good job by keeping all cores utilized for 85\% of the runtime.
+This slow drop at the end of the test run might be improved by employing a better scheduling strategy.
+However, more complex scheduling usually also increases the parallelization overhead.
+Concerning memory, the regular grid holding the impeller requires approximately 600 MiB memory.
+During the algorithm, 300 MiB additional memory has been allocated, mostly for the temporary union structures and the buffer holding the resulting surface.
 
-
-Figure \ref{fig:direct_intersection_results} contains renderings of the resulting triangle meshes.
-
-
+Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes.
+%
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.4\textwidth}
@@ -998,9 +1003,31 @@ Figure \ref{fig:direct_intersection_results} contains renderings of the resultin
 	\caption{
 		Renderings of the result meshes using MeshLab after applying the direct intersection reconstruction approach on the selected test scenes \ref{tbl:test_scenes}.
 	}
-	\label{fig:direct_intersection_results}
+	\label{fig:di_results}
 \end{figure}
-
+%
+The cube2 scene has been extracted almost correctly.
+All intersecting triangles have been properly split and retriangulated.
+There is one small hole at one of the edges and a few falsely remaining ones at the bottom left of the cutting surface, \cf figure \ref{fig:di_cube2}.
+These errors are due to a wrong outcome of the inside test, \cf \textproc{IsTriangleInsideStructure} in algorithm \ref{alg:triangle_inside_test}.
+Nevertheless, the errors in the reconstructed surface are small and be corrected manually using an appropriate 3D modeling tool, creating a closed mesh.
+%
+Both cylinder scenes delivered good results.
+The variant with the small and thin triangles even resulted in an almost perfect surface with zero holes and no leftover triangles.
+Surprisingly, the other variant with the quality triangulation contained 9 holes and 1 un-eliminated triangle.
+This outcome is quite the opposite of what had been observed during the development of the algorithm.
+In early stages, before the GTE library had been used for its excellent CDT, the core problem was the correct splitting of intersected triangles, which was much easier on smaller and more regular triangles.
+With the use of GTE, the numeric problems shifted from the CDT to the \textproc{IsTriangleInsideStructure} test.
+The reason why smaller and more regular triangles entail a higher error rate in this test is not entirely clear.
+The test is quite sensitive to the chosen target point of the structure used for casting the test ray.
+Furthermore, a lot if ray-triangle intersections are performed where triangle normals are compared with the ray's direction, \cf details of algorithm \ref{alg:triangle_inside_test}.
+All these tests become numerically unstable, if the ray becomes parallel to the tested triangles.
+In theory, the tested triangle should always lie clearly inside or outside the structure it is tested against, otherwise there must have been an intersection and the triangle would have been split.
+In practice, if an intersection has been missed and the triangle spans the structure or the tested triangle is almost degenerated and very close to the structure, errors may occur.
+%
+Concerning the more complex scenes, the impeller and turbine surfaces look quite good from a distance, but fail horribly reviewing the details.
+Figure \ref{fig:di_scenes_artifacts} shows two detailed views, one centered on a smaller blade of the impeller and one centered on a milling groove of the turbine.
+%
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{\textwidth}
@@ -1020,10 +1047,21 @@ Figure \ref{fig:direct_intersection_results} contains renderings of the resultin
 	}
 	\label{fig:di_scenes_artifacts}
 \end{figure}
+%
+Especially the impeller scene contains quite a lot of intersecting triangles and structures in each cell.
+When zooming very close to the edges of a blade, several intersecting triangles can be seen which have not been split, probably due to errors when detecting the intersection lines.
+These errors may then cause consequential errors in \eg the triangle inside test.
+As the impeller's grid contains cells with up to 64 structures, small mistakes add up iteratively and may cause huge defects on the final surface.
+Especially the cells which contain triangles from many swept volumes, \ie cells at the blade edges, suffer from this effect.
+The triangle inside test still does an acceptable job and the final surface does somehow resemble the surface.
+Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles.
+Regarding the quality of the produces mesh, the result is probably worthless for subsequent tasks, like using it for simulations.
+%
+The turbine scene seems to have a similar problem.
+Most of the intersections between stock and swept volume triangles have not been caught.
+As the total number of swept volumes is relatively low compared to the impeller scene and only very few of them intersect each other, the surface errors are considerably smaller.
+By deleting self intersecting triangles from the outcome, an intelligent hole closing algorithm might be able to recover a closed surface, \eg an adaption of the ball-pivoting algorithm. %TODO cite BPA close boundary loops.
 
-
-
-Why it does not work on larger meshes?
-Run time complexity
-Numerical robustness
-
+All extracted meshes in general have issues with neighboring triangles not having identical shared vertices.
+The difference however is neglectable and can easily be corrected in a post processing step which merges close vertices, \eg using the Merge Close Vertices filter of MeshLab.
+Furthermore, the result contains many T-vertices around intersected triangles which result from clipping a cell's triangles after the triangle-triangle intersections and retriangulations instead of before, \cf section \ref{sec:clipping}.
