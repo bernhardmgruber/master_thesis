@@ -293,7 +293,7 @@ The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct
 	\end{algorithmic}
 	\caption{
 		Adapter to the Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
-		Calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p_1}$ and $\var{p_2}$ as output parameters.
+		This algorithm calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p_1}$ and $\var{p_2}$ as output parameters.
 	}
 	\label{alg:triangle_intersection}
 \end{algorithm}
@@ -352,16 +352,15 @@ As output they generate a Delaunay mesh, with the convex hull of the point cloud
 \begin{table}[h]
 	\centering
 	\begin{tabular}{p{3cm} l l p{2.1cm} p{3.9cm}}
-		Library & & Language & License & Notes \\
+		Library                                          &                           & Language & License                                  & Notes                                                             \\
 		\hline
-		poly2tri & \cite{poly2tri} & C++ & BSD & Constrains via polylines must not touch each other \\
-		Triangle & \cite{triangle_lib} & C & Custom, free for non-commercial use & Difficult interface and memory management \\
-		Geometric Tools Engine (GTE) & \cite{gte} & C++ & Boost License & modern C++11, SIMD and GPGPU support, high standard documentation \\
-		Computational Geometry Algorithms Library (CGAL) & \cite{cgal_triangulation} & C++ & LGPL, GPL or commercial & Huge functionality, de-facto standard in academics \\
-		Fade2D & \cite{fade2d} & C++ & Commercial, free for scientific research & Closed source \\
-		Triangulation Template Library (TTL) & \cite{ttl} & C++ & GPL & Supports usage of own data structures via C++ templates \\
-		GNU Triangulated Surface Library (GTS) & \cite{gts} & C & LGPL & object-oriented design using GLib\\
-		
+		poly2tri                                         & \cite{poly2tri}           & C++      & BSD                                      & Constrains via polylines must not touch each other                \\
+		Triangle                                         & \cite{triangle_lib}       & C        & Custom, free for non-commercial use      & Difficult interface and memory management                         \\
+		Geometric Tools Engine (GTE)                     & \cite{gte}                & C++      & Boost License                            & modern C++11, SIMD and GPGPU support, high standard documentation \\
+		Computational Geometry Algorithms Library (CGAL) & \cite{cgal_triangulation} & C++      & LGPL, GPL or commercial                  & Huge functionality, de-facto standard in academics                \\
+		Fade2D                                           & \cite{fade2d}             & C++      & Commercial, free for scientific research & Closed source                                                     \\
+		Triangulation Template Library (TTL)             & \cite{ttl}                & C++      & GPL                                      & Supports usage of own data structures via C++ templates           \\
+		GNU Triangulated Surface Library (GTS)           & \cite{gts}                & C        & LGPL                                     & object-oriented design using GLib                                 \\
 	\end{tabular}
 	\caption{
 		Table containing several libraries offering a constrained Delaunay triangulation.
@@ -471,7 +470,7 @@ Due to the regular grid's classification, \cf section \ref{sec:classification}, 
 As it turns out, the test whether a triangle is inside another structure may fail if the tested structure is not a closed mesh, a common case.
 An example of such an issue is shown in figure \ref{fig:inside_test_error}.
 %
-\begin{figure}
+\begin{figure}[!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{inside_test_error}
 	\caption{
@@ -760,7 +759,7 @@ Furthermore, largely divergent triangle counts inside cells challenge schedulers
 An optimal distribution would be an almost empty histogram with a peak at a certain location, meaning all surface cell contain roughly the same number of triangles.
 Figure \ref{fig:histograms} shows histograms of the triangles per cell distribution for the test scenes of table \ref{tbl:test_scenes}.
 %
-\begin{figure}
+\begin{figure}[!]
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
@@ -835,47 +834,47 @@ Cells with even more triangles exist only marginally.
 
 For visual reference, figure \ref{fig:raycasted_scenes} shows images of the selected test scenes raycasted using the VML.
 %
-\begin{figure}[h]
+\begin{figure}[!]
 	\centering
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{cube2_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_cube2}
 		\caption{cube2}
 		\label{fig:cube2_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{cylinder_head_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_cylinder_head}
 		\caption{cylinder\_head}
 		\label{fig:cylinder_head_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{cylinders_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_cylinders}
 		\caption{cylinders}
 		\label{fig:cylinders_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{cylinders_d_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_cylinders_d}
 		\caption{cylinders\_d}
 		\label{fig:cylinders_d_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{impeller_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_impeller}
 		\caption{impeller}
 		\label{fig:impeller_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{impeller_2_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_impeller_2}
 		\caption{impeller\_2}
 		\label{fig:impeller_2_raycasted}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{turbine_raycasted}
+		\includegraphics[width=\textwidth]{raycasted_turbine}
 		\caption{turbine}
 		\label{fig:turbine_raycasted}
 	\end{subfigure}
@@ -891,7 +890,7 @@ For visual reference, figure \ref{fig:raycasted_scenes} shows images of the sele
 Finally, the direct intersection approach described in this chapter has been tested on the scenes described in section \ref{sec:test_scenes}.
 Table \ref{tbl:direct_intersection_results} contains the runtime and output size of the test runs.
 %
-\begin{table}[h]
+\begin{table}[!]
 	\centering
 	\begin{tabular}{lrrrr}
 		Scene          & SVs  & t\textsubscript{in} & t\textsubscript{out} & time \\
@@ -937,7 +936,7 @@ The amount of exploitable parallelism has already been discussed in section \ref
 The topmost loop of the \textproc{DirectIntersection} function has been parallelized in the implementation using Microsoft's Parallel Patterns Library (PPL) and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
 The CPU utilization during an single run of the direct intersection approach on the impeller scene is shown in figure \ref{fig:di_cpu}.
 %
-\begin{figure}
+\begin{figure}[!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{di_hq_impeller_cpu}
 	\caption{
@@ -956,45 +955,48 @@ During the algorithm, 300 MiB additional memory has been allocated, mostly for t
 
 Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes.
 %
-\begin{figure}
+\begin{figure}[!]
 	\centering
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.34\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_cube2}
 		\caption{cube2}
 		\label{fig:di_cube2}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_cylinder_head}
 		\caption{cylinder\_head}
 		\label{fig:di_cylinder_head}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.34\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_cylinders}
 		\caption{cylinders}
 		\label{fig:di_cylinders}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_cylinders_delaunay}
 		\caption{cylinders\_d}
 		\label{fig:di_cylinders_d}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.34\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_hq_impeller}
 		\caption{impeller}
 		\label{fig:di_impeller}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_hq_impeller_2}
 		\caption{impeller\_2}
 		\label{fig:di_impeller_2}
 	\end{subfigure}
-	\begin{subfigure}[b]{0.4\textwidth}
+	\begin{subfigure}[b]{0.33\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{di_turbine}
 		\caption{turbine}
@@ -1028,7 +1030,7 @@ In practice, if an intersection has been missed and the triangle spans the struc
 Concerning the more complex scenes, the impeller and turbine surfaces look quite good from a distance, but fail horribly reviewing the details.
 Figure \ref{fig:di_scenes_artifacts} shows two detailed views, one centered on a smaller blade of the impeller and one centered on a milling groove of the turbine.
 %
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{\textwidth}
 		\centering
