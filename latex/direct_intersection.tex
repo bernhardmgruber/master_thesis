@@ -21,11 +21,11 @@ The separated structures are processed in pairs.
 Each pair is united into a new structure.
 The union of the two structure meshes is calculated by intersecting each triangle of one mesh with each triangle of the other mesh.
 If two triangles intersect, the intersection line is recorded for both triangles.
-After intersection, each triangle with intersection lines is split along these lines, retriangulated and replaced by the triangles resulting from the retriangulation.
+After intersection, each triangle with intersection lines is split along these lines and retriangulated.
 All previous intersection lines are now edges of new triangles.
 Each triangle of one structure is then tested against the other structure, whether the triangle is inside or outside the other structure, \eg by casting a ray from the triangle to the other structure.
-As all triangles intersecting the opposite structure have been split, this property should be unambiguously determinable for each triangle.
-By removing all triangles inside the opposite structure, the remaining triangles form a new surface which corresponds to the union of both structures.
+As all triangles, which initially intersected the opposite structure, have been split, this inside-or-outside property should be unambiguously determinable for each triangle.
+By removing all triangles of a structure which are inside the opposite structure, the remaining triangles of both structures form a new surface which corresponds to the union of both structures.
 This new structure is then again pairwise united with other structures until only one structure is left, \ie all structures are reduced to one.
 This final structure is the reconstructed surface of the VML's data model.
 Figure \ref{fig:cube2} demonstrates this workflow by the example of intersecting a cube with a cuboid.
@@ -74,7 +74,7 @@ Figure \ref{fig:cube2} demonstrates this workflow by the example of intersecting
 		Figure \ref{fig:cube2_classified} shows the classification result when these two solids are mapped into the VML's regular grid.
 		Most of the swept volume's triangles have been removed.
 		When intersecting both structures, \ie swept volume and stock triangles, all intersection lines per triangle are recorded.
-		Regarding the swept volume's triangles, these are shown in figure \ref{fig:cube2_constraints}.
+		Figure \ref{fig:cube2_constraints} shows these lines for the swept volume's triangles.
 		The triangles are then retriangulated with respect to those intersections as shown in figure \ref{fig:cube2_retriangulated}.
 		Afterwards, each triangle is tested against the other structure, whether they are inside and can be removed.
 		The result of testing the retriangulated swept volume's triangles against the stock is shown in figure \ref{fig:cube2_eliminated}.
