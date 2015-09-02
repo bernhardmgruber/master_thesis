@@ -91,13 +91,13 @@ Figure \ref{fig:cube2} demonstrates this workflow by the example of intersecting
 In general, intersecting each triangle of a structure against each other triangle of another structure is an expensive undertaking.
 The cost of this operation is $\mathcal{O}(n^2)$, assuming both structures have $n$ triangles.
 Intersecting the structures at the level of each cell greatly reduces the value of $n$.
-Unfortunately, many triangles usually span the bounding box of a cell and are duplicated in each encompassed cell.
+Unfortunately, many triangles usually span the bounding boxes of several cells and are duplicated in each encompassed one.
 To avoid duplicates or overlapping triangles when combining results from neighboring cells, all triangles of a cell have to be clipped against the cell's bounding box.
 This step can be done before or after intersecting the structures of a cell, but always before starting to eliminate triangles against the opposite structure.
 There is also a second reason why this direct intersection approach must be run on a cell level which is discussed in section \ref{sec:triangle_inside_test}.
 
 An abstracted algorithm of this reconstruction approach is shown in algorithm \ref{alg:direct_intersection}.
-The following sections discuss details of this algorithms and follow the order of subroutines/functions which are not yet defined.
+The following sections discuss details of this algorithms and follow the order of subroutines/functions used within.
 The only exception is the \textproc{SeparateStructures} routine, which only groups the incoming triangles by their structure id.
 It returns a list of structures, where each structure is a set of triangles.
 
@@ -155,7 +155,7 @@ It returns a list of structures, where each structure is a set of triangles.
 		\EndFunction
 	\end{algorithmic}
 	\caption{
-		Abstract workflow of the surface extraction using direct intersection of the VML's stored structures.
+		Abstract workflow of the surface reconstruction using direct intersection of the VML's stored structures.
 	}
 	\label{alg:direct_intersection}
 \end{algorithm}
@@ -230,7 +230,7 @@ After all vertices have been processed, the result list is return, representing 
 			\State $\var{result} \gets \var{array}()$
 			\State $\var{prev} \gets |\var{vertices}| - 1$
 			\State $\var{prevDist} \gets \var{vertices_{prev}} * \var{n} - \var{d};$
-			\For{$\var{i} \gets 0, \dots, |\var{vertices}| - 1$}
+			\For{$\var{i} \gets 0 \To |\var{vertices}| - 1$}
 				\State $\var{dist} \gets \var{vertices_i} * \var{n} - \var{d}$;
 				\If{$(\var{dist} < 0 \wedge \var{prevDist} \geq 0) \vee (\var{dist} \geq 0 \wedge \var{prevDist} < 0)$}
 					\State $\var{edge} \gets (\var{vertices_i} - \var{vertices_{prev}})$
@@ -250,8 +250,8 @@ After all vertices have been processed, the result list is return, representing 
 		\Function{Triangulate}{$\var{vertices}$}
 			\State $\var{result} \gets \varnothing$
 			\If{$|vertices| \geq 3$}
-				\State $\var{c} \gets \var{loop_0}$
-				\For{$\var{i} \gets 2, \dots, |\var{vertices}| - 1$}
+				\State $\var{c} \gets \var{vertices_0}$
+				\For{$\var{i} \gets 2 \To |\var{vertices}| - 1$}
 					\State $\var{result} \gets \var{result} \cup \{\var{Triangle}(\var{c}, \var{vertices_{i - 1}}, \var{vertices_i})\}$
 				\EndFor
 			\EndIf
@@ -280,12 +280,11 @@ The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct
 	\centering
 	\begin{algorithmic}[1]
 		\Function{IntersectTriangles}{$\var{t_1}, \var{t_2}$}
-			\State $\var{isCoplanar}, \var{p_1}, \var{p_2}$ \Comment{Uninitialized variables}
 			\State $\var{hasIntersected} =$ \Call{tri\_tri\_intersect\_with\_isectline}{$\hfill\break
 				% the phantoms at the line starts make sure all hspaces start at the same position
 				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t_1.vertices_0}, \var{t_1.vertices_1}, \var{t_1.vertices_2},\hfill\break
 				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t_2.vertices_0}, \var{t_2.vertices_1}, \var{t_2.vertices_2},\hfill\break
-				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{coplanar}, \var{p_1}, \var{p_2}$}
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\out\var{isCoplanar}, \out\var{p_1}, \out\var{p_2}$} \Comment{Output parameters}
 			\If{$hasIntersected \wedge \neg isCoplanar$}
 				\State \Return $(\var{p_1}, \var{p_2})$ \Comment{Otherwise return nothing}
 			\EndIf
@@ -341,7 +340,7 @@ Hence, an algorithm for triangulating a triangle with respect to a set of lines 
 In the context of triangulations, this set of lines is usually called constraints or constrained edges and the according algorithm a constrained triangulation (CT).
 Initially, a manually written CT was used.
 Even though it was capable of triangulating simple cases, it suffered severely from numerical instability and poor output quality.
-A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the paper giving the initial idea to this approach \cite{mesh_intersection}.
+A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the paper giving the initial idea to the direct intersection reconstruction approach \cite{mesh_intersection}.
 However, as CDT algorithms are quite hard to implement regarding speed and robustness, using an established and tested library is highly recommended.
 A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}.
 Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
@@ -372,8 +371,8 @@ As output they generate a Delaunay mesh, with the convex hull of the point cloud
 The poly2tri library requires constraints to be specified as polylines which may not touch each other.
 This is a problem as constraints may touch the boundary of the original triangle.
 %
-The Triangle library has been used for exactly this purpose in another paper \cite{mesh_intersection}.
-Nevertheless, it has a very difficult C interface which tries to mimic a command line with text arguments even on API level.
+The Triangle library is used for splitting triangles at various constrained edges in another paper \cite{mesh_intersection}.
+Nevertheless, it has a very difficult C interface which tries to mimic a command line with text arguments even on its API level.
 Furthermore, passing in and returning geometric data structures requires extensive care regarding memory management.
 The library did work for most of the cases but crashed several times, \eg on every 1000\textsuperscript{th} triangle.  
 %
@@ -396,11 +395,11 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 				\State $\var{points} \gets \var{points} \cup \{\var{p_1}, \var{p_2}\}$
 			\EndFor
 			\State $\var{axis_0} \gets \Call{LargestAxis}{t.normal}$
-			\State $\var{axis_1} \gets (axis_0 + 1) \bmod 3$ 
-			\State $\var{axis_2} \gets (axis_0 + 2) \bmod 3$
+			\State $\var{axis_1} \gets (\var{axis_0} + 1) \bmod 3$ 
+			\State $\var{axis_2} \gets (\var{axis_0} + 2) \bmod 3$
 			\State $\var{points2} \gets \varnothing$ \Comment{Project 3D to 2D points, order must remain}
 			\ForAll{$\var{p} \in points$}
-				\State $\var{points2} \gets \var{points2} \cup \{\var{Vector2}(\var{p_{axis1}}, \var{p_{axis2}})\}$
+				\State $\var{points2} \gets \var{points2} \cup \{\var{Vector2}(\var{p_{axis_1}}, \var{p_{axis_2}})\}$
 			\EndFor
 			\State $\var{cdt} \gets \var{ConstrainedDelaunay2()}$
 			\ForAll{$(\var{p_1}, \var{p_2}) \in \var{lines}$} \Comment{Add constraints}
@@ -409,9 +408,9 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 			\State $\var{cdt}(|\var{points2}|, \var{points2}, \epsilon)$ \Comment{Compute CDT}
 			\State $\var{indices} \gets \var{cdt.GetIndices()}$
 			\State $\var{triangles} \gets \varnothing$
-			\For{$\var{i} \gets 0,\dots,\frac{|\var{indices}|}{3} - 1$}
+			\For{$\var{i} \gets 0 \To \frac{|\var{indices}|}{3} - 1$}
 				\State $\var{f} \gets \var{triangle()}$
-				\For{$\var{j} \gets 0,1,2$}
+				\For{$\var{j} \gets 0 \To 2$}
 					\State $\var{index} \gets \var{indices_{i * 3 + j}}$
 					\State $\var{f_j} = \var{points_{index}}$
 				\EndFor
@@ -501,8 +500,7 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algo
 			\State $\var{n_{nearest}} \gets \var{s_0.normal}$
 			\State $\var{raydir} \gets \var{ray.normalized()}$
 			\ForAll{$\var{f} \in \var{s} \setminus \{\var{s_0}\}$} \Comment{Retarget ray at closer triangle if intersected}
-				\State $\var{d}, \var{u}, \var{v}$
-				\If{$\Call{IntersectRayTriangle}{\var{origin}, \var{raydir}, \var{f}, \var{d}, \var{u}, \var{v}}$}
+				\If{$\Call{IntersectRayTriangle}{\var{origin}, \var{raydir}, \var{f}, \out\var{d}, \out\var{u}, \out\var{v}}$}
 					\If{$\var{d} > 0 \wedge \var{d} < \var{d_{nearest}}$}
 						\State $\var{d_{nearest}} \gets \var{d}$
 						\State $\var{n_{nearest}} \gets \var{f.normal}$
@@ -523,7 +521,7 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algo
 			\State $\var{qVec} \gets \var{tVec} \times \var{edge_1}$
 			\State $\var{v} \gets \var{qVec} *\cdot \var{direction}$
 			\State $\var{invDet} \gets \frac{1}{\var{det}}$
-			\State $\var{distance} \gets \var{edge_2} \cdot \var{qVec} \cdot \var{invDet}$
+			\State $\var{d} \gets \var{edge_2} \cdot \var{qVec} \cdot \var{invDet}$
 			\State $\var{u} \gets \var{u} \cdot \var{invDet}$
 			\State $\var{v} \gets \var{v} \cdot \var{invDet}$
 			\State \Return $(\var{u} \geq 0) \wedge (\var{v} \geq 0) \wedge (\var{u} + \var{v} \leq 1)$
@@ -537,7 +535,7 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algo
 \end{algorithm}
 %
 The function starts by calculating the origin and target point for the test ray.
-The ray originates the center of the tested triangle and initially targets the center of the first triangle of the other structure.
+The ray originates at the center of the tested triangle and initially targets the center of the first triangle of the other structure.
 Distance and normal of the targeted triangle are stored.
 Then, all other triangles of the structure are tested for intersection with the created ray.
 If an intersection happens and the distance to the newly intersected triangle is shorter than the distance to the currently targeted triangle, the distance and normal are updated to the new triangle, \ie the ray now targets the new triangle.
@@ -565,7 +563,7 @@ The idea of the algorithm is shown in figure \ref{fig:ray_triangle_intersect}.
 	\label{fig:ray_triangle_intersect}
 \end{figure}
 %
-The intersection test relies on the idea that with a simple transformation, the problem can be represented in a coordinate system where the solution is almost given.
+The intersection test relies on the idea that, with a simple transformation, the problem can be represented in a coordinate system where the solution is almost given.
 This transformation should put the origin of the coordinate system at one vertex of the triangle.
 The axes of the new system are the two triangle edges as well as the inverted ray direction.
 If the problem is represented in this space, the ray's origin holds the values of the $u$ and $v$ barycentric coordinate of the intersection point on the triangle as well as the distance $t$ of the triangle to the origin in multiples of the ray direction vector's length.
@@ -576,7 +574,7 @@ The second step is a change of basis with $\left[-D, V_1 - V_0, V_2 - V_0 \right
 This is done by multiplying with the inverse base matrix.
 The result vector $\left[ t,  u,  v \right]$ then contains the desired values.
 By moving the multiplication with the inversed base matrix to the other side, the equation in figure \ref{fig:ray_triangle_intersect} is obtained.
-Möller and Trumbore solve this system of equations in matrix form using Cramer's rule and by calculating the determinant of a matrix using a cross and a dot product.
+Möller and Trumbore solve this system of equations in matrix form using Cramer's rule and by calculating the determinant of a matrix using a cross and a dot product, \aka scalar triple product.
 This allows to calculate the values of the solution vector incrementally to allow early exits.
 
 
@@ -652,7 +650,7 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 	Most CDT libraries triangulate a given point cloud within the convex hull of the cloud.
 	Identifying the edges belonging to the convex hull is usually deterministic if the points are in what is called general position, \ie no coincident or collinear points.
 	However, the vertices of a triangle and a set of constraints where many constraints end at the triangle's edges contain a lot of collinear points.
-	To order to help the CDT in finding the right hull, it is recommended to specify the hull manually via additional constraints.
+	In order to help the CDT in finding the right hull, it is recommended to specify the hull manually via additional constraints.
 	These hull constraints are constructed from the triangle's vertices and the constraint vertices touching an edge of the triangle.
 	The latter are identified by counting the number of constraints incident to each vertex of a point set formed by all constraints' vertices.
 	Vertices with only one incident constraint must lie at the triangle's border and are therefore hull vertices.
@@ -674,12 +672,12 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 
 By choosing to solve the intersections of all structures per cell, the main routine in algorithm \ref{alg:direct_intersection} became embarrassingly parallel.
 As the regular grid usually consists of a larger number of cells, \eg $100 \times 100 \times 100$ is quite common, scheduling each cell in parallel is probably the best option for parallelization.
-However, a good scheduling strategy is needed as the workload per cell is highly diverse.
+However, a good scheduling strategy is needed, as the workload per cell is highly diverse.
 Most of the cells are empty because they are either inside or outside cells and require no processing.
 But also the amount of triangles and structures in each surface cell varies drastically between a few triangles and several thousands.
 
 If all structures would be closed, \ie triangle elimination by classification would be disabled, and there would be no subdivision into cells, the iterative creation of the union structure could be parallelized instead.
-Always combining two elements of a set of elements until only one left is an algorithm known as reduction, fold or accumulate.
+Always combining two elements of a set of elements until only one is left is an algorithm known as reduction, fold or accumulation.
 Reductions are usually parallelized as tree.
 Each independent pair of elements can be reduced into one in parallel.
 However, tree-shaped parallel reduction offers suboptimal parallelism, especially against the end where only a few parallel pairs remain.
@@ -696,7 +694,7 @@ This property is mandatory when programming for GPUs, but has been softened in r
 Furthermore, as most GPU architectures rely on either vectorization or execution of thread groups in lockstep\footnote{
 	Most GPUs usually schedule groups of threads, called warps with 32 threads by NVIDA and wavefronts with 64 threads by AMD.
 	These threads are tied together and executed instruction-wise, meaning all threads execute the same instruction on their individual data in parallel.
-	This behavior is also called lockstep execution.
+	This behavior is also called lockstep execution and the paradigm single instruction, multiple threads (SIMT).
 	If some threads branch differently than others, \eg if, while or for statements, all threads execute both branches, but some of them are masked out to avoid changes by the executed instructions.
 	Intel's on-chip GPUs rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.},
 the uneven work loads in all loops, \eg number of structures per cell, number of triangles per structure, number of intersections, \etc, especially hurt these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
@@ -711,7 +709,7 @@ The test scenes and their configurations are shown in table \ref{tbl:test_scenes
 \begin{table}[h]
 	\centering
 	\begin{tabular}{lrrrrrrrr}
-		Scene          & SVs  & cells & surf. & tri. & tri./SV & s\textsubscript{max} & s\textsubscript{avg} \\
+		Scene          & SVs  & cells & surf. & tri.  & s\textsubscript{max} & s\textsubscript{avg} \\
 		\hline
 		cube2          &    1 &   1k & 47 \% &   0.8k &  2 & 1.1 \\
 		cylinders\_d   &    1 &   1k & 22 \% &     7k &  2 & 1.1 \\
@@ -744,7 +742,7 @@ The cylinder\_head scene was the initial test scene when the ray casting subsyst
 It is the smallest and easiest of the practical scenes used for benchmarking.
 The cylinder\_head uses a medium sized grid of $50\times50\times30$ cells with a moderate, but still little, number of triangles and swept volumes.
 %
-The impeller scene provide a good real world example of a typical machining scenario.
+The impeller scene provides a good real world example of a typical machining scenario.
 It contains a few thousand swept volumes organized in a larger grid of $100\times100\times40$ cells.
 With 6 million stored triangles and a lot more structures in each cell, the impeller scene should already pose a serious workload for the tested algorithms.
 To analyze the effect of the number of swept volumes, a second version of the impeller scene has been created, where only half the number of swept volumes have been loaded.
@@ -905,6 +903,7 @@ Table \ref{tbl:direct_intersection_results} contains the runtime and output size
 	\end{tabular}
 	\caption{
 		Test results for the direct intersection surface extraction approach.
+		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at 3.4 GHz with 16 GiB RAM.
 		Runtime is averaged over 10 runs.
 	}
 	\label{tbl:direct_intersection_results}
@@ -1012,13 +1011,13 @@ The cube2 scene has been extracted almost correctly.
 All intersecting triangles have been properly split and retriangulated.
 There is one small hole at one of the edges and a few falsely remaining ones at the bottom left of the cutting surface, \cf figure \ref{fig:di_cube2}.
 These errors are due to a wrong outcome of the inside test, \cf \textproc{IsTriangleInsideStructure} in algorithm \ref{alg:triangle_inside_test}.
-Nevertheless, the errors in the reconstructed surface are small and be corrected manually using an appropriate 3D modeling tool, creating a closed mesh.
+Nevertheless, the errors in the reconstructed surface are small and may be corrected manually using an appropriate 3D modeling tool, creating a closed mesh.
 %
 Both cylinder scenes delivered good results.
 The variant with the small and thin triangles even resulted in an almost perfect surface with zero holes and no leftover triangles.
 Surprisingly, the other variant with the quality triangulation contained 9 holes and 1 un-eliminated triangle.
 This outcome is quite the opposite of what had been observed during the development of the algorithm.
-In early stages, before the GTE library had been used for its excellent CDT, the core problem was the correct splitting of intersected triangles, which was much easier on smaller and more regular triangles.
+In early stages, before the GTE library had been used for its excellent CDT, the core problem was the correct splitting of intersected triangles, which was much more stable on smaller and more regular triangles.
 With the use of GTE, the numeric problems shifted from the CDT to the \textproc{IsTriangleInsideStructure} test.
 The reason why smaller and more regular triangles entail a higher error rate in this test is not entirely clear.
 The test is quite sensitive to the chosen target point of the structure used for casting the test ray.
@@ -1055,9 +1054,9 @@ When zooming very close to the edges of a blade, several intersecting triangles 
 These errors may then cause consequential errors in \eg the triangle inside test.
 As the impeller's grid contains cells with up to 64 structures, small mistakes add up iteratively and may cause huge defects on the final surface.
 Especially the cells which contain triangles from many swept volumes, \ie cells at the blade edges, suffer from this effect.
-The triangle inside test still does an acceptable job and the final surface does somehow resemble the surface.
+The triangle inside test still does an acceptable job and the final surface does somehow resemble the surface of the machining result.
 Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles.
-Regarding the quality of the produces mesh, the result is probably worthless for subsequent tasks, like using it for simulations.
+Regarding the quality of the produced mesh, the result is probably worthless for subsequent tasks, like using it for simulations.
 %
 The turbine scene seems to have a similar problem.
 Most of the intersections between stock and swept volume triangles have not been caught.
