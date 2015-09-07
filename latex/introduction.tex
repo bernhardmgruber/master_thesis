@@ -8,7 +8,7 @@ Many scientific fields have to deal with the representation of geometries, their
 As visualization is often vital, being able to efficiently render geometries becomes a decisive factor when choosing an appropriate data structure.
 Modern hardware architectures and well-established graphic APIs like OpenGL and DirectX are commonly optimized towards rasterization and require explicit, polygonal surface meshes, \eg triangle meshes.
 Furthermore, many scientific applications in fields like structural engineering, material science or fluid dynamics are based on finite element methods which rely on triangle meshes to approximate their underlying mathematical models.
-Additionally, triangle meshes are a well established way to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
+Additionally, triangle meshes are a well-established way to process, store, edit, distribute and sell geometric models resulting in broad support in many software products.
 
 
 However, despite their great suitability and acceptance, triangle-based representations also have their drawbacks and a numerous amount of problems can be addressed better using different representations. %(\eg CSG trees, dexel images or functional representations).
@@ -36,7 +36,7 @@ The final workpiece is obtained by subtraction of all swept volumes from the ini
 
 
 Despite polygon-based and alternative representations for surfaces both having their specific usage scenarios, it is sometimes necessary to transform one into the other.
-A common scenario in CAD for example is to export an model described using a CSG tree or dexel image as a triangle mesh.
+A common scenario in CAD for example is to export a model described using a CSG tree or dexel image as a triangle mesh.
 The quality of the triangle approximation usually depends on a user-defined resolution which in many cases directly influences the number of generated triangles.
 Several algorithms exist trying to create meshes adaptively, using more and small triangles only where detail is necessary to preserve a models features.
 %
@@ -46,7 +46,7 @@ An example is found in computer-aided engineering (CAE), specifically CAM verifi
 
 \section{Previous work}
 
-Due to the broad field of surface representations and the authors previous experience, this thesis narrows its focus on models used in subtractive manufacturing simulations and focuses solely on the transformation of these models into explicit triangle representations.
+Due to the broad field of surface representations and the author's previous experience, this thesis narrows its focus on models used in subtractive manufacturing simulations and focuses solely on the transformation of these models into explicit triangle representations.
 During the authors work at the RISC Software GmbH a visualization and solid modeling software was developed during two research projects, Enlight and Engrave (\cf previous work in chapter \ref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
 Development is continued under the name virtual machining library (VML) and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
 Although the presented implementations are tailored to this application context, the underlying algorithms are discussed as general as possible to explore broader usage scenarios.
@@ -118,7 +118,7 @@ Chapter \ref{ch:previous_work} contains background information on the VML, the s
 After a bit of history on this project, the VML's data model and a few core algorithms are elaborated to allow a deeper understanding of various design aspects of the presented implementations. These include the VML's regular grid data structure, a triangle elimination strategy called classification and the ray casting subsystem used for visualization.
 
 Chapter \ref{ch:state_of_the_art} provides a literature review of existing algorithms and approaches which could be, fully or partially, used to tackle the problem of surface reconstruction for the VML's data model.
-The presented references include means for direct triangle intersection, surface reconstruction from point clouds, triangulation of dexel-based as well as voxel-based representations.
+The presented references include means for direct triangle intersection, surface reconstruction from point clouds and triangulation of dexel-based as well as voxel-based representations.
 
 Chapter \ref{ch:direct_intersection} discusses the first implemented approach to reconstruct a surface from the VML's data model.
 It relies on directly intersecting the triangles of the swept volumes stored within the VML.

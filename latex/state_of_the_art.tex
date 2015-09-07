@@ -10,7 +10,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 \begin{description}
 	
 	\item[Direct intersection] \hfill \\
-	Directly intersecting each volume with each other, triangle by triangle, is the most direct and theoretically exact approach of calculating the result of a series of boolean subtractions.
+	Directly intersecting each volume with each other, triangle by triangle, is the most direct and theoretically exact approach of calculating the result of a series of Boolean subtractions.
 	A good description of triangle mesh intersections is given by Rosen who tried to smooth the sharp intersection line between two meshes for aesthetics in video games \cite{mesh_intersection}.
 	Triangle-triangle intersection is described by Möller \cite{tri_tri_intersection_moller} as well as Tropp \etal \cite{tri_tri_intersection_2}.
 	
@@ -22,7 +22,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 	
 	\item[Point cloud based] \hfill \\
 	Point clouds are data structures where an object is approximated by a set of points with optional normal vectors.
-	These points can be obtained \eg by sampling a solid's surface, either virtually by \eg using a raycast or in reality by scanning an objects surface, \eg laster scans of buildings, sculptures \etc.
+	These points can be obtained \eg by sampling a solid's surface, either virtually by \eg using a raycast or in reality by scanning an objects surface, \eg laser scans of buildings, sculptures \etc.
 	The VML already uses surface sampling of its data model via its raycast based visualization.
 	%
 	Point clouds can be triangulated using different algorithms:
@@ -44,7 +44,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 	The BPA and its derivatives are region-growing based algorithms and typically provide good runtime performance, but may leave holes in the reconstructed mesh and therefore cannot guarantee water-tight solids.
 		
 	\item[Dexel based] \hfill \\
-	Dexel representations are widely used in virtual machining as they allow  relatively easy boolean operations.
+	Dexel representations are widely used in virtual machining as they allow  relatively easy Boolean operations.
 	Although the VML's data model stores triangulated manifolds directly, a dexel representation can be easily created based on the existing raycasting system.
 	By casting parallel rays through the VML's regular grid from one side to the other and continuing after a surface intersection, a valid dexel image can be constructed.
 	When this process is done along the three axes of the Cartesian coordinate system, a tri-dexel image is obtained.

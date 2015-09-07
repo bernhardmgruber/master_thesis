@@ -167,7 +167,7 @@ It returns a list of structures, where each structure is a set of triangles.
 Clipping triangles against the bounding box of a cell is necessary to avoid duplicated or invalid surfaces.
 In cases where triangles span multiple cells, the VML duplicates each triangle into each cell it encompasses.
 During intersection, only a triangle's intersections with structures of the current cell are recorded, although the triangle might be intersected by additional geometry in neighboring cells.
-Therefore, after splitting, parts of the triangle which are outside the current cell are never split, might pass the inside test as a whole and remain as additional triangles outside the actual surface or remain colinear with surface triangles from neighboring cells.
+Therefore, after splitting, parts of the triangle which are outside the current cell are never split, might pass the inside test as a whole and remain as additional triangles outside the actual surface or remain collinear with surface triangles from neighboring cells.
 To circumvent these issues, all triangles of a cell have to be clipped either before or after intersecting the two structures in \textproc{UnionStructure}.
 
 Algorithms for clipping triangles against a bounding box are found in literature.
@@ -188,7 +188,7 @@ In case of a bounding box, the input polygon has to be clipped against each of t
 These sides are extended and described as planes by specifying a normal vector and the plane's distance to the origin.
 The six planes built from a cell's bounding box are given in the \textproc{ClipPolygonAABB} function of algorithm \ref{alg:clip}.
 The input polygon itself is represented as an ordered list of vertices, where each pair of adjacent vertices form an edge of the polygon, including the last and the first vertex as a pair.
-The order of the vertices remains the sames during the clipping process, but vertices may be removed or additional ones added.
+The order of the vertices remains the same during the clipping process, but vertices may be removed or additional ones added.
 The final vertex list, after clipping against all planes, needs to be triangulated again.
 As the clipping volume, \ie the cell's bounding box, is convex, the resulting clipped polygon is also convex.
 Therefore, the list of vertices can be simply triangulated into a fan by selecting one vertex and emitting a triangle for every adjacent pair of vertices excluding the selected vertex, where each triangle is built from the pair and the selected vertex.
@@ -638,7 +638,7 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 	This routine ensures that each pair of incident triangles intersecting another triangle produce an incident pair of constraints.
 	In other words, constrained edges which are not connected to each other because of numerical issues in the intersection routine are rejoined again to form closed polylines.
 	Furthermore, tiny constraints collapse to points and are removed.
-	This matter is important for correct splittings after running the CDT.
+	This matter is important for correct splits after running the CDT.
 	
 	
 	\item[Ensure unique constraints] \hfill \\
@@ -697,7 +697,7 @@ Furthermore, as most GPU architectures rely on either vectorization or execution
 	This behavior is also called lockstep execution and the paradigm single instruction, multiple threads (SIMT).
 	If some threads branch differently than others, \eg if, while or for statements, all threads execute both branches, but some of them are masked out to avoid changes by the executed instructions.
 	Intel's on-chip GPUs rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.},
-the uneven work loads in all loops, \eg number of structures per cell, number of triangles per structure, number of intersections, \etc, especially hurt these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
+the uneven workloads in all loops, \eg number of structures per cell, number of triangles per structure, number of intersections, \etc, especially hurt these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
 
 
 \section{Test scenes}
@@ -733,8 +733,8 @@ This scene is used as a proof of concept for each surface reconstruction algorit
 %
 The cylinders and cylinders\_d scenes each consist of a broader cylindrical stock with a smaller cylindrical swept volume drilled out.
 The cylinders in the cylinders\_d scene are triangulated into smaller and more regular triangles by constraining the edge lengths of the output triangles.
-The cylinders in the other scene contain longer and thiner triangles.
-The cylinders\_d scene requires more triangles to approximate the cylinders 
+The cylinders in the other scene contain longer and thinner triangles.
+The cylinders\_d scene requires more triangles to approximate the cylinders.
 Both scenes also use the same small grid resolution as the cube2 scene.
 These two scenes should have an almost identical visual outcome but quite different stress on the numeric robustness of the extraction.
 %
@@ -914,7 +914,7 @@ The runtime depends on multiple characteristics of the input.
 The number of swept volumes increase the runtime linearly, as seen when comparing the timings of the impeller and impeller\_2 scene.
 This consequence can also be derived from algorithm \ref{alg:direct_intersection} where the \textproc{DirectIntersection} function performs a pairwise reduction of all structures of a single cell, a linear operation.
 All other parameters influence the runtime in less easily comprehensible ways.
-The turbine scene for example has a little more than 3 times the triangles to process than the impeller scene and a lot less swept volumes, but requires more then 10 times the computation time.
+The turbine scene for example has a little more than 3 times the triangles to process than the impeller scene and a lot less swept volumes, but requires more than 10 times the computation time.
 What causes the big difference in this case is mostly the triangle density per structure.
 When dividing the number of totally stored triangles by the number of swept volumes, we can get a rough idea of the complexity of a single swept volume.
 This number is roughly 2500 for the impeller scenes and 33000 for the turbine scene.
@@ -1061,7 +1061,7 @@ Regarding the quality of the produced mesh, the result is probably worthless for
 The turbine scene seems to have a similar problem.
 Most of the intersections between stock and swept volume triangles have not been caught.
 As the total number of swept volumes is relatively low compared to the impeller scene and only very few of them intersect each other, the surface errors are considerably smaller.
-By deleting self intersecting triangles from the outcome, an intelligent hole closing algorithm might be able to recover a closed surface, \eg an adaption of the ball-pivoting algorithm. %TODO cite BPA close boundary loops.
+By deleting self-intersecting triangles from the outcome, an intelligent hole closing algorithm might be able to recover a closed surface, \eg an adaption of the ball-pivoting algorithm. %TODO cite BPA close boundary loops.
 
 All extracted meshes in general have issues with neighboring triangles not having identical shared vertices.
 The difference however is neglectable and can easily be corrected in a post processing step which merges close vertices, \eg using the Merge Close Vertices filter of MeshLab.

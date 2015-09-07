@@ -9,7 +9,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 \begin{description}
 	
 	\item[Solid] \hfill \\
-	A solid is a object in 3-dimensional Euclidean space with a closed surface, separating space into two half-spaces.
+	A solid is an object in 3-dimensional Euclidean space with a closed surface, separating space into two half-spaces.
 	One is inside the solid, the volume of the solid, and the other outside.
 	From a physical perspective, a solid is rigid and cannot be deformed, as opposed to \eg liquids.
 	Examples of solids are cubes, pyramids, a flowerpot or your desk.
@@ -43,7 +43,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	
 	\item[Manifold mesh] \hfill \\
 	A mesh is a manifold, if it locally maps to Euclidean space.
-	In other words, for each point on an n-dimensional mesh, the neighborhood of this point, \ie a region of the mesh, can be mapped to an Euclidean space of a dimension lower than n.
+	In other words, for each point on an n-dimensional mesh, the neighborhood of this point, \ie a region of the mesh, can be mapped to a Euclidean space of a dimension lower than n.
 	This mapping must be bijective and is called homeomorphism or topological isomorphism.
 	Each point of the region has a corresponding point in the mapped space and vice versa.
 	In case of 3-dimensional meshes, a mesh is a 2-manifold if it can locally be mapped into 2-dimensional Euclidean space.
@@ -167,7 +167,8 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	
 	\item[Delaunay triangulation] \hfill \\
 	Named after the Russian mathematician Boris Delaunay, a 2-dimensional triangulation is called Delaunay when the circumcircle of each triangle does not contain a vertex of another triangle.
-	The Delaunay triangulation is unique for each set of points as long as not more than three vertices lie on a circle. \Eg a quad can be triangulated along any of the diagonals to be Delaunay.
+	The Delaunay triangulation is unique for each set of points as long as not more than three vertices lie on a circle.
+	\Eg a quad can be triangulated along any of the diagonals to be Delaunay.
 	The concept of 2-dimensional Delaunay triangulations can be extended to 3 dimensions, where each triangle of a manifold mesh has an empty circumscribing sphere.
 	Such a triangle is sometimes also referred to as Gabriel 2-Simplex (G2S) \cite{g2s}.
 	Delaunay triangulations produce very regular and visually appealing triangle meshes, as triangles with larger interior angles are preferred.
@@ -206,7 +207,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	\item[Swept volume] \hfill \\
 	In the context virtual machining, a single move of a cutting tool along a path is called a sweep.
 	A swept volume is the volume which is covered by the cutting tool's solid during a sweep.
-	The fast and efficient computation of such swept volumes for all kinds of paths, including self intersection, is still subject to research and discussed in the field of envelope theory.
+	The fast and efficient computation of such swept volumes for all kinds of paths, including self-intersection, is still subject to research and discussed in the field of envelope theory.
 	
 	
 	\item[Feature] \hfill \\
@@ -293,13 +294,13 @@ The following section is based on a comprehensive overview with sketches and des
 	A dexel is created by tracing a ray, starting at a grid point, perpendicular to the grid's plane through the workpiece and collecting all surface intersections.
 	Therefore, a 2-dimensional dexel image is sometimes also referred to as ray-rep, abbreviated from ray representation.
 	Each dexel stores a sorted list of these intersections, where an intersection is also called a dexel node.
-	A node basically contains the depth value of the intersection and can contain further informations such as a surface normal or a color value.
+	A node basically contains the depth value of the intersection and can contain further information such as a surface normal or a color value.
 	Pairs of dexel nodes where the first node has been an entry and the second an exit are called segments and always lie inside the workpiece.
 	Figure \ref{fig:dexel_image} shows a dexel representation of a half sphere with a smaller, concentric half sphere drilled out.
 	
-	Material removal is done in a similar fashion as with with z-maps.
+	Material removal is done in a similar fashion as with z-maps.
 	A dexel image is created for a sweep and then combined with the dexel image of the current workpiece.
-	Instead of updating to the minimum value as done with z-maps, a 1-dimensional boolean subtraction of all sweep dexels from the workpiece dexels is performed.
+	Instead of updating to the minimum value as done with z-maps, a 1-dimensional Boolean subtraction of all sweep dexels from the workpiece dexels is performed.
 	
 	In comparison with image-based representations like z-maps and depth images, dexel-based approaches are able to represent overlapping surfaces and workpieces with a front- and a back-face.
 	Nevertheless, the sampling resolution from the surface's perspective is dependent on the orientation of the surface towards the dexel grid.
@@ -318,7 +319,7 @@ The following section is based on a comprehensive overview with sketches and des
 		
 	\item[Multi-dexel images] \hfill \\
 	To increase the accuracy of dexel-based models, especially in regions of the surface where the surface normals are parallel to the dexels, multiple dexel images can be used.
-	This idea was described by Benouamer \etal in 1997 to provide a good representation that can combine BRep and CSG models \cite{tridexel_intersection}.
+	This idea was described by Benouamer \etal in 1997 to provide a good representation that can combine B-rep and CSG models \cite{tridexel_intersection}.
 	Although multiple dexel images can be created from any orientations, it is common to create three dexel images along the three axes of a Cartesian coordinate system.
 	Therefore, the 2-dimensional dexel grids lie in the three planes defined by pairs of the coordinate system's axes, \ie xy-, yz-, zx-plane.
 	This case of multi-dexel image is also referred to as triple- or tri-dexel image.
@@ -340,7 +341,7 @@ The following section is based on a comprehensive overview with sketches and des
 	It has its origins in 1978 where Gossard \etal tried to use set theory to verify material removal in NC processes \cite{csg}.
 	CSG describes a solid by its construction process from a set of simple primitives, making it therefore an interesting approach in procedural modeling.
 	Although primitives are typically basic shapes such as cubes, spheres or cylinders, they can, in theory, be any kind of complex shape.
-	Pairs of primitives can be combined using boolean set operations such as union, intersection or difference.
+	Pairs of primitives can be combined using Boolean set operations such as union, intersection or difference.
 	The result of such an operation is a new solid, which can be again combined with other models or further primitives.
 	A good visualization of these combinations is as a tree as shown in figure \ref{fig:csg_tree}.
 	
@@ -355,18 +356,18 @@ The following section is based on a comprehensive overview with sketches and des
 		\includegraphics[width=0.8\textwidth]{images/csg_tree}
 		\caption{
 			A solid object modeled using CSG.
-			The final shape of the object at the top is the result of combining the primitives at the bottom using boolean operations \cite{csg_tree}.
+			The final shape of the object at the top is the result of combining the primitives at the bottom using Boolean operations \cite{csg_tree}.
 		}
 		\label{fig:csg_tree}
 	\end{figure}
 	
-	\item[Spacial decomposition] \hfill \\
+	\item[Spatial decomposition] \hfill \\
 	The volume covered by a solid can also be represented by listing regions in 3-dimensional space which are occupied by the volume.
-	This representation is also commonly known as spacial occupancy enumeration.
+	This representation is also commonly known as spatial occupancy enumeration.
 	To enumerate occupied regions, one must first decompose space into smaller regions.
 	This can be done in a uniform or hierarchical manner.
 	
-	Uniform spacial decomposition (USD) divides space into equally sized cells.
+	Uniform spatial decomposition (USD) divides space into equally sized cells.
 	An example would be a regular grid with cubic cells.
 	This special case is known as voxel model, where a voxel, abbreviated from volume element, is a single cell of the regular grid.
 	Figure \ref{fig:spatial_decomposition_usd} shows a voxel model of a simple solid.
@@ -376,7 +377,7 @@ The following section is based on a comprehensive overview with sketches and des
 	However, USDs are highly memory demanding to achieve a sufficient resolution to accurately represent a solid.
 	Furthermore, a high resolution may only be needed in certain regions of the solid, \ie features.
 	
-	Hierarchical spacial decomposition (HSD) overcomes the shortcomings of USDs.
+	Hierarchical spatial decomposition (HSD) overcomes the shortcomings of USDs.
 	HSDs partition space in an adaptive way and increase their resolution only where detail is necessary.
 	Therefore, HSDs usually require less memory at the cost of increased complexity.
 	Figure \ref{fig:spatial_decomposition_hsd} shows an example of a solid represented by a hierarchically decomposed space.
@@ -407,26 +408,26 @@ The following section is based on a comprehensive overview with sketches and des
 			\label{fig:spatial_decomposition_hsd}
 		\end{subfigure}
 		\caption{
-			The solid on the left side can be described using spacial decomposition in either a uniform manner, central image, or a hierarchical manner, right image \cite{virtual_machining_review}.
+			The solid on the left side can be described using spatial decomposition in either a uniform manner, central image, or a hierarchical manner, right image \cite{virtual_machining_review}.
 		}
 		\label{fig:spatial_decomposition}
 	\end{figure}
 	
 
-	\item[Boundary representation (BRep)] \hfill \\
+	\item[Boundary representation (B-rep)] \hfill \\
 	Boundary representations, are the most wide-spread representations used in modern CAD systems.
-	As the term suggests, BReps describe a solid by specifying its boundary surface.
+	As the term suggests, B-reps describe a solid by specifying its boundary surface.
 	This surface typically consists of faces, \ie bounded surfaces, edges between those faces, \ie bounded curves, vertices, \ie 3-dimensional points, as well as their topology.
-	BReps are therefore closed meshes.
-	Faces can be specified using a variety of mathematical models from complex splines such as BSplines and NURBs to simple polygons like triangles.
-	Figure \ref{fig:brep} shows an example of a BRep which represents a machining part using triangles as faces.
+	B-reps are therefore closed meshes.
+	Faces can be specified using a variety of mathematical models from complex splines such as B-splines and NURBs to simple polygons like triangles.
+	Figure \ref{fig:brep} shows an example of a B-rep which represents a machining part using triangles as faces.
 	%
-	In the field of virtual machining, the faces of BReps are typically polygons which are connected by straight edges, \ie polyhedrons.
+	In the field of virtual machining, the faces of B-reps are typically polygons which are connected by straight edges, \ie polyhedrons.
 	The most common case are triangle meshes, although quadrilateral meshes are also popular in CAD.
 	%
-	Boolean operations like subtraction are hard to perform on arbitrary BReps.
+	Boolean operations like subtraction are hard to perform on arbitrary B-reps.
 	When considering only triangulated surfaces, the undertaking becomes doable, but still remains calculatively expensive and usually suffers from numerics.
-	Boolean operations on triangulated BReps are typically available in modern CAD kernels.
+	Boolean operations on triangulated B-reps are typically available in modern CAD kernels.
 	
 	\begin{figure}[H]
 		\centering
@@ -437,7 +438,7 @@ The following section is based on a comprehensive overview with sketches and des
 		\label{fig:brep}
 	\end{figure}
 	
-	\item[Functional representation (FRep)] \hfill \\
+	\item[Functional representation (F-rep)] \hfill \\
 	From a more mathematical point of view, surfaces can also be represented using real-valued functions.
 	Pasko \etal give a good overview on this subject in the context of modeling and computer graphics \cite{frep}.
 	\Eg a sphere is defined analytically as the infinite set of points with the same distance, \ie radius, to a distinct center point.
@@ -459,9 +460,9 @@ The following section is based on a comprehensive overview with sketches and des
 	
 	Functional representations excel in exactness, expressiveness and memory requirements.
 	Additionally, some classes of problems are easier to solve on analytical models, \eg intersection tests.
-	Furthermore, boolean operations and manipulations like bending and twisting are easier to formulate on mathematical entities then on the other data structures discussed in this section, \cf boolean operations on signed distance functions \cite{extended_marching_cubes}.
+	Furthermore, Boolean operations and manipulations like bending and twisting are easier to formulate on mathematical entities then on the other data structures discussed in this section, \cf Boolean operations on signed distance functions \cite{extended_marching_cubes}.
 	
-	Many primitives used in CSG are typically described using FReps.
-	Several CAD kernels also use FReps internally to retain precision until the final result is exported, where it is typically tesselated into a BRep.
+	Many primitives used in CSG are typically described using F-reps.
+	Several CAD kernels also use F-reps internally to retain precision until the final result is exported, where it is typically tessellated into a B-rep.
 	
 \end{description}
