@@ -87,7 +87,7 @@ Secondly, the tri-dexel representation is converted into a triangle mesh.
 This procedure is mostly based on the paper already mentioned during the introduction \cite{tridexel_reconstruction}.
 Each intersection point of three orthogonal dexels from the tri-dexel grid forms a grid point.
 If a grid point lies within a dexel segment on any of these dexels, it is said to be occupied, \ie lies within the workpiece's volume.
-By cutting the dexel segments at each grid point, 8 grid points and their 12 connecting edges along with their dexel segments are grouped into cells of the grid.
+8 grid points and their 12 connecting edges along with their dexel segments are grouped into cells of the grid.
 Each grid cell is then processed independently.
 Figure \ref{fig:tri_dexel_cell} shows the structure of a tri-dexel cell.
 %
@@ -114,6 +114,24 @@ This optional feature reconstruction pass is run on the loops found in the previ
 \section{Implementation}
 \label{sec:tri_dexel_implementation}
 
+In order to run the tri-dexel surface reconstruction, the user must supply a resolution as parameter.
+This resolution determines the size of the raycasted dexel images as well as the resulting tri-dexel grid.
+For esthetic reasons, the specified resolution is only used for the longest dimension of the workpiece.
+The resolution along the other dimensions is usually smaller in order to make the cells more cubic, although the implementation does not require cubic cells.
+
+cutting dexels
+
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{TriDexel}{$\var{grid}, \var{resolution}$}
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Abstract workflow of the surface reconstruction using a tri-dexel approach.
+	}
+	\label{alg:direct_intersection}
+\end{algorithm}
 
 
 \subsection{Raycast}
