@@ -2,6 +2,19 @@
 \chapter{Method 2: Tri-dexel}
 \label{ch:tri_dexel}
 
+The second discussed method to extract a triangulated surface from the VML's data model is based on a tri-dexel representation, \cf section \ref{sec:surface_representations}.
+As observed with the previously shown method in chapter \ref{ch:direct_intersection}, reconstructing a surface directly form the many intersecting triangles stored in the VML's grid is computationally expensive, highly numerically unstable and prone to errors.
+A more robust approach is desirable, which is able to always successfully reconstruct a surface with good quality.
+This reconstruction should succeed independently of the complexity of the maintained geometry.
+As a trade-off for this robustness, the approach may sacrifice surface exactness and filigree features.
+Dexel-based representations fit this purpose nicely.
+They provide a good abstraction of a machined workpiece with rich semantics.
+The used grid resolution supplies an easy to configure level of detail and steering parameter between representation quality and memory/CPU demands.
+Creating dexel-based representations from the VML's data model is achieved using an adaption of the already implemented and well-working raycasting subsystem used for visualization, \cf section \ref{sec:raycasting}.
+To achieve a good portrayal independently of the workpiece's orientation, three axis-aligned dexel images will be generated, thus creating a tri-dexel representation.
+For converting such a tri-dexel model into a final triangle mesh, various algorithms are found in literature.
+An excellent example is Ren \etal's "Feature Conservation and Conversion of Tri-dexel Volumetric Models to Polyhedral Surface Models for Product Prototyping" \cite{tridexel_reconstruction}.
+Their approach form the idea and foundation of the implementation presented in this chapter.
 
 
 \section{Concept}
