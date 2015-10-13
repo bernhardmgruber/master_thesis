@@ -119,19 +119,77 @@ This resolution determines the size of the raycasted dexel images as well as the
 For esthetic reasons, the specified resolution is only used for the longest dimension of the workpiece.
 The resolution along the other dimensions is usually smaller in order to make the cells more cubic, although the implementation does not require cubic cells.
 
-cutting dexels
 
+In addition to the types already specified by the VML, \cf figure \ref{fig:vml_datamodel}, the tri-dexel reconstruction algorithm requires a few more types.
+Most of these type definitions and also the algorithms themselves are vastly simplified when compared with the underlying source code.
+Especially parallelism, asynchrony, memory efficient handling of data structures and numeric stability enhancements have been intentionally left out in the discussed pseudo code.
+The additional types needed for the tri-dexel implementation are shown in the class diagram in figure \ref{fig:tri_dexel_datamodel}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/tri_dexel_datamodel}
+	\caption{
+		Simplified UML class diagram of the types needed for the tri-dexel reconstruction algorithm in addition to the types used by the VML, \cf figure \ref{fig:vml_datamodel}.
+	}
+	\label{fig:tri_dexel_datamodel}
+\end{figure}
+%
+The most central data structure is the \lstinline!TriDexelGrid! class.
+It represents a tri-dexel representation of the complete VML workpiece which is already prepared for subsequent regularization and triangulation.
+In addition to the tri-dexel grid's resolution \lstinline!res! and bounding box \lstinline!aabb!, the \lstinline!TriDexelGrid! class further contains the occupancy information for each grid point in \lstinline!occupancy!, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \lstinline!edges!.
+The \lstinline!cells! method separates all this information into distinct and independent cells.
+Each cell is an instance of the \lstinline!Cell! class and contains the same information as the tri-dexel grid, but locally for a single cell.
+A cell stores it's bounding box \lstinline!box!, the point occupancy of each of the cell's corners in \lstinline!occupancy!, the corners' coordinates in \lstinline!realPoints! and the 12 edges of the cell, stored in \lstinline!edges!.
+Each edge of the cell is an instance of \lstinline!Edge! and contains all spanning dexel segments, clamped to the interval between the edge's incident grid points.
+Furthermore, a method \lstinline!isBoundary! is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points and therefore contains a part of the workpiece's surface.
+The \lstinline!TriDexelGrid! is constructed from the \lstinline!TriDexelImage! class, which, fundamentally, contains the same information as the tri-dexel grid.
+The difference is larger from the workflow's point of view.
+The \lstinline!TriDexelImage! class contains the raw result as created by raycasting the VML's data model from three orthogonal directions.
+This data only consists of the resolution \lstinline!res! used for raycasting as well as three dexel images \lstinline!images! along the three coordinate system axes.
+A \lstinline!DexelImage! describes the result of a single raycast along the axis specified in \lstinline!axis0!, where 0 denotes the x-, 1 the y- and 2 the z-axis.
+The members \lstinline!axis1Res! and \lstinline!axis2Res! store the resolution of the dexel image along the two cyclically following axes after \lstinline!axis0!.
+For example, if \lstinline!axis0! is 1, the y-axis, then \lstinline!axis1Res! and \lstinline!axis2Res! hold the resolutions along the axes 2 and 0, the z- and x-axis.
+Finally, \lstinline!dexels! contains all the dexels of the image.
+Each \lstinline!Dexel! instance is then essentially a list of nodes, stored in \lstinline!nodes!.
+The number of stored nodes after raycasting is always a multiple of two.
+As dexel nodes are typically processed in pairs, as dexel segments, a convenience method \lstinline!segments! is provided which groups adjacent nodes into instances of \lstinline!DexelSegment!.
+A \lstinline!DexelSegment! contains these two nodes as \lstinline!start! and \lstinline!end! node.
+Finally, the \lstinline!Node! class holds the depth of the node along its dexel, \ie the distance of the node from the plane where the dexels originate, \cf figure \ref{fig:dexel_image}, as well as the normal vector of this surface entry/exit.
+
+Based on the discussed tri-dexel types, the basic reconstruction algorithm is shown in algorithm \ref{alg:tri_dexel}.
+%
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriDexel}{$\var{grid}, \var{resolution}$}
+			\State $\var{box} = \var{Extends}(\var{grid.aabb.lower} - \epsilon, \var{grid.aabb.upper} + \epsilon)$
+			\State $\var{res} = \Call{UniformResolution}{\var{box}, \var{resolution}}$
+			\State $\var{img} = \var{TriDexelImage}(\var{res})$
+			\State $\Call{AxisParallelRaycast}{\var{grid}, \var{box}, \var{res},\hfill\break
+				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{img.images_{axis}.dexels_{x, y}.nodes.add}(\var{Node}(\var{v_{axis}}, \var{n}))}$
+			%\State $\var{img.ensureConsistency}()$
+			\State $dgrid = \Call{CreateTriDexelGrid}{\var{img}, \var{box}}$
+			\State $\var{triangles} \gets \varnothing$
+			\ForAll{$\var{c} \in \var{dgrid.cells}()$}
+				\State $\Call{RegularizeCell}{\var{c}}$
+				\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{c}}$
+			\EndFor
+			\State \Return $\var{triangles}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
 		Abstract workflow of the surface reconstruction using a tri-dexel approach.
 	}
-	\label{alg:direct_intersection}
+	\label{alg:tri_dexel}
 \end{algorithm}
+%
+At the beginning, a slightly enlarged bounding box is calculated for the size of the tri-dexel grid and raycast.
+In this way, edge cases with a surface exactly at the grid's border are avoided.
+The \textproc{UniformResolution} function takes the user-specified resolution and the tri-dexel grid's bounding box and calculates three resolutions, one for each axis.
+The longest one is equal to the specified resolution and the other two are calculated in such a way that the resulting cells of the tri-dexel grid are as cubic as possible.
+This resolution is used to preallocate space for the tri-dexel image created in the subsequent raycasting process.
+The remaining part of the algorithm closely follows the concept discussed in the previous section\ref{sec:tri_dexel_concept}.
+The subsequent sections discuss the functions and procedures of the algorithm in the order they are used.
 
 
 \subsection{Raycast}
@@ -139,14 +197,65 @@ cutting dexels
 
 
 
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{Raycast}{$\var{grid}, \var{box}, \var{res}, \var{hitFunc}$}
+	
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Basic algorithm for performing a parallel raycast along all three coordinate system axes.
+	}
+	\label{alg:tri_dexel_raycast}
+\end{algorithm}
+
+
 \subsection{Dexel image generation}
 \label{sec:tri_dexel_dexel_image_generation}
 
+cutting dexels?
+
+
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{CreateTriDexelGrid}{$\var{img}, \var{box}$}
+		
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Creating a tri-dexel grid from the raycasted dexel images.
+	}
+	\label{alg:tri_dexel_dexel_image_generation}
+\end{algorithm}
 
 
 \subsection{Regularization}
 \label{sec:tri_dexel_regularization}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/tri_dexel_regularization}
+	\caption{
+		The four regularization rules applied to each tri-dexel cell before it is triangulated \cite{tridexel_reconstruction}.
+	}
+	\label{fig:tri_dexel_regularization}
+\end{figure}
+
+
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{RegularizeCell}{$\var{c}$}
+		
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Regularizing a cell of the tri-dexel grid by applying the four rules specified in figure \ref{fig:tri_dexel_regularization} \cite{tridexel_reconstruction}.
+	}
+	\label{alg:tri_dexel_regularization}
+\end{algorithm}
 
 
 \subsection{Triangulation}
@@ -157,6 +266,29 @@ The search traverses the cell's edges and backtracks each time an occupied grid 
 The list of visited grid edges containing dexel nodes, in the order they where visited, forms a boundary loop.
 A cell might contain multiple boundary loops, found when starting at different, non-occupied grid points.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/tri_dexel_triangulation}
+	\caption{
+		Triangulating a tri-dexel cell by finding boundary loops using depth-first search along the cube, starting at non-occupied nodes \cite{tridexel_reconstruction}.
+	}
+	\label{fig:tri_dexel_triangulation}
+\end{figure}
+
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{TriangulateCell}{$\var{c}$}
+		
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Basic triangulating routine for a tri-dexel cell.
+		No refinement or feature reconstruction is done.
+	}
+	\label{alg:tri_dexel_triangulation}
+\end{algorithm}
+
 \subsection{Refinement and feature reconstruction}
 \label{sec:tri_dexel_refinement}
 
@@ -164,6 +296,16 @@ This optional feature reconstruction pass is run on the loops found in the previ
 Using the normals of each pair of adjacent dexel nodes of the loop, an additional intermediate/feature point may be created.
 Using the normals of multiple nodes, a further apex vertex may be created per loop.
 Finally, these enhanced loops are also triangulated.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/tri_dexel_refinement}
+	\caption{
+		Triangulating a tri-dexel cell by finding boundary loops using depth-first search along the cube, starting at non-occupied nodes \cite{tri_dexel_refinement}.
+	}
+	\label{fig:tri_dexel_refinement}
+\end{figure}
+
 
 \subsection{Subslicing *experimential*}
 \label{sec:tri_dexel_subslicing}
@@ -173,6 +315,7 @@ Finally, these enhanced loops are also triangulated.
 \subsection{Parallelization}
 \label{sec:tri_dexel_parallelization}
 
+raycast, parallel cell processing
 
 
 \section{Results}
