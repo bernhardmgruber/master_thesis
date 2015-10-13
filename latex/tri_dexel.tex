@@ -200,8 +200,34 @@ The subsequent sections discuss the functions and procedures of the algorithm in
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{Raycast}{$\var{grid}, \var{box}, \var{res}, \var{hitFunc}$}
-	
+		\Procedure{Raycast}{$\var{grid}, \var{box}, \var{res}, \var{hitFunc}$}
+			\For{$\var{axis0} \gets 0 \To 2$}
+				\State $axis1 \gets (axis0 + 1) \% 3$
+				\State $axis2 \gets (axis0 + 2) \% 3$
+				\State $xCount \gets res_{axis1}$
+				\State $yCount \gets res_{axis2}$
+				\State $range \gets box.upper - box.lower$
+				\State $\Delta x \gets range_{axis1} / (xCount - 1)$
+				\State $\Delta y \gets range_{axis2} / (yCount - 1)$
+				\For{$\var{y} \gets 0 \To yCount - 1$}
+					\For{$\var{x} \gets 0 \To xCount - 1$}
+						\State $ray = \Call{CreateRay}{box, axis0, axis1, axis2, \Delta x, \Delta y,\hfill\break
+							\hspace*{\dimexpr\algorithmicindent*5} x, y, xCount, yCount}$
+						\State $\Call{CastRay}{grid, axis0, axis1, axis2, ray,\hfill\break
+							\hspace*{\dimexpr\algorithmicindent*5}(v, n) \rightarrow hitFunc(axis0, x, y, v, n)}$
+					\EndFor
+				\EndFor
+			\EndFor
+		\EndProcedure
+		\\
+		\Function{CreateRay}{$box, axis0, axis1, axis2, \Delta x, \Delta y, x, y, xCount, yCount$}
+			\State $origin \gets (box.lower + box.upper) / 2$
+			\State $origin_{axis0} \gets box.lower_{axis0}$
+			\State $origin_{axis1} \gets origin_{axis1} + (x - (xCount - 1) / 2) * \Delta x$
+			\State $origin_{axis2} \gets origin_{axis2} + (y - (yCount - 1) / 2) * \Delta y$
+			\State $direction = Vertex(0, 0, 0)$
+			\State $direction_{axis0} \gets 1$
+			\State \Return $Ray(origin, direction)$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
