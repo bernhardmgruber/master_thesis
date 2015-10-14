@@ -301,13 +301,60 @@ This conversion is more a reinterpretation and preparation of the information co
 Whereas the image contains the raw raycasting result, the tri-dexel grid already stores grid point occupancy information and cuts all dexels at cell borders.
 This preparation eases the follow-up processing of individual cells.
 
-Converting the tri-dexel image into a tri-dexel grid is done by the \testproc{CreateTriDexelGrid} function, which is shown in algorithm \ref{alg:tri_dexel_grid_generation}.
+Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{CreateTriDexelGrid} function, which is shown in algorithm \ref{alg:tri_dexel_grid_generation}.
 %
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{CreateTriDexelGrid}{$\var{img}, \var{box}$}
-		
+		\Function{CreateTriDexelGrid}{$\var{triImg}, \var{box}$}
+			\State $res = triImg.res$
+			\State $grid = TriDexelGrid(res, box)$
+			\For{$\var{axis0} \gets 0 \To 2$}
+				\State $axis1 \gets (axis0 + 1) \bmod 3$
+				\State $axis2 \gets (axis0 + 2) \bmod 3$
+				\For{$axis1Val \gets 0 \To res_{axis1} - 1$}
+					\For{$axis2Val \gets 0 \To res_{axis2} - 1$}
+						\State $dexel \gets triImg.images_{axis0}.dexels_{axis1Val, axis2Val}$
+						\ForAll{$seg \in dexel.segments()$}
+							\LineComment{Compute affected grid point range}
+							\State $axis0Start \gets \floor{\Call{MapDepthToGrid}{seg.start.depth, axis0, res, box}}$
+							\State $axis0End \gets \floor{\Call{MapDepthToGrid}{seg.end.depth, axis0, res, box}}$
+							\For{$axis0Val \gets axis0Start \To axis0End$}
+								\State $gridFrom$
+								\State $gridFrom_{axis0} \gets axis0Val$
+								\State $gridFrom_{axis1} \gets axis1Val$
+								\State $gridFrom_{axis2} \gets axis2Val$
+								\State $gridTo \gets gridFrom$
+								\State $gridTo_{axis0} \gets gridTo_{axis0} + 1$
+								\State $depthFrom = \Call{MapGridToDepth}{gridFrom_{axis0}, axis0, res, box}$
+								\State $depthTo = \Call{MapGridToDepth}{gridTo_{axis0}, axis0, res, box}$
+								\LineComment{Point occupancy}
+								\If{$seg.start.depth <= depthFrom <= seg.end.depth$}
+									\State $grid.occupancy_{gridFrom} \gets \True$
+								\EndIf
+								\If{$seg.start.depth <= depthTo <= seg.end.depth$}
+									\State $grid.occupancy_{gridTo} \gets \True$
+								\EndIf
+								\LineComment{Copy and clamp to cell border}
+								\State $s \gets seg$
+								\If{$s.start.depth \leq depthFrom$}
+									\State $s.start.depth \gets depthFrom$
+								\EndIf
+								\If{$s.end.depth \geq depthTo$}
+									\State $s.end.depth \gets depthTo$
+								\EndIf
+								\State $grid.edges_{axis0, gridFrom}.segments.add(s)$
+							\EndFor
+						\EndFor
+					\EndFor
+				\EndFor
+			\EndFor
+		\EndFunction
+		\Function{MapDepthToGrid}{depth, axis0, res, box}
+			\State \Return $(depth - box.lower_{axis0}) \div (box.upper_{axis0} - box.lower_{axis0}) * (res_{axis0} - 1)$
+		\EndFunction
+		\Function{MapGridToDepth}{gridCoord, axis0, res, box}
+			\State \Return $gridCoord \div (res_{axis0} - 1) * (box.upper_{axis0} - box.lower_{axis0}) + box.lower_{axis0}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
