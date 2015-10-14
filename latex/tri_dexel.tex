@@ -143,8 +143,8 @@ A cell stores it's bounding box \lstinline!box!, the point occupancy of each of 
 Each edge of the cell is an instance of \lstinline!Edge! and contains all spanning dexel segments, clamped to the interval between the edge's incident grid points.
 Furthermore, a method \lstinline!isBoundary! is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points and therefore contains a part of the workpiece's surface.
 The \lstinline!TriDexelGrid! is constructed from the \lstinline!TriDexelImage! class, which, fundamentally, contains the same information as the tri-dexel grid.
-The difference is larger from the workflow's point of view.
-The \lstinline!TriDexelImage! class contains the raw result as created by raycasting the VML's data model from three orthogonal directions.
+The difference is substantially clearer from the workflow's point of view.
+Whereas the \lstinline!TriDexelGrid! is already prepared for further processing, the \lstinline!TriDexelImage! class only contains the raw result as created by raycasting the VML's data model from three orthogonal directions.
 This data only consists of the resolution \lstinline!res! used for raycasting as well as three dexel images \lstinline!images! along the three coordinate system axes.
 A \lstinline!DexelImage! describes the result of a single raycast along the axis specified in \lstinline!axis0!, where 0 denotes the x-, 1 the y- and 2 the z-axis.
 The members \lstinline!axis1Res! and \lstinline!axis2Res! store the resolution of the dexel image along the two cyclically following axes after \lstinline!axis0!.
@@ -188,7 +188,7 @@ At the beginning, a slightly enlarged bounding box is calculated for the size of
 In this way, edge cases with a surface exactly at the grid's border are avoided.
 The \textproc{UniformResolution} function takes the user-specified resolution and the tri-dexel grid's bounding box and calculates three resolutions, one for each axis.
 The longest one is equal to the specified resolution and the other two are calculated in such a way that the resulting cells of the tri-dexel grid are as cubic as possible.
-This resolution is used to preallocate space for the tri-dexel image created in the subsequent raycasting process.
+This resolution is used to preallocate space for the tri-dexel image which is then filled in the subsequent raycasting process.
 The remaining part of the algorithm closely follows the concept discussed in the previous section\ref{sec:tri_dexel_concept}.
 The subsequent sections discuss the functions and procedures of the algorithm in the order they are used.
 
@@ -292,11 +292,17 @@ As it is quite comprehensive and highly tailored to the VML's internal data stru
 \label{sec:tri_dexel_dexel_image_generation}
 
 Based on the generic, axis parallel raycasting routine, a tri-dexel image is created in the base algorithm \ref{alg:tri_dexel}.
+Before the raycast is lauched, an instance of $TriDexelImage$ is created, preallocating enough space to hold 3 dexel images, each holding a 2-dimensional grid of empty dexels.
+When calling \textproc{AxisParallelRaycast} procedure, an anonymous function is passed which is invoked on every surface hit detected during raycasting.
+This function receives the primary axis $axis$, \ie the axis along the rays where traversed, $x$ and $y$ coordinate on the 2-dimensional dexel grid as well as the intersection point $v$ with the normal of the hit triangle $n$.
+With this information, the tri-dexel image stored in $img$ is populated.
+Once raycasting has completed, the tri-dexel grid is generated from the tri-dexel image.
+This conversion is more a reinterpretation and preparation of the information contained within the tri-dexel image.
+Whereas the image contains the raw raycasting result, the tri-dexel grid already stores grid point occupancy information and cuts all dexels at cell borders.
+This preparation eases the follow-up processing of individual cells.
 
-
-cutting dexels?
-
-
+Converting the tri-dexel image into a tri-dexel grid is done by the \testproc{CreateTriDexelGrid} function, which is shown in algorithm \ref{alg:tri_dexel_grid_generation}.
+%
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
@@ -307,8 +313,10 @@ cutting dexels?
 	\caption{
 		Creating a tri-dexel grid from the raycasted dexel images.
 	}
-	\label{alg:tri_dexel_dexel_image_generation}
+	\label{alg:tri_dexel_grid_generation}
 \end{algorithm}
+%
+
 
 
 \subsection{Regularization}
