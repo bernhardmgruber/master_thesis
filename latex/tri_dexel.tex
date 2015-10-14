@@ -155,6 +155,7 @@ The number of stored nodes after raycasting is always a multiple of two.
 As dexel nodes are typically processed in pairs, as dexel segments, a convenience method \lstinline!segments! is provided which groups adjacent nodes into instances of \lstinline!DexelSegment!.
 A \lstinline!DexelSegment! contains these two nodes as \lstinline!start! and \lstinline!end! node.
 Finally, the \lstinline!Node! class holds the depth of the node along its dexel, \ie the distance of the node from the plane where the dexels originate, \cf figure \ref{fig:dexel_image}, as well as the normal vector of this surface entry/exit.
+Unrelated to the tri-dexel types is the additional class \lstinline!Ray! which represents a ray starting at the vertex \lstinline!origin! and traveling into the direction stored by \lstinline!direction!.
 
 Based on the discussed tri-dexel types, the basic reconstruction algorithm is shown in algorithm \ref{alg:tri_dexel}.
 %
@@ -195,24 +196,29 @@ The subsequent sections discuss the functions and procedures of the algorithm in
 \subsection{Raycast}
 \label{sec:tri_dexel_raycast}
 
+The raycast is the prime algorithm for converting the VML's data model into a tri-dexel representation.
+The raycast is performed with parallel, axis-aligned and equidistant rays.
+All rays start at the intersection points of a uniform 2-dimensional grid placed on one side of the data model's slightly enlarged bounding box and end at the opposite side, \cf figure \ref{fig:dexel_image}.
+Three of these raycasts along the three axes of the coordinate system result in three dexel images.
+As the raycasting code is kept separated from the tri-dexel data structures, a function is passed to the raycasting code which is invoked each time a ray has found a surface intersection.
+Therefore, the same code can be used to create other data structures as well. %TODO: ref point cloud creation
 
-
+The entry routine and ray creation code of the raycasting algorithm is shown in algorithm \ref{alg:tri_dexel_raycast}.
+%
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
 		\Procedure{Raycast}{$\var{grid}, \var{box}, \var{res}, \var{hitFunc}$}
 			\For{$\var{axis0} \gets 0 \To 2$}
-				\State $axis1 \gets (axis0 + 1) \% 3$
-				\State $axis2 \gets (axis0 + 2) \% 3$
+				\State $axis1 \gets (axis0 + 1) \bmod 3$
+				\State $axis2 \gets (axis0 + 2) \bmod 3$
 				\State $xCount \gets res_{axis1}$
 				\State $yCount \gets res_{axis2}$
-				\State $range \gets box.upper - box.lower$
-				\State $\Delta x \gets range_{axis1} / (xCount - 1)$
-				\State $\Delta y \gets range_{axis2} / (yCount - 1)$
+				\State $\Delta x \gets (box.upper_{axis1} - box.lower_{axis1}) \div (xCount - 1)$
+				\State $\Delta y \gets (box.upper_{axis2} - box.lower_{axis2}) \div (yCount - 1)$
 				\For{$\var{y} \gets 0 \To yCount - 1$}
 					\For{$\var{x} \gets 0 \To xCount - 1$}
-						\State $ray = \Call{CreateRay}{box, axis0, axis1, axis2, \Delta x, \Delta y,\hfill\break
-							\hspace*{\dimexpr\algorithmicindent*5} x, y, xCount, yCount}$
+						\State $ray = \Call{CreateRay}{box, axis0, axis1, axis2, \Delta x, \Delta y, x, y}$
 						\State $\Call{CastRay}{grid, axis0, axis1, axis2, ray,\hfill\break
 							\hspace*{\dimexpr\algorithmicindent*5}(v, n) \rightarrow hitFunc(axis0, x, y, v, n)}$
 					\EndFor
@@ -221,24 +227,72 @@ The subsequent sections discuss the functions and procedures of the algorithm in
 		\EndProcedure
 		\\
 		\Function{CreateRay}{$box, axis0, axis1, axis2, \Delta x, \Delta y, x, y, xCount, yCount$}
-			\State $origin \gets (box.lower + box.upper) / 2$
-			\State $origin_{axis0} \gets box.lower_{axis0}$
-			\State $origin_{axis1} \gets origin_{axis1} + (x - (xCount - 1) / 2) * \Delta x$
-			\State $origin_{axis2} \gets origin_{axis2} + (y - (yCount - 1) / 2) * \Delta y$
+			\State $origin \gets box.lower$
+			\State $origin_{axis1} \gets origin_{axis1} + x * \Delta x$
+			\State $origin_{axis2} \gets origin_{axis2} + y * \Delta y$
 			\State $direction = Vertex(0, 0, 0)$
 			\State $direction_{axis0} \gets 1$
 			\State \Return $Ray(origin, direction)$
 		\EndFunction
+		\\
+		\Procedure{CastRay}{$grid, axis0, axis1, axis2, ray, hitFunc$}
+			\State $traverser \gets AxisAlignedTraverser(grid, ray, axis0, axis1, axis2)$
+			\While{$\neg traverser.reachedEnd()$}
+				\State $cell \gets traverser.nextCell()$
+				\State $\Call{IntersectCell}{cell, ray, axis0, axis1, axis2, hitFunc}$
+			\EndWhile
+		\EndProcedure
 	\end{algorithmic}
 	\caption{
-		Basic algorithm for performing a parallel raycast along all three coordinate system axes.
+		Basic algorithm for performing a parallel raycast along all three coordinate system axes on the VML's data model.
 	}
 	\label{alg:tri_dexel_raycast}
 \end{algorithm}
+%
+The outmost procedure \textproc{Raycast} takes four arguments: the VML's regular grid data structure, the slightly enlarged bounding box of the raycasted area, the resolution of the raycasted \enquote{image} as well as a function, which is called on every surface hit.
+The algorithm starts of by iterating over the three coordinate system's axes.
+The index of each axis is stored in the variable \lstinline!axis0!, where 0 denotes the x-, 1 the y- and 2 the z-axis.
+\lstinline!axis0! is also called primary axis and is accompanied by \lstinline!axis1! and \lstinline!axis2! which hold the other two, secondary axes, in cyclic order.
+Depending on the choice of primary and secondary axes, the resolution of the 2-dimensional grid spawning the rays is determined and assigned to \lstinline!xCount! and \lstinline!yCount!, for the horizontal and vertical resolution.
+Afterwards, the distance between two incident rays along both secondary axes is computed.
+Therefore, along both secondary axes, the size of the bounding box is computed and divided by the resolution minus one.
+The result is assigned to the variables $\Delta x$ and $\Delta y$.
+Now the algorithm starts creating and casting all rays along their primary axis.
+Two nested loops iterate over all points of the 2-dimensional grid spawning rays.
+For each grid point at $x, y$ a ray is created using the \textproc{CreateRay} function.
+Subsequently, the ray is cast into the VML's regular grid by invoking \textproc{CastRay}, passing a closure which is invoked each time a hit is recorded.
+
+The \textproc{CreateRay} function's objective is to create an instance of \lstinline!Ray! storing the ray's origin and direction.
+The origin is calculated by starting from the bounding box's \lstinline!lower! corner.
+Along the primary axis, this value is already correct.
+On the secondary axes, the origin, currently at the origin for ray $0, 0$, must be moved according to the ray's $x$ and $y$ coordinate.
+In order to do so, $x$ and $y$ are multiplied by the distances between incident rays, $\Delta x$ and $\Delta y$, and added to the origin's secondary axes.
+%
+Computing the ray's direction is simpler, as it is axis aligned.
+Therefore, the direction is a unit vector along the primary axis, created by setting the corresponding component of a zeroed vector to one.
+%
+Finally, $origin$ and $direction$ are aggregated into an instance of $Ray$ and returned.
+
+After rays have been created, they are cast into the VML's regular grid data structure to find surface intersections using the \textproc{CastRay} procedure.
+Traversing a ray through a regular grid is usually done using the 3D-DDA algorithm \cite{3DDDA}, \cf figure \ref{fig:traverser}.
+However, as the rays are axis parallel, traversal essentially boils down to mapping the ray's origin to the appropriate grid cell and incrementing the 3-dimensional cell index along the primary axis until the other end of the grid is reached.
+This logic is hidden behind the $AxisAlignedTraverser$ class and is no further elaborated.
+%
+The ray is then intersected with each cell pulled from the traverser using the \textproc{IntersectCell} algorithm.
+Fundamentally, the implementation is based on the inside counting scheme of the visualization code explained in figure \ref{fig:raycast}.
+The important difference is that the raycast for visualization may terminate after the first intersection found.
+Furthermore, minor inconsistencies are tolerable and may result in a few pixel errors on the final image.
+However, when creating dexels, a consistent number of surface entries and exits as well as numerically correct ordering of the intersections is substantial.
+Consequently, such an intersection routine must employ a great deal of numeric precautions and extra checks to deliver a correct result, even sacrificing intersections for the sake of consistency.
+This procedure forms the heart of the raycasting algorithm.
+As it is quite comprehensive and highly tailored to the VML's internal data structures, the detailed pseudocode of the \textproc{IntersectCell} routine is omitted from the thesis.
 
 
-\subsection{Dexel image generation}
+\subsection{Tri-dexel image and grid generation}
 \label{sec:tri_dexel_dexel_image_generation}
+
+Based on the generic, axis parallel raycasting routine, a tri-dexel image is created in the base algorithm \ref{alg:tri_dexel}.
+
 
 cutting dexels?
 
