@@ -458,21 +458,132 @@ These rules are illustrated in figure \ref{fig:tri_dexel_regularization} and are
 	Figure \ref{fig:tri_dexel_regularization_4} shows the removal of segments on the left and right edge which do not touch any grid point.
 \end{enumerate}
 
-
-
+These rules are applied to each cell of the tri-dexel grid constructed so far.
+The implementation of these regularization rules, \ie the \textproc{RegularizeCell} routine, is detailed in algorithm \ref{alg:tri_dexel_regularization}.
+%
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{RegularizeCell}{$\var{c}$}
-		
+		\Function{RegularizeCell}{$\var{cell}$}
+			\For{$ i \gets 0 \To 11 $}
+				\State $segs \gets cell.edge_i.segments$ \Comment{reference only}
+				\State $(src, dst) \gets edgeIndexToCorners_i$
+				\State $srcPoint \gets cell.realPoints_{src}$
+				\State $dstPoint \gets cell.realPoints_{dst}$
+				\State $srcOcc \gets cell.occupancy_{src}$
+				\State $dstOcc \gets cell.occupancy_{dst}$
+				\State $axis0 \gets edgeToAxis_{src, dst}$
+				
+				\LineComment{Rule 1}
+				\If{$srcOcc \wedge dstOcc$}
+					\State $n \gets Vertex()$ \Comment{Invalid normal}
+					\State $segs = \{ Segment(Node(srcPoint_{axis0}, n), Node(dstPoint_{axis0}, n)) \}$
+				\EndIf
+				
+				\LineComment{Rule 2}
+				\If{$\neg srcOcc \wedge \neg dstOcc$}
+					\State $segs \gets \varnothing$
+				\EndIf
+				
+				\LineComment{Rule 3}
+				\State $n = Vertex(0, 0, 0)$
+				\State $n_{axis0} = 1$
+				\If{$srcOcc \wedge \neg dstOcc$}
+					\If{$|segs| = 0 \vee segs_0.start.depth \neq srcPoint_{axis0}$}
+						\State $segs.add(Segment(Node(srcPoint_{axis0}, -n), Node(srcPoint_{axis0} + \rho, n)))$
+					\EndIf
+				\EndIf
+				\If{$\neg srcOcc \wedge dstOcc$}
+					\If{$|segs| = 0 \vee segs_{|segs| - 1}.end.depth \neq dstPoint_{axis0}$}
+						\State $segs.add(Segment(Node(dstPoint_{axis0} - \rho, -n), Node(dstPoint_{axis0}, n)))$
+					\EndIf
+				\EndIf
+				
+				\LineComment{Rule 4}
+				\ForAll{$s \in segs$}
+					\If{$s.start.depth \neq srcPoint_{axis0} \wedge s.end.depth \neq dstPoint_{axis0}$}
+						\State $segs.remove(s)$
+					\EndIf
+				\EndFor
+			\EndFor
 		\EndFunction
+		\\
+		\State $edgeIndexToCorners \gets (\dots)$
+		\State $edgeToAxis \gets (\dots)$
 	\end{algorithmic}
 	\caption{
 		Regularizing a cell of the tri-dexel grid by applying the four rules specified in figure \ref{fig:tri_dexel_regularization} \cite{tridexel_reconstruction}.
 	}
 	\label{alg:tri_dexel_regularization}
 \end{algorithm}
+%
 
+\begin{figure}
+	\begin{subfigure}[t]{0.24\textwidth}
+		\begin{align*}
+		\text{neighborIds:} \\
+		0: (1, 4, 2) \\
+		1: (0, 3, 5) \\
+		2: (0, 6, 3) \\
+		3: (1, 2, 7) \\
+		4: (0, 5, 6) \\
+		5: (1, 7, 4) \\
+		6: (2, 4, 7) \\
+		7: (3, 6, 5)
+		\end{align*}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.24\textwidth}
+		\begin{align*}
+		\text{edgeIndexToCorners:} \\
+		 0: (0, 1) \\
+		 1: (2, 3) \\
+		 2: (4, 5) \\
+		 3: (6, 7) \\
+		 4: (0, 2) \\
+		 5: (1, 3) \\
+		 6: (4, 6) \\
+		 7: (5, 7) \\
+		 8: (0, 4) \\
+		 9: (1, 5) \\
+		10: (2, 6) \\
+		11: (3, 7)
+		\end{align*}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.24\textwidth}
+		\begin{align*}
+		\text{edgeToAxis:} \\
+		(0, 1), (1, 0): 0 \\
+		(2, 3), (3, 2): 0 \\
+		(4, 5), (5, 4): 0 \\
+		(6, 7), (7, 6): 0 \\
+		(0, 2), (2, 0): 1 \\
+		(1, 3), (3, 1): 1 \\
+		(4, 6), (6, 4): 1 \\
+		(5, 7), (7, 5): 1 \\
+		(0, 4), (4, 0): 2 \\
+		(1, 5), (5, 1): 2 \\
+		(2, 6), (6, 2): 2 \\
+		(3, 7), (7, 3): 2
+		\end{align*}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.24\textwidth}
+		\begin{align*}
+		\text{cornersToEdgeIndex:} \\
+		(0, 1), (1, 0):  0 \\
+		(2, 3), (3, 2):  1 \\
+		(4, 5), (5, 4):  2 \\
+		(6, 7), (7, 6):  3 \\
+		(0, 2), (2, 0):  4 \\
+		(1, 3), (3, 1):  5 \\
+		(4, 6), (6, 4):  6 \\
+		(5, 7), (7, 5):  7 \\
+		(0, 4), (4, 0):  8 \\
+		(1, 5), (5, 1):  9 \\
+		(2, 6), (6, 2): 10 \\
+		(3, 7), (7, 3): 11
+		\end{align*}
+	\end{subfigure}
+\end{figure}
 
 \subsection{Triangulation}
 \label{sec:tri_dexel_triangulation}
