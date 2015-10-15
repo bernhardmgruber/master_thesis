@@ -305,19 +305,20 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{CreateTriDexelGrid}{$\var{triImg}, \var{box}$}
-			\State $\var{res} = \var{triImg}.\var{res}()$
-			\State $\var{grid} = \var{TriDexelGrid}(\var{res}, \var{box})$
+		\Function{CreateTriDexelGrid}{$\var{triImage}, \var{box}$}
+			\State $\var{res} = \var{triImage}.\var{res}$
+			\State $\var{grid} = \var{TriDexelGrid}(\var{res}, \var{box})$ \Comment{$\forall x, y, z : grid.occupancy_{x, y, z} = \False$}
 			\For{$\var{axis0} \gets 0 \To 2$}
 				\State $\var{axis1} \gets (\var{axis0} + 1) \bmod 3$
 				\State $\var{axis2} \gets (\var{axis0} + 2) \bmod 3$
+				\State $\var{image} \gets \var{triImage.images}_{\var{axis0}}$
 				\For{$\var{axis1Val} \gets 0 \To \var{res}_{\var{axis1}} - 1$}
 					\For{$\var{axis2Val} \gets 0 \To \var{res}_{\var{axis2}} - 1$}
-						\State $\var{dexel} \gets \var{triImg.images}_{\var{axis0}}.\var{dexels}_{\var{axis1Val}, \var{axis2Val}}$
+						\State $\var{dexel} \gets image.\var{dexels}_{\var{axis1Val}, \var{axis2Val}}$
 						\ForAll{$\var{seg} \in \var{dexel}.\var{segments}()$}
 							\LineComment{Compute affected grid point range}
-							\State $\var{start} \gets \floor{\Call{MapDepthToGrid}{\var{seg}.\var{start}.\var{depth}, \var{axis0}, \var{res}, \var{box}}}$
-							\State $\var{end} \gets \floor{\Call{MapDepthToGrid}{\var{seg}.\var{end}.\var{depth}, \var{axis0}, \var{res}, \var{box}}}$
+							\State $\var{start} \gets \Call{DepthToGrid}{\var{seg}.\var{start}.\var{depth}, \var{axis0}, \var{res}, \var{box}}$
+							\State $\var{end} \gets \Call{DepthToGrid}{\var{seg}.\var{end}.\var{depth}, \var{axis0}, \var{res}, \var{box}}$
 							\For{$\var{axis0Val} \gets \var{start} \To \var{end}$}
 								\State $\var{gridFrom}$
 								\State $\var{gridFrom}_{\var{axis0}} \gets \var{axis0Val}$
@@ -325,8 +326,8 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 								\State $\var{gridFrom}_{\var{axis2}} \gets \var{axis2Val}$
 								\State $\var{gridTo} \gets \var{gridFrom}$
 								\State $\var{gridTo}_{axis0} \gets \var{gridTo}_{\var{axis0}} + 1$
-								\State $\var{depthFrom} = \Call{MapGridToDepth}{\var{gridFrom}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
-								\State $\var{depthTo}   = \Call{MapGridToDepth}{\var{gridTo}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
+								\State $\var{depthFrom} = \Call{GridToDepth}{\var{gridFrom}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
+								\State $\var{depthTo}   = \Call{GridToDepth}{\var{gridTo}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
 								\LineComment{Point occupancy}
 								\If{$\var{seg}.\var{start}.\var{depth} \leq \var{depthFrom} \leq \var{seg}.\var{end}.\var{depth}$}
 									\State $\var{grid}.\var{occupancy}_{\var{gridFrom}} \gets \True$
@@ -334,12 +335,12 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 								\If{$\var{seg}.\var{start}.\var{depth} \leq \var{depthTo} \leq \var{seg}.\var{end}.\var{depth}$}
 									\State $\var{grid}.\var{occupancy}_{\var{gridTo}} \gets \True$
 								\EndIf
-								\LineComment{Copy and clamp to cell border}
+								\LineComment{Copy segment and clamp to cell border}
 								\State $\var{s} \gets \var{seg}$
-								\If{$\var{s}.\var{start}.\var{depth} \leq \var{depthFrom}$}
+								\If{$\var{s}.\var{start}.\var{depth} < \var{depthFrom}$}
 									\State $\var{s}.\var{start}.\var{depth} \gets \var{depthFrom}$
 								\EndIf
-								\If{$\var{s}.\var{end}.\var{depth} \geq \var{depthTo}$}
+								\If{$\var{s}.\var{end}.\var{depth} > \var{depthTo}$}
 									\State $\var{s}.\var{end}.\var{depth} \gets \var{depthTo}$
 								\EndIf
 								\State $\var{grid}.\var{edges}_{\var{axis0}, \var{gridFrom}}.\var{segments}.\var{add}(\var{s})$
@@ -349,11 +350,13 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 				\EndFor
 			\EndFor
 		\EndFunction
-		\Function{MapDepthToGrid}{\var{depth}, \var{axis0}, \var{res}, \var{box}}
-			\State \Return $(\var{depth} - \var{box}.\var{lower}_{\var{axis0}}) \div (\var{box}.\var{upper}_{\var{axis0}} - \var{box}.\var{lower}_{\var{axis0}}) * (\var{res}_{\var{axis0}} - 1)$
+		\\
+		\Function{DepthToGrid}{\var{depth}, \var{axis}, \var{res}, \var{box}}
+			\State \Return $\floor{(\var{depth} - \var{box}.\var{lower}_{\var{axis}}) \div (\var{box}.\var{upper}_{\var{axis}} - \var{box}.\var{lower}_{\var{axis}}) \cdot (\var{res}_{\var{axis}} - 1)}$
 		\EndFunction
-		\Function{MapGridToDepth}{\var{gridCoord}, \var{axis0}, \var{res}, \var{box}}
-			\State \Return $\var{gridCoord} \div (\var{res}_{\var{axis0}} - 1) * (\var{box}.\var{upper}_{\var{axis0}} - \var{box}.\var{lower}_{\var{axis0}}) + \var{box}.\var{lower}_{\var{axis0}}$
+		\\
+		\Function{GridToDepth}{\var{gridCoord}, \var{axis}, \var{res}, \var{box}}
+			\State \Return $\var{gridCoord} \div (\var{res}_{\var{axis}} - 1) \cdot (\var{box}.\var{upper}_{\var{axis}} - \var{box}.\var{lower}_{\var{axis}}) + \var{box}.\var{lower}_{\var{axis}}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
@@ -362,7 +365,35 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 	\label{alg:tri_dexel_grid_generation}
 \end{algorithm}
 %
-
+The algorithm starts by constructing an instance of the $TriDexelGrid$ class.
+During this construction, \ie the constructor, the occupancy of each grid point is set to \False.
+Furthermore, space to hold all edges of the tri-dexel grid is allocated.
+Accessing grid edges, \ie subscripting the member \var{edges}, is done by supplying the axis to which the edge is parallel as well as a three dimensional position.
+Afterwards, the algorithm iterates over all three axes of the coordinate system and therefore over the three dexel images of the tri-dexel image.
+For each dexel image, further loops are necessary to iterate over all dexels of the image and for each dexel over its segments.
+For each segment, the affected range of grid points is computed.
+Two coordinates of these points are already known, which are the same as the coordinates of the dexel in its image.
+The third, missing coordinates are the ones spanned by the dexel segment.
+To compute these coordinates, the dexel segment's start and end depth are mapped to grid point coordinates.
+Each call to \textproc{DepthToGrid} yields the lower grid point coordinate along the specified axis for a given depth on this axis.
+This value is also equivalent to the index of the edge along \var{axis} on which a dexel node with the given depth would lie.
+The computed range, \var{start} to \var{end}, in conjunction with \var{axis1Val} and \var{axis2Val}, now gives all indices of the affected grid points and edges.
+The innermost loop finally iterates over all edges of the tri-dexel grid spanned by the current dexel segment \var{seg}.
+The variables \var{gridFrom} and \var{gridTo} are the indices of the grid points incident to the current edge, which's index is also \var{gridFrom}.
+For both grid points of the current edge a depth value along the current axis is calculated.
+Two conditionals then compare these depth values against the start and end depth of the current dexel segment.
+If the depth of any grid point is between a dexel segment's start and end depth, \ie the segment spans the grid point, it is marked as occupied by setting the corresponding element of the grid's \var{occupancy} member.
+After this point occupancy check, the segment must also be added to the current edge, incident to both grid points.
+As the cells of the tri-dexel grid are later processed independently and to make some calculations easier, the dexel-segments are further clamped to the cell's bounds, \ie constrained to the cell's grid point's depth values.
+Therefore, a copy of the current segment is made and the start and end depth set to the respective grid point's depth values in case they are outside.
+Finally, the clamped segment is added to the current edge.
+%
+After the call to \textproc{CreateTriDexelGrid} returned, the tri-dexel image is no longer needed as the semantically equivalent information is stored in the newly created tri-dexel grid.
+The main algorithm, algorithm \ref{alg:tri_dexel}, may release resources held for the \var{img} variable now.
+The newly created tri-dexel grid \var{dgrid} is now used iterate over all cells and process them further.
+The call to $\var{dgrid}.\var{cells}()$, for each cell, collects all data from the tri-dexel grid belonging to a single cell into an instance of \var{Cell}.
+The created cells contain deep copies of the grid's data, as the cell's edges are conceptually shared with neighboring cells, but will be modified in subsequent parts of the algorithm.
+This poses no problem in a single threaded context, but would lead to data races when multiple cells are processed concurrently, \cf section \ref{sec:tri_dexel_parallelization}.
 
 
 \subsection{Regularization}
