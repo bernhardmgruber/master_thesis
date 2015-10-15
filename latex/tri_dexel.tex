@@ -399,14 +399,65 @@ This poses no problem in a single threaded context, but would lead to data races
 \subsection{Regularization}
 \label{sec:tri_dexel_regularization}
 
-\begin{figure}
+During the conversion of the VML's data model into a tri-dexel representation errors may occur.
+Dexels segments for example might not be of accurate length because of numerics in the triangle intersection routine or corrections applied by the raycaster when sorting and counting through the intersected structures to identify surface hits.
+Such defects are especially critical at the intersection points of dexels from multiple dexel images, the grid points.
+Furthermore, the number of different configurations a single tri-dexel cell may have is huge, as each edge may contain an arbitrary number of dexel segments, rendering the creation of an appropriate triangulation algorithm almost impossible.
+It is thus beneficial to reduce the number of cases by dropping some information in favor of regularity.
+
+The process of repairing defects and reducing complexity of a tri-dexel cell is called regularization.
+This method is documented well in the tri-dexel paper foundational to this chapter \cite{tridexel_reconstruction}.
+Regularizing a tri-dexel cell is done by iterating over all edges and applying a set of rules.
+These rules are illustrated in figure \ref{fig:tri_dexel_regularization} and are as follows:
+
+\begin{figure}[h]
+	%\renewcommand{\thesubfigure}{\arabic{subfigure}}
 	\centering
-	\includegraphics[width=0.9\textwidth]{images/tri_dexel_regularization}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/tri_dexel_regularization_1}
+		\caption{Two occupied points.}
+		\label{fig:tri_dexel_regularization_1}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/tri_dexel_regularization_2}
+		\caption{Two non-occuupied points}
+		\label{fig:tri_dexel_regularization_2}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/tri_dexel_regularization_3}
+		\caption{One occupied point with no segment}
+		\label{fig:tri_dexel_regularization_3}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/tri_dexel_regularization_4}
+		\caption{Deletion of non-spanning segments}
+		\label{fig:tri_dexel_regularization_4}
+	\end{subfigure}
 	\caption{
-		The four regularization rules applied to each tri-dexel cell before it is triangulated \cite{tridexel_reconstruction}.
+		The four regularization rules which are applied to each tri-dexel cell before it is triangulated.
+		Image adapted from \cite{tridexel_reconstruction}.
 	}
 	\label{fig:tri_dexel_regularization}
 \end{figure}
+
+\begin{enumerate}
+	\item If two adjacent grid points are marked as occupied, the incident edge must contain exactly one dexel segment with start and end depth exactly at the corresponding positions of the grid points.
+	Figure \ref{fig:tri_dexel_regularization_1} shows the extension of the leftmost segment to touch the occupied grid point in the upper left.
+
+	\item If two adjacent grid points are not marked as occupied, the incident edge must not contain any dexel segments.
+	Figure \ref{fig:tri_dexel_regularization_2} shows the removal of the leftmost segment from an edge beween two non-occupied grid points.
+
+	\item If any edge, which is only incident to exactly one occupied grid point, does not contain a dexel segment touching this point, a short segment is added.
+	Figure \ref{fig:tri_dexel_regularization_3} shows the creation of two small dexel segments at both lower grid points as the left and right edge do not contain any segments.
+
+	\item If any segment does not touch any of the two incident grid points, it is removed.
+	Figure \ref{fig:tri_dexel_regularization_4} shows the removal of segments on the left and right edge which do not touch any grid point.
+\end{enumerate}
+
 
 
 \begin{algorithm}
