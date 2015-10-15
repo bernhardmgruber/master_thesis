@@ -134,28 +134,28 @@ The additional types needed for the tri-dexel implementation are shown in the cl
 	\label{fig:tri_dexel_datamodel}
 \end{figure}
 %
-The most central data structure is the \lstinline!TriDexelGrid! class.
+The most central data structure is the \var{TriDexelGrid} class.
 It represents a tri-dexel representation of the complete VML workpiece which is already prepared for subsequent regularization and triangulation.
-In addition to the tri-dexel grid's resolution \lstinline!res! and bounding box \lstinline!aabb!, the \lstinline!TriDexelGrid! class further contains the occupancy information for each grid point in \lstinline!occupancy!, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \lstinline!edges!.
-The \lstinline!cells! method separates all this information into distinct and independent cells.
-Each cell is an instance of the \lstinline!Cell! class and contains the same information as the tri-dexel grid, but locally for a single cell.
-A cell stores it's bounding box \lstinline!box!, the point occupancy of each of the cell's corners in \lstinline!occupancy!, the corners' coordinates in \lstinline!realPoints! and the 12 edges of the cell, stored in \lstinline!edges!.
-Each edge of the cell is an instance of \lstinline!Edge! and contains all spanning dexel segments, clamped to the interval between the edge's incident grid points.
-Furthermore, a method \lstinline!isBoundary! is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points and therefore contains a part of the workpiece's surface.
-The \lstinline!TriDexelGrid! is constructed from the \lstinline!TriDexelImage! class, which, fundamentally, contains the same information as the tri-dexel grid.
+In addition to the tri-dexel grid's resolution \var{res} and bounding box \var{aabb}, the \var{TriDexelGrid} class further contains the occupancy information for each grid point in \var{occupancy}, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \var{edges}.
+The \var{cells} method separates all this information into distinct and independent cells.
+Each cell is an instance of the \var{Cell} class and contains the same information as the tri-dexel grid, but locally for a single cell.
+A cell stores it's bounding box \var{box}, the point occupancy of each of the cell's corners in \var{occupancy}, the corners' coordinates in \var{realPoints} and the 12 edges of the cell, stored in \var{edges}.
+Each edge of the cell is an instance of \var{Edge} and contains all spanning dexel segments, clamped to the interval between the edge's incident grid points.
+Furthermore, a method \var{isBoundary} is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points and therefore contains a part of the workpiece's surface.
+The \var{TriDexelGrid} is constructed from the \var{TriDexelImage} class, which, fundamentally, contains the same information as the tri-dexel grid.
 The difference is substantially clearer from the workflow's point of view.
-Whereas the \lstinline!TriDexelGrid! is already prepared for further processing, the \lstinline!TriDexelImage! class only contains the raw result as created by raycasting the VML's data model from three orthogonal directions.
-This data only consists of the resolution \lstinline!res! used for raycasting as well as three dexel images \lstinline!images! along the three coordinate system axes.
-A \lstinline!DexelImage! describes the result of a single raycast along the axis specified in \lstinline!axis0!, where 0 denotes the x-, 1 the y- and 2 the z-axis.
-The members \lstinline!axis1Res! and \lstinline!axis2Res! store the resolution of the dexel image along the two cyclically following axes after \lstinline!axis0!.
-For example, if \lstinline!axis0! is 1, the y-axis, then \lstinline!axis1Res! and \lstinline!axis2Res! hold the resolutions along the axes 2 and 0, the z- and x-axis.
-Finally, \lstinline!dexels! contains all the dexels of the image.
-Each \lstinline!Dexel! instance is then essentially a list of nodes, stored in \lstinline!nodes!.
+Whereas the \var{TriDexelGrid} is already prepared for further processing, the \var{TriDexelImage} class only contains the raw result as created by raycasting the VML's data model from three orthogonal directions.
+This data only consists of the resolution \var{res} used for raycasting as well as three dexel images \var{images} along the three coordinate system axes.
+A \var{DexelImage} describes the result of a single raycast along the axis specified in \var{axis0}, where 0 denotes the x-, 1 the y- and 2 the z-axis.
+The members \var{axis1Res} and \var{axis2Res} store the resolution of the dexel image along the two cyclically following axes after \var{axis0}.
+For example, if \var{axis0} is 1, the y-axis, then \var{axis1Res} and \var{axis2Res} hold the resolutions along the axes 2 and 0, the z- and x-axis.
+Finally, \var{dexels} contains all the dexels of the image.
+Each \var{Dexel} instance is then essentially a list of nodes, stored in \var{nodes}.
 The number of stored nodes after raycasting is always a multiple of two.
-As dexel nodes are typically processed in pairs, as dexel segments, a convenience method \lstinline!segments! is provided which groups adjacent nodes into instances of \lstinline!DexelSegment!.
-A \lstinline!DexelSegment! contains these two nodes as \lstinline!start! and \lstinline!end! node.
-Finally, the \lstinline!Node! class holds the depth of the node along its dexel, \ie the distance of the node from the plane where the dexels originate, \cf figure \ref{fig:dexel_image}, as well as the normal vector of this surface entry/exit.
-Unrelated to the tri-dexel types is the additional class \lstinline!Ray! which represents a ray starting at the vertex \lstinline!origin! and traveling into the direction stored by \lstinline!direction!.
+As dexel nodes are typically processed in pairs, as dexel segments, a convenience method \var{segments} is provided which groups adjacent nodes into instances of \var{DexelSegment}.
+A \var{DexelSegment} contains these two nodes as \var{start} and \var{end} node.
+Finally, the \var{Node} class holds the depth of the node along its dexel, \ie the distance of the node from the plane where the dexels originate, \cf figure \ref{fig:dexel_image}, as well as the normal vector of this surface entry/exit.
+Unrelated to the tri-dexel types is the additional class \var{Ray} which represents a ray starting at the vertex \var{origin} and traveling into the direction stored by \var{direction}.
 
 Based on the discussed tri-dexel types, the basic reconstruction algorithm is shown in algorithm \ref{alg:tri_dexel}.
 %
@@ -163,15 +163,14 @@ Based on the discussed tri-dexel types, the basic reconstruction algorithm is sh
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriDexel}{$\var{grid}, \var{resolution}$}
-			\State $\var{box} = \var{Extends}(\var{grid.aabb.lower} - \epsilon, \var{grid.aabb.upper} + \epsilon)$
+			\State $\var{box} = \var{Extends}(\var{grid}.\var{aabb}.\var{lower} - \epsilon, \var{grid}.\var{aabb}.\var{upper} + \epsilon)$
 			\State $\var{res} = \Call{UniformResolution}{\var{box}, \var{resolution}}$
 			\State $\var{img} = \var{TriDexelImage}(\var{res})$
 			\State $\Call{AxisParallelRaycast}{\var{grid}, \var{box}, \var{res},\hfill\break
-				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{img.images_{axis}.dexels_{x, y}.nodes.add}(\var{Node}(\var{v_{axis}}, \var{n}))}$
-			%\State $\var{img.ensureConsistency}()$
-			\State $dgrid = \Call{CreateTriDexelGrid}{\var{img}, \var{box}}$
+				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{img}.\var{images}_{\var{axis}}.\var{dexels}_{\var{x}, \var{y}}.\var{nodes}.\var{add}(\var{Node}(\var{v}_{\var{axis}}, \var{n}))}$
+			\State $\var{dgrid} = \Call{CreateTriDexelGrid}{\var{img}, \var{box}}$
 			\State $\var{triangles} \gets \varnothing$
-			\ForAll{$\var{c} \in \var{dgrid.cells}()$}
+			\ForAll{$\var{c} \in \var{dgrid}.\var{cells}()$}
 				\State $\Call{RegularizeCell}{\var{c}}$
 				\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{c}}$
 			\EndFor
@@ -210,36 +209,36 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 	\begin{algorithmic}[1]
 		\Procedure{Raycast}{$\var{grid}, \var{box}, \var{res}, \var{hitFunc}$}
 			\For{$\var{axis0} \gets 0 \To 2$}
-				\State $axis1 \gets (axis0 + 1) \bmod 3$
-				\State $axis2 \gets (axis0 + 2) \bmod 3$
-				\State $xCount \gets res_{axis1}$
-				\State $yCount \gets res_{axis2}$
-				\State $\Delta x \gets (box.upper_{axis1} - box.lower_{axis1}) \div (xCount - 1)$
-				\State $\Delta y \gets (box.upper_{axis2} - box.lower_{axis2}) \div (yCount - 1)$
-				\For{$\var{y} \gets 0 \To yCount - 1$}
-					\For{$\var{x} \gets 0 \To xCount - 1$}
-						\State $ray = \Call{CreateRay}{box, axis0, axis1, axis2, \Delta x, \Delta y, x, y}$
-						\State $\Call{CastRay}{grid, axis0, axis1, axis2, ray,\hfill\break
-							\hspace*{\dimexpr\algorithmicindent*5}(v, n) \rightarrow hitFunc(axis0, x, y, v, n)}$
+				\State $\var{axis1} \gets (\var{axis0} + 1) \bmod 3$
+				\State $\var{axis2} \gets (\var{axis0} + 2) \bmod 3$
+				\State $\var{xCount} \gets \var{res}_{\var{axis1}}$
+				\State $\var{yCount} \gets \var{res}_{\var{axis2}}$
+				\State $\Delta \var{x} \gets (\var{box}.\var{upper}_{\var{axis1}} - \var{box}.\var{lower}_{\var{axis1}}) \div (\var{xCount} - 1)$
+				\State $\Delta \var{y} \gets (\var{box}.\var{upper}_{\var{axis2}} - \var{box}.\var{lower}_{\var{axis2}}) \div (\var{yCount} - 1)$
+				\For{$\var{y} \gets 0 \To \var{yCount} - 1$}
+					\For{$\var{x} \gets 0 \To \var{xCount} - 1$}
+						\State $ray = \Call{CreateRay}{\var{box}, \var{axis0}, \var{axis1}, \var{axis2}, \var{\Delta x}, \var{\Delta y}, \var{x}, \var{y}}$
+						\State $\Call{CastRay}{\var{grid}, \var{axis0}, \var{axis1}, \var{axis2}, \var{ray},\hfill\break
+							\hspace*{\dimexpr\algorithmicindent*5}(\var{v}, \var{n}) \rightarrow \var{hitFunc}(\var{axis0}, \var{x}, \var{y}, \var{v}, \var{n})}$
 					\EndFor
 				\EndFor
 			\EndFor
 		\EndProcedure
 		\\
-		\Function{CreateRay}{$box, axis0, axis1, axis2, \Delta x, \Delta y, x, y, xCount, yCount$}
-			\State $origin \gets box.lower$
-			\State $origin_{axis1} \gets origin_{axis1} + x * \Delta x$
-			\State $origin_{axis2} \gets origin_{axis2} + y * \Delta y$
-			\State $direction = Vertex(0, 0, 0)$
-			\State $direction_{axis0} \gets 1$
-			\State \Return $Ray(origin, direction)$
+		\Function{CreateRay}{$\var{box}, \var{axis0}, \var{axis1}, \var{axis2}, \var{\Delta x}, \var{\Delta y}, \var{x}, \var{y}, \var{xCount}, \var{yCount}$}
+			\State $\var{origin} \gets \var{box}.\var{lower}$
+			\State $\var{origin}_{axis1} \gets \var{origin}_{\var{axis1}} + \var{x} * \var{\Delta x}$
+			\State $\var{origin}_{axis2} \gets \var{origin}_{\var{axis2}} + \var{y} * \var{\Delta y}$
+			\State $\var{direction} = \var{Vertex}(0, 0, 0)$
+			\State $\var{direction}_{\var{axis0}} \gets 1$
+			\State \Return $\var{Ray}(\var{origin}, \var{direction})$
 		\EndFunction
 		\\
-		\Procedure{CastRay}{$grid, axis0, axis1, axis2, ray, hitFunc$}
-			\State $traverser \gets AxisAlignedTraverser(grid, ray, axis0, axis1, axis2)$
-			\While{$\neg traverser.reachedEnd()$}
-				\State $cell \gets traverser.nextCell()$
-				\State $\Call{IntersectCell}{cell, ray, axis0, axis1, axis2, hitFunc}$
+		\Procedure{CastRay}{$\var{grid}, \var{axis0}, \var{axis1}, \var{axis2}, \var{ray}, \var{hitFunc}$}
+			\State $\var{traverser} \gets \var{AxisAlignedTraverser}(\var{grid}, \var{ray}, \var{axis0}, \var{axis1}, \var{axis2})$
+			\While{$\neg \var{traverser}.\var{reachedEnd}()$}
+				\State $\var{cell} \gets \var{traverser}.\var{nextCell}()$
+				\State $\Call{IntersectCell}{\var{cell}, \var{ray}, \var{axis0}, \var{axis1}, \var{axis2}, \var{hitFunc}}$
 			\EndWhile
 		\EndProcedure
 	\end{algorithmic}
@@ -251,32 +250,32 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 %
 The outmost procedure \textproc{Raycast} takes four arguments: the VML's regular grid data structure, the slightly enlarged bounding box of the raycasted area, the resolution of the raycasted \enquote{image} as well as a function, which is called on every surface hit.
 The algorithm starts of by iterating over the three coordinate system's axes.
-The index of each axis is stored in the variable \lstinline!axis0!, where 0 denotes the x-, 1 the y- and 2 the z-axis.
-\lstinline!axis0! is also called primary axis and is accompanied by \lstinline!axis1! and \lstinline!axis2! which hold the other two, secondary axes, in cyclic order.
-Depending on the choice of primary and secondary axes, the resolution of the 2-dimensional grid spawning the rays is determined and assigned to \lstinline!xCount! and \lstinline!yCount!, for the horizontal and vertical resolution.
+The index of each axis is stored in the variable \var{axis0}, where 0 denotes the x-, 1 the y- and 2 the z-axis.
+\var{axis0} is also called primary axis and is accompanied by \var{axis1} and \var{axis2} which hold the other two, secondary axes, in cyclic order.
+Depending on the choice of primary and secondary axes, the resolution of the 2-dimensional grid spawning the rays is determined and assigned to \var{xCount} and \var{yCount}, for the horizontal and vertical resolution.
 Afterwards, the distance between two incident rays along both secondary axes is computed.
 Therefore, along both secondary axes, the size of the bounding box is computed and divided by the resolution minus one.
-The result is assigned to the variables $\Delta x$ and $\Delta y$.
+The result is assigned to the variables \var{\Delta x} and \var{\Delta y}.
 Now the algorithm starts creating and casting all rays along their primary axis.
 Two nested loops iterate over all points of the 2-dimensional grid spawning rays.
-For each grid point at $x, y$ a ray is created using the \textproc{CreateRay} function.
+For each grid point at $\var{x}, \var{y}$ a ray is created using the \textproc{CreateRay} function.
 Subsequently, the ray is cast into the VML's regular grid by invoking \textproc{CastRay}, passing a closure which is invoked each time a hit is recorded.
 
-The \textproc{CreateRay} function's objective is to create an instance of \lstinline!Ray! storing the ray's origin and direction.
-The origin is calculated by starting from the bounding box's \lstinline!lower! corner.
+The \textproc{CreateRay} function's objective is to create an instance of \var{Ray} storing the ray's origin and direction.
+The origin is calculated by starting from the bounding box's \var{lower} corner.
 Along the primary axis, this value is already correct.
-On the secondary axes, the origin, currently at the origin for ray $0, 0$, must be moved according to the ray's $x$ and $y$ coordinate.
-In order to do so, $x$ and $y$ are multiplied by the distances between incident rays, $\Delta x$ and $\Delta y$, and added to the origin's secondary axes.
+On the secondary axes, the origin, currently at the origin for ray $0, 0$, must be moved according to the ray's \var{x} and \var{y} coordinate.
+In order to do so, \var{x} and \var{y} are multiplied by the distances between incident rays, \var{\Delta x} and \var{\Delta y}, and added to the origin's secondary axes.
 %
 Computing the ray's direction is simpler, as it is axis aligned.
 Therefore, the direction is a unit vector along the primary axis, created by setting the corresponding component of a zeroed vector to one.
 %
-Finally, $origin$ and $direction$ are aggregated into an instance of $Ray$ and returned.
+Finally, \var{origin} and \var{direction} are aggregated into an instance of \var{Ray} and returned.
 
 After rays have been created, they are cast into the VML's regular grid data structure to find surface intersections using the \textproc{CastRay} procedure.
 Traversing a ray through a regular grid is usually done using the 3D-DDA algorithm \cite{3DDDA}, \cf figure \ref{fig:traverser}.
 However, as the rays are axis parallel, traversal essentially boils down to mapping the ray's origin to the appropriate grid cell and incrementing the 3-dimensional cell index along the primary axis until the other end of the grid is reached.
-This logic is hidden behind the $AxisAlignedTraverser$ class and is no further elaborated.
+This logic is hidden behind the \var{AxisAlignedTraverser} class and is no further elaborated.
 %
 The ray is then intersected with each cell pulled from the traverser using the \textproc{IntersectCell} algorithm.
 Fundamentally, the implementation is based on the inside counting scheme of the visualization code explained in figure \ref{fig:raycast}.
@@ -292,10 +291,10 @@ As it is quite comprehensive and highly tailored to the VML's internal data stru
 \label{sec:tri_dexel_dexel_image_generation}
 
 Based on the generic, axis parallel raycasting routine, a tri-dexel image is created in the base algorithm \ref{alg:tri_dexel}.
-Before the raycast is lauched, an instance of $TriDexelImage$ is created, preallocating enough space to hold 3 dexel images, each holding a 2-dimensional grid of empty dexels.
+Before the raycast is lauched, an instance of \var{TriDexelImage} is created, preallocating enough space to hold 3 dexel images, each holding a 2-dimensional grid of empty dexels.
 When calling \textproc{AxisParallelRaycast} procedure, an anonymous function is passed which is invoked on every surface hit detected during raycasting.
-This function receives the primary axis $axis$, \ie the axis along the rays where traversed, $x$ and $y$ coordinate on the 2-dimensional dexel grid as well as the intersection point $v$ with the normal of the hit triangle $n$.
-With this information, the tri-dexel image stored in $img$ is populated.
+This function receives the primary axis \var{axis}, \ie the axis along the rays where traversed, \var{x} and \var{y} coordinate on the 2-dimensional dexel grid as well as the intersection point \var{v} with the normal of the hit triangle \var{n}.
+With this information, the tri-dexel image stored in \var{img} is populated.
 Once raycasting has completed, the tri-dexel grid is generated from the tri-dexel image.
 This conversion is more a reinterpretation and preparation of the information contained within the tri-dexel image.
 Whereas the image contains the raw raycasting result, the tri-dexel grid already stores grid point occupancy information and cuts all dexels at cell borders.
@@ -307,54 +306,54 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 	\centering
 	\begin{algorithmic}[1]
 		\Function{CreateTriDexelGrid}{$\var{triImg}, \var{box}$}
-			\State $res = triImg.res$
-			\State $grid = TriDexelGrid(res, box)$
+			\State $\var{res} = \var{triImg}.\var{res}()$
+			\State $\var{grid} = \var{TriDexelGrid}(\var{res}, \var{box})$
 			\For{$\var{axis0} \gets 0 \To 2$}
-				\State $axis1 \gets (axis0 + 1) \bmod 3$
-				\State $axis2 \gets (axis0 + 2) \bmod 3$
-				\For{$axis1Val \gets 0 \To res_{axis1} - 1$}
-					\For{$axis2Val \gets 0 \To res_{axis2} - 1$}
-						\State $dexel \gets triImg.images_{axis0}.dexels_{axis1Val, axis2Val}$
-						\ForAll{$seg \in dexel.segments()$}
+				\State $\var{axis1} \gets (\var{axis0} + 1) \bmod 3$
+				\State $\var{axis2} \gets (\var{axis0} + 2) \bmod 3$
+				\For{$\var{axis1Val} \gets 0 \To \var{res}_{\var{axis1}} - 1$}
+					\For{$\var{axis2Val} \gets 0 \To \var{res}_{\var{axis2}} - 1$}
+						\State $\var{dexel} \gets \var{triImg.images}_{\var{axis0}}.\var{dexels}_{\var{axis1Val}, \var{axis2Val}}$
+						\ForAll{$\var{seg} \in \var{dexel}.\var{segments}()$}
 							\LineComment{Compute affected grid point range}
-							\State $axis0Start \gets \floor{\Call{MapDepthToGrid}{seg.start.depth, axis0, res, box}}$
-							\State $axis0End \gets \floor{\Call{MapDepthToGrid}{seg.end.depth, axis0, res, box}}$
-							\For{$axis0Val \gets axis0Start \To axis0End$}
-								\State $gridFrom$
-								\State $gridFrom_{axis0} \gets axis0Val$
-								\State $gridFrom_{axis1} \gets axis1Val$
-								\State $gridFrom_{axis2} \gets axis2Val$
-								\State $gridTo \gets gridFrom$
-								\State $gridTo_{axis0} \gets gridTo_{axis0} + 1$
-								\State $depthFrom = \Call{MapGridToDepth}{gridFrom_{axis0}, axis0, res, box}$
-								\State $depthTo = \Call{MapGridToDepth}{gridTo_{axis0}, axis0, res, box}$
+							\State $\var{start} \gets \floor{\Call{MapDepthToGrid}{\var{seg}.\var{start}.\var{depth}, \var{axis0}, \var{res}, \var{box}}}$
+							\State $\var{end} \gets \floor{\Call{MapDepthToGrid}{\var{seg}.\var{end}.\var{depth}, \var{axis0}, \var{res}, \var{box}}}$
+							\For{$\var{axis0Val} \gets \var{start} \To \var{end}$}
+								\State $\var{gridFrom}$
+								\State $\var{gridFrom}_{\var{axis0}} \gets \var{axis0Val}$
+								\State $\var{gridFrom}_{\var{axis1}} \gets \var{axis1Val}$
+								\State $\var{gridFrom}_{\var{axis2}} \gets \var{axis2Val}$
+								\State $\var{gridTo} \gets \var{gridFrom}$
+								\State $\var{gridTo}_{axis0} \gets \var{gridTo}_{\var{axis0}} + 1$
+								\State $\var{depthFrom} = \Call{MapGridToDepth}{\var{gridFrom}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
+								\State $\var{depthTo}   = \Call{MapGridToDepth}{\var{gridTo}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
 								\LineComment{Point occupancy}
-								\If{$seg.start.depth <= depthFrom <= seg.end.depth$}
-									\State $grid.occupancy_{gridFrom} \gets \True$
+								\If{$\var{seg}.\var{start}.\var{depth} \leq \var{depthFrom} \leq \var{seg}.\var{end}.\var{depth}$}
+									\State $\var{grid}.\var{occupancy}_{\var{gridFrom}} \gets \True$
 								\EndIf
-								\If{$seg.start.depth <= depthTo <= seg.end.depth$}
-									\State $grid.occupancy_{gridTo} \gets \True$
+								\If{$\var{seg}.\var{start}.\var{depth} \leq \var{depthTo} \leq \var{seg}.\var{end}.\var{depth}$}
+									\State $\var{grid}.\var{occupancy}_{\var{gridTo}} \gets \True$
 								\EndIf
 								\LineComment{Copy and clamp to cell border}
-								\State $s \gets seg$
-								\If{$s.start.depth \leq depthFrom$}
-									\State $s.start.depth \gets depthFrom$
+								\State $\var{s} \gets \var{seg}$
+								\If{$\var{s}.\var{start}.\var{depth} \leq \var{depthFrom}$}
+									\State $\var{s}.\var{start}.\var{depth} \gets \var{depthFrom}$
 								\EndIf
-								\If{$s.end.depth \geq depthTo$}
-									\State $s.end.depth \gets depthTo$
+								\If{$\var{s}.\var{end}.\var{depth} \geq \var{depthTo}$}
+									\State $\var{s}.\var{end}.\var{depth} \gets \var{depthTo}$
 								\EndIf
-								\State $grid.edges_{axis0, gridFrom}.segments.add(s)$
+								\State $\var{grid}.\var{edges}_{\var{axis0}, \var{gridFrom}}.\var{segments}.\var{add}(\var{s})$
 							\EndFor
 						\EndFor
 					\EndFor
 				\EndFor
 			\EndFor
 		\EndFunction
-		\Function{MapDepthToGrid}{depth, axis0, res, box}
-			\State \Return $(depth - box.lower_{axis0}) \div (box.upper_{axis0} - box.lower_{axis0}) * (res_{axis0} - 1)$
+		\Function{MapDepthToGrid}{\var{depth}, \var{axis0}, \var{res}, \var{box}}
+			\State \Return $(\var{depth} - \var{box}.\var{lower}_{\var{axis0}}) \div (\var{box}.\var{upper}_{\var{axis0}} - \var{box}.\var{lower}_{\var{axis0}}) * (\var{res}_{\var{axis0}} - 1)$
 		\EndFunction
-		\Function{MapGridToDepth}{gridCoord, axis0, res, box}
-			\State \Return $gridCoord \div (res_{axis0} - 1) * (box.upper_{axis0} - box.lower_{axis0}) + box.lower_{axis0}$
+		\Function{MapGridToDepth}{\var{gridCoord}, \var{axis0}, \var{res}, \var{box}}
+			\State \Return $\var{gridCoord} \div (\var{res}_{\var{axis0}} - 1) * (\var{box}.\var{upper}_{\var{axis0}} - \var{box}.\var{lower}_{\var{axis0}}) + \var{box}.\var{lower}_{\var{axis0}}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
