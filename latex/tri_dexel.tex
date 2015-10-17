@@ -472,12 +472,12 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 				\State $dstPoint \gets cell.realPoints_{dst}$
 				\State $srcOcc \gets cell.occupancy_{src}$
 				\State $dstOcc \gets cell.occupancy_{dst}$
-				\State $axis0 \gets edgeToAxis_{src, dst}$
+				\State $axis \gets edgeToAxis_{src, dst}$
 				
 				\LineComment{Rule 1}
 				\If{$srcOcc \wedge dstOcc$}
 					\State $n \gets Vertex()$ \Comment{Invalid normal}
-					\State $segs = \{ Segment(Node(srcPoint_{axis0}, n), Node(dstPoint_{axis0}, n)) \}$
+					\State $segs = \{ Segment(Node(srcPoint_{axis}, n), Node(dstPoint_{axis}, n)) \}$
 				\EndIf
 				
 				\LineComment{Rule 2}
@@ -487,29 +487,26 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 				
 				\LineComment{Rule 3}
 				\State $n = Vertex(0, 0, 0)$
-				\State $n_{axis0} = 1$
+				\State $n_{axis} = 1$
 				\If{$srcOcc \wedge \neg dstOcc$}
-					\If{$|segs| = 0 \vee segs_0.start.depth \neq srcPoint_{axis0}$}
-						\State $segs.add(Segment(Node(srcPoint_{axis0}, -n), Node(srcPoint_{axis0} + \rho, n)))$
+					\If{$|segs| = 0 \vee segs_0.start.depth \neq srcPoint_{axis}$}
+						\State $segs.add(Segment(Node(srcPoint_{axis}, -n), Node(srcPoint_{axis} + \rho, n)))$
 					\EndIf
 				\EndIf
 				\If{$\neg srcOcc \wedge dstOcc$}
-					\If{$|segs| = 0 \vee segs_{|segs| - 1}.end.depth \neq dstPoint_{axis0}$}
-						\State $segs.add(Segment(Node(dstPoint_{axis0} - \rho, -n), Node(dstPoint_{axis0}, n)))$
+					\If{$|segs| = 0 \vee segs_{|segs| - 1}.end.depth \neq dstPoint_{axis}$}
+						\State $segs.add(Segment(Node(dstPoint_{axis} - \rho, -n), Node(dstPoint_{axis}, n)))$
 					\EndIf
 				\EndIf
 				
 				\LineComment{Rule 4}
 				\ForAll{$s \in segs$}
-					\If{$s.start.depth \neq srcPoint_{axis0} \wedge s.end.depth \neq dstPoint_{axis0}$}
+					\If{$s.start.depth \neq srcPoint_{axis} \wedge s.end.depth \neq dstPoint_{axis}$}
 						\State $segs.remove(s)$
 					\EndIf
 				\EndFor
 			\EndFor
 		\EndFunction
-		\\
-		\State $edgeIndexToCorners \gets (\dots)$
-		\State $edgeToAxis \gets (\dots)$
 	\end{algorithmic}
 	\caption{
 		Regularizing a cell of the tri-dexel grid by applying the four rules specified in figure \ref{fig:tri_dexel_regularization} \cite{tridexel_reconstruction}.
@@ -517,7 +514,10 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 	\label{alg:tri_dexel_regularization}
 \end{algorithm}
 %
-
+Regularizing a cell essentially boils down to processing all 12 edges of the cell, indexed from 0 to 11.
+For each edge a bit of meta information is retrieved using some lookup tables.
+These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corners, edges and axes.
+%
 \begin{figure}
 	\begin{subfigure}[t]{0.24\textwidth}
 		\begin{align*}
@@ -551,23 +551,6 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 	\end{subfigure}
 	\begin{subfigure}[t]{0.24\textwidth}
 		\begin{align*}
-		\text{edgeToAxis:} \\
-		(0, 1), (1, 0): 0 \\
-		(2, 3), (3, 2): 0 \\
-		(4, 5), (5, 4): 0 \\
-		(6, 7), (7, 6): 0 \\
-		(0, 2), (2, 0): 1 \\
-		(1, 3), (3, 1): 1 \\
-		(4, 6), (6, 4): 1 \\
-		(5, 7), (7, 5): 1 \\
-		(0, 4), (4, 0): 2 \\
-		(1, 5), (5, 1): 2 \\
-		(2, 6), (6, 2): 2 \\
-		(3, 7), (7, 3): 2
-		\end{align*}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.24\textwidth}
-		\begin{align*}
 		\text{cornersToEdgeIndex:} \\
 		(0, 1), (1, 0):  0 \\
 		(2, 3), (3, 2):  1 \\
@@ -583,7 +566,58 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 		(3, 7), (7, 3): 11
 		\end{align*}
 	\end{subfigure}
+	\begin{subfigure}[t]{0.24\textwidth}
+		\begin{align*}
+		\text{edgeToAxis:} \\
+		(0, 1), (1, 0): 0 \\
+		(2, 3), (3, 2): 0 \\
+		(4, 5), (5, 4): 0 \\
+		(6, 7), (7, 6): 0 \\
+		(0, 2), (2, 0): 1 \\
+		(1, 3), (3, 1): 1 \\
+		(4, 6), (6, 4): 1 \\
+		(5, 7), (7, 5): 1 \\
+		(0, 4), (4, 0): 2 \\
+		(1, 5), (5, 1): 2 \\
+		(2, 6), (6, 2): 2 \\
+		(3, 7), (7, 3): 2
+		\end{align*}
+	\end{subfigure}
+	\caption{
+		Various helper tables used by regularization and triangulation algorithms.
+	}
+	\label{fig:tri_dexel_tables}
 \end{figure}
+%
+For a given edge index, the indices of the incident grid points are retrieved, called \var{src} and \var{dst}, where \var{src} is always the grid point with the lower depth value.
+In addition to the index, the coordinate and occupancy is also retrieved in \var{srcPoint}, \var{dstPoint}, \var{srcOcc} and \var{dstOcc}.
+Finally, the axis parallel to the edge is looked up and stored in \var{axis}.
+Afterwards, the algorithm starts to apply the regularization rules.
+%
+For the first rule, the occupancy of both grid points is checked.
+If both of them are occupied, the existing segments on the edge are replaced by a new set with a new segment spanning from the source to the destination grid point.
+As both incident grid points are occupied, the edge cannot contain a surface intersection.
+Therefore, the normal on the dexel nodes can be safely ignored.
+%
+The second rule states that if both grid points are not occupied, the incident edge must be empty.
+Thus, in this case, all segments are simply removed.
+%
+Rule three is applied if only one grid point is marked as occupied.
+If segments are present on the current edge, the algorithm tests whether the first or last segment touches the grid point which is marked as occupied.
+If the source point is marked, the first segment's start must touch it, \ie must have equal depth than the grid point.
+In case the destination point is marked, the last segment's end must touch it.
+If there are no segments on the edge or the present segments do not touch their appropriate points, a new dexel segment is added.
+The new segment starts at the occupied grid point and has a small length of $\rho$.
+This length can be chosen arbitrarily, but as it's purpose is to correct a numeric issue, a tiny value is sufficient.
+Regarding the normal, the surface intersection represented by the newly added segment might be used by a later triangulation.
+However, the true normal is stored on the numerically too short segment in the appropriate neighboring cell, which is hard to retrieve as the tri-dexel grid's cells are isolated to allow independent processing.
+Hence, an artificial normal is added in the direction of the edge's axis.
+%
+The last rule, rule 4, finally checks all segments if they touch at least one grid point.
+If any segment does not satisfy this condition, the segment is removed.
+%
+After all 4 rules have been applied to all 12 edges of the cell, the cell is regularized and ready for triangulation.
+
 
 \subsection{Triangulation}
 \label{sec:tri_dexel_triangulation}
