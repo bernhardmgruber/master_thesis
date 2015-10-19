@@ -155,7 +155,10 @@ The number of stored nodes after raycasting is always a multiple of two.
 As dexel nodes are typically processed in pairs, as dexel segments, a convenience method \var{segments} is provided which groups adjacent nodes into instances of \var{DexelSegment}.
 A \var{DexelSegment} contains these two nodes as \var{start} and \var{end} node.
 Finally, the \var{Node} class holds the depth of the node along its dexel, \ie the distance of the node from the plane where the dexels originate, \cf figure \ref{fig:dexel_image}, as well as the normal vector of this surface entry/exit.
-Unrelated to the tri-dexel types is the additional class \var{Ray} which represents a ray starting at the vertex \var{origin} and traveling into the direction stored by \var{direction}.
+Unrelated to the tri-dexel types are two additional classes, which are used in some algorithms during the reconstruction.
+The \var{Ray} class represents a ray starting at the vertex \var{origin} and traveling into the direction stored by \var{direction}.
+The \var{EdgeVertex} class holds data to represent a vertex on an edge of a tri-dexel cell.
+It contains grid point indices for the two points incident to this vertex's edge, a position and the surface normal of the vertex.
 
 Based on the discussed tri-dexel types, the basic reconstruction algorithm is shown in algorithm \ref{alg:tri_dexel}.
 %
@@ -714,23 +717,23 @@ Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a t
 		\EndFunction
 		\\
 		\Function{DepthFirstSearch}{$occupied, cur, last, cell, visited, loop$}
-			\If{$cell.point_{cur} = occupied \wedge \neg visited_{cur}$}
+			\If{$cell.occupancy_{cur} = occupied \wedge \neg visited_{cur}$}
 				\State $visited_{cur} \gets \True$
-				\State $neighbors \gets \Call{Rotate}{neighborIds_{cur}, last}$
+				\State $neighbors \gets \Call{RotateToStartAfter}{neighborIds_{cur}, last}$
 				\For{$n \in neighbors$}
-					\If{$cell.point_{n} \neq occupied$}
+					\If{$cell.occupancy_{n} \neq occupied$}
 						\State $axis \gets edgeToAxis_{cur, n}$
 						\State $seg \gets cell.edges_{pointsToEdgeId_{cur, n}}.segments_0$
 						\State $curReal \gets cell.realPoints_{cur}$
 						\State $nReal \gets cell.realPoints_{n}$
-						\State $v \gets curReal$
 						\If{$seg.start.depth = curReal_{axis} \vee seg.start.depth = nReal_{axis}$}
-							\State $v_{axis} \gets seg.end.depth$
-							\State $loop.add(EdgeVertex(cur, n, v, seg.end.normal))$
+							\State $node \gets seg.end$
 						\Else
-							\State $v_{axis} \gets seg.start.depth$
-							\State $loop.add(EdgeVertex(cur, n, v, seg.start.normal))$
+							\State $node \gets seg.start$
 						\EndIf
+						\State $v \gets curReal$
+						\State $v_{axis} \gets node.depth$
+						\State $loop.add(EdgeVertex(cur, n, v, node.normal))$
 					\Else
 						\State $\Call{DepthFirstSearch}{occupied, n, cur, cell, visited, loop}$
 					\EndIf
@@ -751,6 +754,45 @@ Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a t
 	\label{alg:tri_dexel_triangulation}
 \end{algorithm}
 %
+The \textproc{TriangulateCell} function begins by checking if the cell is one of the 4 problematic cases, \ie cases with two, diagonally opposing occupied grid points.
+In non problematic cases, the \textproc{FindLoops} function is called, starting at non-occupied vertices.
+In problematic cases, the loop search routine is started at occupied vertices and the resulting loops reversed.
+After all loops have been identified, they are sent to the \textproc{TriangulateLoopSimple} function which generates triangles from the loop.
+The union of all triangulated loops is returned as triangulation result of the given tri-dexel cell.
+%
+The \textproc{FindLoops} algorithm is the entry into the depth-first search based traversal of the cell's edges as shown in figure \ref{fig:tri_dexel_triangulation}.
+It starts by initializing an array with eight boolean values set to false.
+These values keep track of the already visited vertices.
+For each of the 8 possible start grid points an empty array \var{loop} is created which is passed recursively through the following depth-first search.
+It collects information about the encountered dexel nodes, in the order they are visited, to form a boundary loop.
+The call to \textproc{DepthFirstSearch} then starts traversing the cell's edges starting at the grid point \var{start}.
+After the call has returned, a conditional checks if loop vertices have been found and adds the loop in this case.
+After a search has been launched from each start point, the set of collected loops is returned.
+%
+The recursive \textproc{DepthFirstSearch} algorithm is the heart of the boundary loop discovery.
+Initially, it checks if the current grid point is equal to \var{occupied} and has not been visited yet.
+The parameter \var{occupied} is usually false for the default case, \ie the search traverses on non-occupied points, and only true in problematic cases.
+If both conditions are met, the point is marked as visited and the list of neighbor points is fetched.
+This list is rotated to start at the index right after the one the search came from.
+This rotation ensures, that each neighbors are visited in counter-clockwise order as seen from the incoming edge.
+In case of the first call to \textproc{DepthFirstSearch}, there is no last visited point, \var{last} is $-1$, and the neighbor list is not rotated.
+For each neighboring grid point, it is checked for inequality to \var{occupied}.
+If this is true, the \var{cur} and \var{n} have different occupancy and the edge between them contains a vertex of the surface.
+This vertex is now constructed from the corresponding dexel node together with some meta data.
+Using the \var{edgeToAxis} table of figure \ref{fig:tri_dexel_tables}, the axis parallel to the current edge is obtained.
+Using \var{pointsToEdgeId}, the segment on the corresponding cell's edge is also retrieved.
+Furthermore, the coordinates of the current and neighboring grid point are stored in local variables.
+The \var{node} variable is then set to the dexel node which does not touch one of the grid points.
+The vertex on the current edge is then constructed starting with the coordinate of the current grid point \var{curReal}.
+Choosing the neighboring grid point's coordinate is also valid, as both coordinates only differ at the component at \var{axis}.
+This component of the new vertex is then set to the selected node's depth.
+Finally, an instance of \var{EdgeVertex} is added to the boundary loop, containing both grid point's ids, the newly calculated vertex and the corresponding surface normal as obtained from the dexel node.
+Afterwards, the function returns and the search backtracks.
+In case the current neighbor's occupancy is equal to \var{occupied}, \ie no vertex on the current edge, the depth-first search is recursively continued with the current point index passed as last and the neighbor index passed as current.
+
+Finally, the \textproc{TriangulateLoopSimple} function just maps each \var{EdgeVertex} of the passed loop to its position, creating a pure list of 3D vertices.
+The sum of these vertices, divided by their count, yields their center of mass, stored in \var{center}.
+This value is used to ultimately create a triangle fan from the loop's vertices with around \var{center}.
 
 
 \subsection{Refinement and feature reconstruction}
