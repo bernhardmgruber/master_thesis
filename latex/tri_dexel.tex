@@ -534,7 +534,7 @@ These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corn
 	\end{subfigure}
 	\begin{subfigure}[t]{0.24\textwidth}
 		\begin{align*}
-		\text{edgeIndexToCorners:} \\
+		\text{edgeToPointIds:} \\
 		 0: (0, 1) \\
 		 1: (2, 3) \\
 		 2: (4, 5) \\
@@ -551,7 +551,7 @@ These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corn
 	\end{subfigure}
 	\begin{subfigure}[t]{0.24\textwidth}
 		\begin{align*}
-		\text{cornersToEdgeIndex:} \\
+		\text{pointsToEdgeId:} \\
 		(0, 1), (1, 0):  0 \\
 		(2, 3), (3, 2):  1 \\
 		(4, 5), (5, 4):  2 \\
@@ -679,16 +679,69 @@ The depth-first search approach, however, does have an issue with 4 of the 256 c
 If only two grid points are occupied and lie on diagonally opposing corners of the cell, they form two boundary loops which are both discoverable by a single depth-first search.
 This causes a problem, as the search discovers 6 vertices, which do not make up a single but two loops.
 Therefore, these cases have to be handled differently.
+A simple solution is to just start the depth-first search at the occupied grid points, resulting in two loops, and reverse the vertex order.
 
-
-
-
-
+Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a tri-dexel cell without any feature reconstruction.
+%
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{TriangulateCell}{$\var{c}$}
-			
+		\Function{TriangulateCell}{$\var{cell}$}
+			%\State $loops$
+			\If{$\neg \Call{IsProblematicCase}{cell}$}
+				\State $loops \gets \Call{FindLoops}{\var{cell}, \False}$
+			\Else
+				\State $loops \gets \Call{ReverseLoops}{\Call{FindLoops}{\var{cell}, \True}}$
+			\EndIf
+			\State $triangles \gets \varnothing$
+			\For{$loop \in loops$}
+				\State $triangles \gets triangles \cup \Call{TriangulateLoopSimple}{loop}$
+			\EndFor
+			\State \Return $triangles$
+		\EndFunction
+		\\
+		\Function{FindLoops}{$\var{cell}, occupied$}
+			\State $visited \gets (\False, \False, \False, \False, \False, \False, \False, \False)$
+			\State $loops \gets \varnothing$
+			\For{$start \gets 0 \To 7$}
+				\State $loop \gets array()$
+				\State $\Call{DepthFirstSearch}{occupied, start, -1, cell, visited, loop}$
+				\If{$|loop| > 0$}
+					\State $loops.add(loop)$
+				\EndIf
+			\EndFor
+			\State \Return $loops$
+		\EndFunction
+		\\
+		\Function{DepthFirstSearch}{$occupied, cur, last, cell, visited, loop$}
+			\If{$cell.point_{cur} = occupied \wedge \neg visited_{cur}$}
+				\State $visited_{cur} \gets \True$
+				\State $neighbors \gets \Call{Rotate}{neighborIds_{cur}, last}$
+				\For{$n \in neighbors$}
+					\If{$cell.point_{n} \neq occupied$}
+						\State $axis \gets edgeToAxis_{cur, n}$
+						\State $seg \gets cell.edges_{pointsToEdgeId_{cur, n}}.segments_0$
+						\State $curReal \gets cell.realPoints_{cur}$
+						\State $nReal \gets cell.realPoints_{n}$
+						\State $v \gets curReal$
+						\If{$seg.start.depth = curReal_{axis} \vee seg.start.depth = nReal_{axis}$}
+							\State $v_{axis} \gets seg.end.depth$
+							\State $loop.add(EdgeVertex(cur, n, v, seg.end.normal))$
+						\Else
+							\State $v_{axis} \gets seg.start.depth$
+							\State $loop.add(EdgeVertex(cur, n, v, seg.start.normal))$
+						\EndIf
+					\Else
+						\State $\Call{DepthFirstSearch}{occupied, n, cur, cell, visited, loop}$
+					\EndIf
+				\EndFor
+			\EndIf
+		\EndFunction
+		\\
+		\Function{TriangulateLoopSimple}{$loop$}
+			\State $vertices \gets \Call{Map}{loop, v \rightarrow v.position}$
+			\State $center \gets \Call{Sum}{vertices} \div |vertices|$
+			\State \Return $\Call{TriangulateLoop}{vertices, center}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
@@ -697,6 +750,8 @@ Therefore, these cases have to be handled differently.
 	}
 	\label{alg:tri_dexel_triangulation}
 \end{algorithm}
+%
+
 
 \subsection{Refinement and feature reconstruction}
 \label{sec:tri_dexel_refinement}
@@ -710,7 +765,9 @@ Finally, these enhanced loops are also triangulated.
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_refinement}
 	\caption{
-		Triangulating a tri-dexel cell by finding boundary loops using depth-first search along the cube, starting at non-occupied nodes \cite{tri_dexel_refinement}.
+		Triangulating a tri-dexel cell's boundary loops with additional feature information \cite{tridexel_reconstruction}.
+		The left image shows the creation of two intermediate vertices.
+		The right image shows the creation of three intermediate vertices and an apex vertex.
 	}
 	\label{fig:tri_dexel_refinement}
 \end{figure}
