@@ -616,17 +616,32 @@ Hence, an artificial normal is added in the direction of the edge's axis.
 The last rule, rule 4, finally checks all segments if they touch at least one grid point.
 If any segment does not satisfy this condition, the segment is removed.
 %
-After all 4 rules have been applied to all 12 edges of the cell, the cell is regularized and ready for triangulation.
+After all 4 rules have been applied to all 12 edges of the cell, the cell is regularized and fulfills a few properties:
+\begin{itemize}
+	\item Between two occupied grid points, there is always a full segment.
+	\item Between two non-occupied grid points, there is never a segment.
+	\item Between two differently marked grid points, there is exactly one segment with one node not equal to the depth of the occupied grid point.
+\end{itemize}
+These properties now allow for a subsequent triangulation.
 
 
 \subsection{Triangulation}
 \label{sec:tri_dexel_triangulation}
 
-For this purpose, a depth-first search process is iteratively started at non-occupied grid points of the cell.
-The search traverses the cell's edges and backtracks each time an occupied grid point and therefore a grid edge containing a dexel node is found.
-The list of visited grid edges containing dexel nodes, in the order they where visited, forms a boundary loop.
-A cell might contain multiple boundary loops, found when starting at different, non-occupied grid points.
+After regularization, a cell of the tri-dexel grid is ready for triangulation.
+The process of creating triangles from a cell is done in three steps where the second one is optional.
+Firstly, set of boundary loops is created from the grid points and dexel nodes between them.
+Secondly, from the loop, vertex and normal information, optional feature points are created.
+Thirdly, the boundary loops with optional feature information are triangulated.
 
+For the initial boundary loop discovery, a depth-first search process is iteratively started at non-occupied grid points of the cell.
+The search traverses the cell's edges and backtracks each time an occupied grid point and therefore a grid edge containing a dexel node is found.
+Traversed grid points are marked as visited and cause future searches to backtrack immediately.
+The list of visited grid edges containing dexel nodes, per search, in the order they where visited, form a boundary loop.
+A cell might contain multiple boundary loops, which are found in multiple searches when starting at different, non-occupied grid points.
+
+Figure \ref{fig:tri_dexel_triangulation} illustrates this depth-search process by two examples.
+%
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_triangulation}
@@ -635,12 +650,45 @@ A cell might contain multiple boundary loops, found when starting at different, 
 	}
 	\label{fig:tri_dexel_triangulation}
 \end{figure}
+%
+In the upper example, a single boundary loop is discovered.
+The search starts at grid point 1.
+At each grid point, a list of neighbors has to be retrieved.
+These neighbor ids make up a small table which is listed in figure \ref{fig:tri_dexel_tables} and beside the two examples in figure \ref{fig:tri_dexel_triangulation}.
+The neighbors of a grid point are further traversed in counter-clockwise order, starting at the next neighbor after the one from which the current grid point has been reached.
+At the first grid point of the search, the neighbor to start with may be chosen freely, and is usually the first one of the neighbor ids table.
+At grid point 1, the neighbors 0, 3 and 5 are traversed.
+Neighbors 0 and 3 reach an occupied grid point and therefore cause the search to backtrack, storing the dexel nodes A and B on the edges to 0 and 3.
+As the neighbor 5 is non-occupied, the search continues with its neighbors, 1, 7, and 4.
+Grid point 1 is omitted, as it has already been visited.
+Grid point 7 is further traversed and backtracks at point 3 and 6, resulting in the dexel nodes C and D.
+Grid point 4 produces the nodes E and F.
+Afterwards, the search backtracks until the starting point is reached and terminates.
+In visited order, the dexel nodes A to F form a boundary loop.
+Further searches started at other grid points immediately return as all non-occupied nodes have already been visited by the search started at point 1.
+%
+In the lower example of figure \ref{fig:tri_dexel_triangulation}, the depth-first search discovers multiple boundary loops.
+
+Triangulating a cell with occupancy information at its corners and vertices on it's edges into triangles is a problem which is also discussed in voxel-based surface reconstruction techniques, such as the marching cubes variants.
+In fact, a tri-dexel cell with 8 boolean occupancy values at the corners represents one of $2^8 = 256$ cases.
+Therefore, the boundary loop configuration and also the triangulation could also be precomputed for each case and stored in a lookup table.
+This strategy is typically found in the original and many derived marching cubes implementations \cite{marching_cubes}.
+As a matter of fact, the tables used by these marching cubes implementations, actually any table, could be used to triangulate tri-dexel cells.
+
+The depth-first search approach, however, does have an issue with 4 of the 256 configurations.
+If only two grid points are occupied and lie on diagonally opposing corners of the cell, they form two boundary loops which are both discoverable by a single depth-first search.
+This causes a problem, as the search discovers 6 vertices, which do not make up a single but two loops.
+Therefore, these cases have to be handled differently.
+
+
+
+
 
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriangulateCell}{$\var{c}$}
-		
+			
 		\EndFunction
 	\end{algorithmic}
 	\caption{
