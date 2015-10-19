@@ -798,11 +798,18 @@ This value is used to ultimately create a triangle fan from the loop's vertices 
 \subsection{Refinement and feature reconstruction}
 \label{sec:tri_dexel_refinement}
 
-This optional feature reconstruction pass is run on the loops found in the previous step.
-Using the normals of each pair of adjacent dexel nodes of the loop, an additional intermediate/feature point may be created.
-Using the normals of multiple nodes, a further apex vertex may be created per loop.
+The triangulation shown in the last section \ref{sec:tri_dexel_triangulation}, \textproc{TriangulateLoopSimple} in algorithm \ref{alg:tri_dexel_triangulation}, is very basic and does not make use of the per-vertex normal information.
+However, this additional data is helpful and allows to refine the generated surface and reconstruct features like sharp edges and corners.
+In order to do so, the \textproc{TriangulateLoopSimple} routine is replaced by a more comprehensive algorithm, which makes use of the vertex normals to calculate additional feature vertices before triangulation.
+Two types of feature information is calculated:
+Using the normals of each pair of adjacent vertices of the loop, an additional intermediate vertex may be created.
+Using the normals of multiple vertices, a further apex vertex may be created, one per loop.
 Finally, these enhanced loops are also triangulated.
 
+Figure \ref{fig:tri_dexel_refinement} sketches both cases.
+The drawing on the left shows the creation of two intermediate vertices.
+The one on the right shows the creation of three intermediate vertices and the calculation of an apex vertex.
+%
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_refinement}
@@ -813,6 +820,49 @@ Finally, these enhanced loops are also triangulated.
 	}
 	\label{fig:tri_dexel_refinement}
 \end{figure}
+%
+All feature points are calculated using the intersection of three planes.
+For the intermediate vertices between two adjacent loop vertices, two planes are given by the two vertices' normals and one plane is given by the cell's side containing both vertices.
+In the left drawing of figure \ref{fig:tri_dexel_refinement}, the original boundary loop consists of the vertices A, B, C, and D.
+Each of these points holds an additional normal, $n_A$, $n_B$, $n_C$ and $n_D$.
+Now, the intermediate point G for example is calculated from the two planes described by the positions and normals of D and C and the cell side to the left.
+Using this schema, an intermediate vertex is calculated for each adjacent pair of vertices on the boundary loop.
+In case the calculated vertex is too close to the original edge or lies outside the cell's bounding box, the vertex is discarded.
+The vertices G and E are too close to their edges CD and AB and discarded, whereas vertex H and F are kept.
+%
+If at least three intermediate vertices are created, an additional apex vertex may be calculated.
+This apex vertex is again calculated as intersection of three planes.
+For these planes, the first three loop vertices are taken, which have resulted in the construction of a valid intermediate vertex.
+In the right drawing of figure \ref{fig:tri_dexel_refinement}, the loop vertices A, B and C have resulted in intermediate vertices, namely D, E and F.
+The first three of them, A, B, and C, are then used to form three planes which intersect in the apex point G.
+The location of the apex is also checked against the cell's bounding box.
+In case it is outside, the apex is discarded again.
+
+Finally, after creating intermediate and apex vertices, the enhanced boundary loops must be triangulated.
+This task is not as easy as the simple triangulation of a loop, as some cases must now be distinguish.
+In case a valid apex vertex has been created, the intermediate vertices are placed between the original loop vertices and the resulting loop is triangulated into a fan with the apex vertex as center.
+Otherwise, if no intermediate vertex is found at all, the initial loop is just triangulated into a fan with its center of mass as center, \cf \textproc{TriangulateLoopSimple}.
+If one intermediate vertex is found, the loop is triangulated with the intermediate vertex as center.
+If more than one intermediate vertex is found, the loop is split into subloops.
+Each sequence of an intermediate vertex, an arbitrary number of original loop vertices and another intermediate vertex is triangulated.
+This loop clipping is repeated until only one loop with intermediate vertices is left, which is also triangulated.
+
+Algorithm \ref{alg:tri_dexel_refinement} describes the details of the refinement and feature reconstruction pass, creating enhanced boundary loops which are also triangulated.
+This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} function of algorithm \ref{alg:tri_dexel_triangulation}.
+%
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{TriangulateCellRefined}{$\var{loop}, \var{cell}$}
+		
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Refinement, feature reconstruction and triangulation based on the original boundary loops.
+	}
+	\label{alg:tri_dexel_refinement}
+\end{algorithm}
+%
 
 
 \subsection{Subslicing *experimential*}
