@@ -743,7 +743,6 @@ Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a t
 		\\
 		\Function{TriangulateLoopSimple}{$loop$}
 			\State $vertices \gets \Call{Map}{loop, v \rightarrow v.position}$
-			%\State $center \gets \Call{Sum}{vertices} \div |vertices|$
 			\State \Return $\Call{TriangulateLoopIntoFan}{vertices}$
 		\EndFunction
 	\end{algorithmic}
@@ -792,8 +791,62 @@ In case the current neighbor's occupancy is equal to \var{occupied}, \ie no vert
 
 Finally, the \textproc{TriangulateLoopSimple} function just maps each \var{EdgeVertex} of the passed loop to its position, creating a pure list of 3D vertices.
 These vertices are then sent to the \textproc{TriangulateLoopIntoFan} function which creates a triangle fan from the given vertices around their center of mass.
-%The sum of these vertices, divided by their count, yields their center of mass, stored in \var{center}.
-%This value is used to ultimately create a triangle fan from the loop's vertices with around \var{center}.
+
+The \textproc{TriangulateLoopIntoFan} is one of three loop triangulation primitives used throughout this chapter.
+These primitives are listed in algorithm \ref{alg:tri_dexel_loop_triangulation_primitives}.
+%
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{TriangulateLoopIntoFan}{$loop, center$}
+			\If{$|loop| < 3$}
+				\State \Return $\varnothing$
+			\EndIf
+			\State $triangles \gets \varnothing$
+			\For{$a \gets 0 \To |loop| - 1$}
+				\State $b \gets (a + 1) \mod |loop|$
+				\State $triangles.add(Triangle(center, loop_{a}, loop_{b}))$
+			\EndFor
+			\State \Return $triangles$
+		\EndFunction
+		\\
+		\Function{TriangulateLoopIntoFan}{$loop$}
+			\State $center \gets \Call{Sum}{loop} \div |loop|$
+			\State \Return $\Call{TriangulateLoopIntoFan}{loop, center}$
+		\EndFunction
+		\\
+		\Function{TriangulateLoopAtFirst}{$loop, center$}
+			\If{$|loop| < 3$}
+				\State \Return $\varnothing$
+			\EndIf
+			\State $center \gets loop_0$
+			\State $triangles \gets \varnothing$
+			\For{$b \gets 2 \To |loop| - 1$}
+				\State $a \gets (b - 1)$
+				\State $triangles.add(Triangle(center, loop_{a}, loop_{b}))$
+			\EndFor
+			\State \Return $triangles$
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Loop triangulation primitives.
+	}
+	\label{alg:tri_dexel_loop_triangulation_primitives}
+\end{algorithm}
+%
+The \textproc{TriangulateLoopIntoFan} function is overloaded and, in its first version, takes two arguments, the loop to triangulate as well as the center of the triangulation.
+The function initially checks if the loop contains at least 3 triangles and returns an empty set of triangles in this case.
+Otherwise, a loop iterates over all neighboring pairs of vertices of loop.
+From each pair and the specified center, a triangle is instanced.
+The set of all created triangles is returned at the end.
+
+The single argument overload of \textproc{TriangulateLoopIntoFan} just takes a loop as argument and calculates the center itself as the centroid of all loop vertices.
+This is done by summing up all vertices and dividing the result by the number of vertices.
+
+The \textproc{TriangulateLoopAtFirst} does also create a triangle fan.
+However, this fan is centered on the first one of the loop vertices.
+The code is similar to the \textproc{TriangulateLoopIntoFan} routine but spares both index pairs containing the first vertex.
+The resulting triangulation saves exactly two triangles in comparison with the \textproc{TriangulateLoopIntoFan} approach.
 
 
 \subsection{Refinement and feature reconstruction}
@@ -917,7 +970,7 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop}$
 			\ElsIf{$intermedCount = 1$}
 				\State $\Call{Rotate}{finalLoop, \Call{FindFirst}{isEdgeVertex, \False}}$
-				\State \Return $\Call{TriangulateLoopAtFirst}{finalLoop}$
+				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop}$
 			\Else
 				\State $triangles \gets \varnothing$
 				\For{$first \gets 0 \To |finalLoop| - 1$} \Comment{Reevaluated at each iteration}
@@ -931,12 +984,12 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 							\State $subLoop.add(finalLoop_{i})$
 						\EndFor
 						\State $subLoop.add(finalLoop_{last})$
-						\State $triangles \gets triangles \cup \Call{TriangulateLoopAtFirst}{subLoop}$
+						\State $triangles \gets triangles \cup \Call{TriangulateLoopIntoFan}{subLoop}$
 						\State $\Call{RemoveCyclicRange}{finalLoop, first + 1, last}$
 						\State $\Call{RemoveCyclicRange}{isEdgeVertex, first + 1, last}$
 					\EndIf
 				\EndFor
-				\State $triangles \gets triangles \cup \Call{TriangulateLoopAtFirst}{finalLoop}$
+				\State $triangles \gets triangles \cup \Call{TriangulateLoopIntoFan}{finalLoop}$
 				\State \Return $triangles$
 			\EndIf
 		\EndFunction
