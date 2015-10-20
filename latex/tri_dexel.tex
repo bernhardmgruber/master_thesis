@@ -901,14 +901,14 @@ If more than one intermediate vertex is found, the loop is split into subloops.
 Each sequence of an intermediate vertex, an arbitrary number of original loop vertices and another intermediate vertex is triangulated.
 This loop clipping is repeated until only one loop with intermediate vertices is left, which is also triangulated.
 
-Algorithm \ref{alg:tri_dexel_refinement} describes the details of the refinement and feature reconstruction pass, creating enhanced boundary loops which are also triangulated.
+Algorithm \ref{alg:tri_dexel_refinement} describes the details of the refinement and feature reconstruction pass, creating enhanced boundary loops for triangulation.
 This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} function of algorithm \ref{alg:tri_dexel_triangulation}.
 %
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriangulateCellRefined}{$\var{loop}, \var{cell}$}
-			\State $box \gets cell.aabb$
+			\State $inside \gets p \rightarrow cell.aabb.lower < p < cell.aab.upper$
 			\State $apexVertices \gets array()$
 			\State $finalLoop \gets array()$
 			\State $isEdgeVertex \gets array()$
@@ -919,15 +919,15 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 				\State $b \gets loop_{(i + 1) \mod |loop|}$
 				\State $finalLoop.add(a.position)$
 				\State $isEdgeVertex.add(\True)$
-				\State $points \gets \Call{Unique}{\Call{Sort}{(a.point, a.neigbor, b.point, b.neighbor)}}$
-				\State $idx \gets planeIndex_{points_0, points_1, points_2}$
-				\State $n \gets cellPlaneNormals_{idx}$
+				\State $points \gets \Call{Unique}{(a.point, a.neigbor, b.point, b.neighbor)}$
+				%\State $idx \gets \Call{PlaneIndex}{points_0, points_1, points_2}$
+				\State $n \gets cellPlaneNormals_{points_0, points_1, points_2}$
 				\State $cellPlane \gets Plane(n, cell.realPoints_{points_0})$
 				\State $aPlane \gets Plane(a.normal, a.position)$
 				\State $bPlane \gets Plane(b.normal, b.position)$
 				\State $intermed \gets \Call{IntersectPlanes}{cellPlane, aPlane, bPlane}$
-				\If{$intermed \wedge box.lower < intermediate < box.upper$}
-					\State $dist \gets \Call{PointLineDistance}{Line(a.position, b.position), intermed}$
+				\If{$intermed \wedge inside(intermediate)$}
+					\State $dist \gets \Call{PointLineDistance}{a.position, b.position, intermed}$
 					\If{$dist > \delta$}
 						\State $finalLoop.add(intermed)$
 						\State $isEdgeVertex.add(\False)$
@@ -945,7 +945,7 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 					\State $planes_i \gets Plane(apexVertices_i.normal, apexVertices_i.position)$
 				\EndFor
 				\State $a \gets \Call{IntersectPlanes}{planes_0, planes_1, planes_2}$
-				\If{$a \wedge box.lower < a < box.upper$}
+				\If{$a \wedge inside(a)$}
 					\State $apex \gets a$
 				\EndIf
 			\EndIf
@@ -958,6 +958,37 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 	}
 	\label{alg:tri_dexel_refinement}
 \end{algorithm}
+%
+In the beginning, a closure is created to test if a point is inside the bounding box of the passed cell.
+Then, a few arrays are created.
+One contains a list of vertices which have lead to a valid intermediate point and may be considered for creating an apex vertex, called \var{apexVertices}.
+The variable \var{finalLoop} will contain the original boundary loop's vertices interleaved with the created intermediate vertices.
+The \var{isEdgeVertex} array complements the \var{finalLoop} array, as it stores a boolean for each of the vertices in the final loop.
+This boolean value is true if the vertex at the same index originated from an edge of the cell and false if the vertex is an intermediate vertex.
+Finally, a counter for the number of successfully created intermediate vertices is created and initialized to zero.
+A loop then iterates over all vertices \var{a} and their successors \var{b}, \ie adjacent pairs, of vertices of the original loop.
+Vertex \var{a} is added to the final loop and \True to \var{isEdgeVertex}.
+Afterwards the four grid point indices of both edge vertices are collected and uniqued.
+As both edge vertices share a common side of the cell, the result is a list of grid point indices with either 4 or 3 elements, depending on whether or not one of them is shared.
+Three of these indices uniquely identify one of the cell's sides and are used as indices into another lookup table storing the cell side's normal for each combination of three grid points. %TODO: add table
+The normal is retrieved using the first three grid points of the current edge vertex pair and stored in \var{n}.
+Now, three planes are created, one using the cell side's normal and the coordinate of a grid point on this cell side and two others from the pair of edge vertices.
+By calling \textproc{IntersectPlanes}, the intersection point of the three planes is calculated, which is a possible intermediate vertex.
+The returned result in \var{intermed} is tested for validity as \textproc{IntersectPlanes} may return an empty result if no intersection could be found.
+Furthermore, the intersection point must lie within the bounds of the cell.
+If these conditions are satisfied, the distance from the line between the pair of vertices to the calculated intersection point is measured.
+If this distance is larger than a specified and small $\delta$, the intersection point is accepted as an intermediate vertex.
+It is therefore added to the final loop.
+As it is not an edge vertex, \False is added to the \var{isEdgeVertex} list.
+Furthermore, the intermediate vertex counter is incremented and both edge vertices added to the list of candidates to create an apex.
+
+After all edge vertex pairs of the initial loop have been processed and all intermediate vertices have been created, an apex vertex may be generated.
+Therefore, the number of emitted intermediate vertices is checked.
+If this number is larger than 3, the first 3 unique edge vertices are used to create three planes which are again intersected.
+In case an intersection point could be found and it also lies within the cell's bounding box, it is accepted as valid apex vertex.
+
+Now, enough information has been gathered from the normal information at each vertex to begin triangulating the loop.
+This second part of the \textproc{TriangulateCellRefined} function is listed in algorithm \ref{alg:tri_dexel_refinement_triangulation}.
 %
 \begin{algorithm}
 	\centering
@@ -993,6 +1024,20 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 				\State \Return $triangles$
 			\EndIf
 		\EndFunction
+		\\
+		\Function{IntersectPlanes}{$a, b, c$}
+			\State $det \gets \begin{vmatrix} a.normal & b.normal & c.normal \end{vmatrix}$
+			\If{$det \neq 0$}
+				\State \Return $((b.normal \times c.normal) \cdot a.dist + {}$\hfill\break
+				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(c.normal \times a.normal) \cdot b.dist + {}$\hfill\break
+				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(a.normal \times b.normal) \cdot c.dist) \div det$
+			\EndIf
+			\LineComment{Otherwise, return nothing}
+		\EndFunction
+		\\
+		\Function{PointLineDistance}{$a, b, p$}
+			\State \Return $|(p - a) \times (p - b)| \div |a - b|$
+		\EndFunction
 	\end{algorithmic}
 	\caption{
 		Continuation of algorithm \ref{alg:tri_dexel_refinement}.
@@ -1001,6 +1046,9 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 	\label{alg:tri_dexel_refinement_triangulation}
 \end{algorithm}
 %
+For the triangulation of the loop, enriched with intermediate vertices and an optional apex vertex, several cases have to be distinguished, depending on the available data.
+If an apex vertex has been found, the final loop containing edge and intermediate vertices is directly triangulated into a fan with the apex vertex as center.
+
 
 \subsection{Subslicing *experimential*}
 \label{sec:tri_dexel_subslicing}
