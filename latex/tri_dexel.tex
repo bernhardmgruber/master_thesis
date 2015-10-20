@@ -743,8 +743,8 @@ Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a t
 		\\
 		\Function{TriangulateLoopSimple}{$loop$}
 			\State $vertices \gets \Call{Map}{loop, v \rightarrow v.position}$
-			\State $center \gets \Call{Sum}{vertices} \div |vertices|$
-			\State \Return $\Call{TriangulateLoop}{vertices, center}$
+			%\State $center \gets \Call{Sum}{vertices} \div |vertices|$
+			\State \Return $\Call{TriangulateLoopIntoFan}{vertices}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
@@ -791,8 +791,9 @@ Afterwards, the function returns and the search backtracks.
 In case the current neighbor's occupancy is equal to \var{occupied}, \ie no vertex on the current edge, the depth-first search is recursively continued with the current point index passed as last and the neighbor index passed as current.
 
 Finally, the \textproc{TriangulateLoopSimple} function just maps each \var{EdgeVertex} of the passed loop to its position, creating a pure list of 3D vertices.
-The sum of these vertices, divided by their count, yields their center of mass, stored in \var{center}.
-This value is used to ultimately create a triangle fan from the loop's vertices with around \var{center}.
+These vertices are then sent to the \textproc{TriangulateLoopIntoFan} function which creates a triangle fan from the given vertices around their center of mass.
+%The sum of these vertices, divided by their count, yields their center of mass, stored in \var{center}.
+%This value is used to ultimately create a triangle fan from the loop's vertices with around \var{center}.
 
 
 \subsection{Refinement and feature reconstruction}
@@ -854,16 +855,99 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriangulateCellRefined}{$\var{loop}, \var{cell}$}
-		
-		\EndFunction
+			\State $box \gets cell.aabb$
+			\State $apexVertices \gets array()$
+			\State $finalLoop \gets array()$
+			\State $isEdgeVertex \gets array()$
+			\State $intermedCount = 0$
+			\LineComment{Create new boundary loop with intermediate vertices}
+			\For{$i \gets 0 \To |loop| - 1$}
+				\State $a \gets loop_{i}$
+				\State $b \gets loop_{(i + 1) \mod |loop|}$
+				\State $finalLoop.add(a.position)$
+				\State $isEdgeVertex.add(\True)$
+				\State $points \gets \Call{Unique}{\Call{Sort}{(a.point, a.neigbor, b.point, b.neighbor)}}$
+				\State $idx \gets planeIndex_{points_0, points_1, points_2}$
+				\State $n \gets cellPlaneNormals_{idx}$
+				\State $cellPlane \gets Plane(n, cell.realPoints_{points_0})$
+				\State $aPlane \gets Plane(a.normal, a.position)$
+				\State $bPlane \gets Plane(b.normal, b.position)$
+				\State $intermed \gets \Call{IntersectPlanes}{cellPlane, aPlane, bPlane}$
+				\If{$intermed \wedge box.lower < intermediate < box.upper$}
+					\State $dist \gets \Call{PointLineDistance}{Line(a.position, b.position), intermed}$
+					\If{$dist > \delta$}
+						\State $finalLoop.add(intermed)$
+						\State $isEdgeVertex.add(\False)$
+						\State $intermedCount \gets intermedCount + 1$
+						\State $apexVertices.add(a)$
+						\State $apexVertices.add(b)$
+					\EndIf
+				\EndIf
+			\EndFor
+			\LineComment{Try to create an apex vertex}
+			\If{$intermedCount \geq 3$}
+				\State $apexVertices \gets \Call{Unique}{apexVertices}$
+				\State $planes \gets array()$
+				\For{$i \gets 0 \To 2$}
+					\State $planes_i \gets Plane(apexVertices_i.normal, apexVertices_i.position)$
+				\EndFor
+				\State $a \gets \Call{IntersectPlanes}{planes_0, planes_1, planes_2}$
+				\If{$a \wedge box.lower < a < box.upper$}
+					\State $apex \gets a$
+				\EndIf
+			\EndIf
+			\State $\dots$
+		\algstore{refinement}
 	\end{algorithmic}
 	\caption{
-		Refinement, feature reconstruction and triangulation based on the original boundary loops.
+		Refinement, feature reconstruction by calculating intermediate vertices and an optiona apex based on the original boundary loops.
+		The algorithm is continued in algorithm \ref{alg:tri_dexel_refinement_triangulation}.
 	}
 	\label{alg:tri_dexel_refinement}
 \end{algorithm}
 %
-
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\algrestore{refinement}
+			\State $\dots$
+			\If{$apex$}
+				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop, apex}$
+			\ElsIf{$intermedCount = 0$}
+				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop}$
+			\ElsIf{$intermedCount = 1$}
+				\State $\Call{Rotate}{finalLoop, \Call{FindFirst}{isEdgeVertex, \False}}$
+				\State \Return $\Call{TriangulateLoopAtFirst}{finalLoop}$
+			\Else
+				\State $triangles \gets \varnothing$
+				\For{$first \gets 0 \To |finalLoop| - 1$} \Comment{Reevaluated at each iteration}
+					\If{$\neg isEdgeVertex_{first}$}
+						\State $last \gets (first + 1) \mod |finalLoop|$
+						\While{$isEdgeVertex_{last}$}
+							\State $last \gets (last + 1) \mod |finalLoop|$
+						\EndWhile
+						\State $subLoop \gets array()$
+						\For{$i \gets (first \To last) \mod |finalLoop|$}
+							\State $subLoop.add(finalLoop_{i})$
+						\EndFor
+						\State $subLoop.add(finalLoop_{last})$
+						\State $triangles \gets triangles \cup \Call{TriangulateLoopAtFirst}{subLoop}$
+						\State $\Call{RemoveCyclicRange}{finalLoop, first + 1, last}$
+						\State $\Call{RemoveCyclicRange}{isEdgeVertex, first + 1, last}$
+					\EndIf
+				\EndFor
+				\State $triangles \gets triangles \cup \Call{TriangulateLoopAtFirst}{finalLoop}$
+				\State \Return $triangles$
+			\EndIf
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Continuation of algorithm \ref{alg:tri_dexel_refinement}.
+		Triangulation of a boundary loop enhanced with intermediate vertices and an optional apex.
+	}
+	\label{alg:tri_dexel_refinement_triangulation}
+\end{algorithm}
+%
 
 \subsection{Subslicing *experimential*}
 \label{sec:tri_dexel_subslicing}
