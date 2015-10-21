@@ -907,7 +907,7 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{TriangulateCellRefined}{$\var{loop}, \var{cell}$}
+		\Function{TriangulateLoopRefined}{$\var{loop}, \var{cell}$}
 			\State $inside \gets p \rightarrow cell.aabb.lower < p < cell.aab.upper$
 			\State $apexVertices \gets array()$
 			\State $finalLoop \gets array()$
@@ -988,7 +988,7 @@ If this number is larger than 3, the first 3 unique edge vertices are used to cr
 In case an intersection point could be found and it also lies within the cell's bounding box, it is accepted as valid apex vertex.
 
 Now, enough information has been gathered from the normal information at each vertex to begin triangulating the loop.
-This second part of the \textproc{TriangulateCellRefined} function is listed in algorithm \ref{alg:tri_dexel_refinement_triangulation}.
+This second part of the \textproc{TriangulateLoopRefined} function is listed in algorithm \ref{alg:tri_dexel_refinement_triangulation}.
 %
 \begin{algorithm}
 	\centering
@@ -1001,7 +1001,7 @@ This second part of the \textproc{TriangulateCellRefined} function is listed in 
 				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop}$
 			\ElsIf{$intermedCount = 1$}
 				\State $\Call{Rotate}{finalLoop, \Call{FindFirst}{isEdgeVertex, \False}}$
-				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop}$
+				\State \Return $\Call{TriangulateLoopAtFirst}{finalLoop}$
 			\Else
 				\State $triangles \gets \varnothing$
 				\For{$first \gets 0 \To |finalLoop| - 1$} \Comment{Reevaluated at each iteration}
@@ -1014,10 +1014,9 @@ This second part of the \textproc{TriangulateCellRefined} function is listed in 
 						\For{$i \gets (first \To last) \mod |finalLoop|$}
 							\State $subLoop.add(finalLoop_{i})$
 						\EndFor
-						\State $subLoop.add(finalLoop_{last})$
 						\State $triangles \gets triangles \cup \Call{TriangulateLoopIntoFan}{subLoop}$
-						\State $\Call{RemoveCyclicRange}{finalLoop, first + 1, last}$
-						\State $\Call{RemoveCyclicRange}{isEdgeVertex, first + 1, last}$
+						\State $\Call{RemoveCyclicRange}{finalLoop, first + 1, last - 1}$
+						\State $\Call{RemoveCyclicRange}{isEdgeVertex, first + 1, last - 1}$
 					\EndIf
 				\EndFor
 				\State $triangles \gets triangles \cup \Call{TriangulateLoopIntoFan}{finalLoop}$
@@ -1048,6 +1047,72 @@ This second part of the \textproc{TriangulateCellRefined} function is listed in 
 %
 For the triangulation of the loop, enriched with intermediate vertices and an optional apex vertex, several cases have to be distinguished, depending on the available data.
 If an apex vertex has been found, the final loop containing edge and intermediate vertices is directly triangulated into a fan with the apex vertex as center.
+If no apex and intermediate vertices have been found, the loop is triangulated the same way as in the \textproc{TriangulateLoopSimple} version, by creating a fan around the loops centroid.
+If no apex and one intermediate vertex are found, the loop is triangulated as a fan around the intermediate vertex.
+Therefore, the loop is rotated to start with the intermediate vertex and then passed to \textproc{TriangulateLoopAtFirst}.
+Loops with no apex vertex and more than one intermediate vertex are more difficult to triangulate.
+The case illustrated in figure \ref{fig:tri_dexel_refinement} on the left shows, that final loop must actually split into two sub loops, one containing C, D, H and F, as well as one containing A, B, D, H.
+This fact becomes even more clearer with cases like the one on the right and an invalid apex vertex, \eg the apex G would be outside the cell's box.
+In this case, all intermediate vertices D, E and F would form a plateau.
+The remaining parts of the final loop are sub loops, each consisting of two neighboring intermediate vertices and the edge vertices in-between.
+This sub loop clipping strategy is now algorithmically applied to \var{finalLoop}.
+A for loop iterates over the indices of all vertices, marking the first element of a potential sub loop.
+If the vertex at this current index is not an edge vertex, \ie an intermediate vertex, then a nested loop searches the next, cyclically occurring intermediate vertex on the loop, skipping all edge vertices in between.
+After it has been found, the inclusive range from \var{first} to \var{last} contains a sub loop, which is now copied from \var{finalLoop} and triangulated into a fan.
+Afterwards, the sub loop's edge vertices are removed from \var{finalLoop} and \var{isEdgeVertex}.
+After the loop has completed, \var{finalLoop} consists only of intermediate vertices.
+These are also triangulated.
+The union of the triangulations of all sub loops and the remaining final loop forms the triangulation of the complete boundary loop and is returned.
+
+Throughout the \textproc{TriangulateLoopRefined} function, two helper functions are used.
+The \textproc{IntersectPlanes} function is used to calculate the intersection point between three planes.
+A good algorithm for this problem is found in the Graphics Gems series \cite[p304]{graphics_gems_1}.
+It describes the intersection point as the solution of a system of linear equations as follows:
+For three planes with normals $n_a$, $n_b$, $n_c$ and distances $d_a$, $d_b$, $d_c$, using the variables
+\begin{equation*}
+	N = \begin{bmatrix} n_a, n_b, n_c \end{bmatrix}, \;
+	d = \begin{bmatrix} d_a \\ d_b \\ d_c \end{bmatrix},
+\end{equation*}
+the system
+\begin{equation*}
+N \begin{bmatrix} x \\ y \\ z \end{bmatrix} = d
+\end{equation*}
+is solved using Cramer's rule
+\begin{equation*}
+	x = \frac{\begin{vmatrix} d, n_b, n_c \end{vmatrix}}{|N|}, \;
+	y = \frac{\begin{vmatrix} n_a, d, n_c \end{vmatrix}}{|N|}, \;
+	z = \frac{\begin{vmatrix} n_a, n_b, d \end{vmatrix}}{|N|} \text{.}
+\end{equation*}
+By describing the intersection point as
+\begin{equation*}
+	I =
+	x \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} +
+	y \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} +
+	z \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \text{,}
+\end{equation*}
+substituting $x$, $y$ and $z$ and expanding the determinant into a triple product, the equation becomes
+\begin{equation*}
+	I =
+	\frac{d \times n_b \cdot n_c}{|N|} \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} +
+	\frac{n_a \times d \cdot n_c}{|N|} \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} +
+	\frac{n_a \times n_b \cdot d}{|N|} \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \text{.}
+\end{equation*}
+As the operands of the triple product can be rotated, $d$ is isolated from the cross product.
+Then, the vectors after the fractions are lifted onto the numerator and multiplied with $d$, extracting the components $d_a$, $d_b$ and $d_c$, resulting in
+\begin{equation*}
+I =
+	\frac{n_b \times n_c \cdot d_a}{|N|} +
+	\frac{n_c \times n_a \cdot d_b}{|N|} +
+	\frac{n_a \times n_b \cdot d_c}{|N|} \text{.}
+\end{equation*}
+By combining all three fractions, the equation for the intersection calculation, which is used by the \textproc{IntersectPlanes} function, is complete.
+If the determinant of matrix $N$ becomes zero, two of the contained normal vectors and therefore planes are parallel.
+In this case, the function does not return a result, \ie a result which always evaluates to \False in boolean expressions.
+
+The function \textproc{PointLineDistance} computes the closest distance of a point \var{p} to the line defined by two other points \var{a} and \var{b}.
+The implemented variant to solve this problem \cite{point_line_distance}, computes the length of the cross product between the two vectors from \var{p} to both line endings.
+This value is the doubled area of the triangle \var{a}, \var{b}, \var{c}, where the line distance is the altitude of the triangle.
+Dividing the doubled area by the triangle's base, \ie the length of the line \var{a}, \var{b}, the point to line distance is obtained.
 
 
 \subsection{Subslicing *experimential*}
