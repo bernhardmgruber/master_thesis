@@ -1025,7 +1025,7 @@ This second part of the \textproc{TriangulateLoopRefined} function is listed in 
 		\\
 		\Function{IntersectPlanes}{$\var{a}, \var{b}, \var{c}$}
 			\State $\var{det} \gets \begin{vmatrix} \var{a}.\var{normal} & \var{b}.\var{normal} & \var{c}.\var{normal} \end{vmatrix}$
-			\If{$\var{det} \neq 0$}
+			\If{$|\var{det}| > \epsilon$} %TODO: already used epsilon somewhere else
 				\State \Return $((\var{b}.\var{normal} \times \var{c}.\var{normal}) \cdot \var{a}.\var{dist} + {}$\hfill\break
 				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(\var{c}.\var{normal} \times \var{a}.\var{normal}) \cdot \var{b}.\var{dist} + {}$\hfill\break
 				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(\var{a}.\var{normal} \times \var{b}.\var{normal}) \cdot \var{c}.\var{dist}) \div \var{det}$
@@ -1106,7 +1106,8 @@ I =
 \end{equation*}
 By combining all three fractions, the equation for the intersection calculation, which is used by the \textproc{IntersectPlanes} function, is complete.
 If the determinant of matrix $N$ becomes zero, two of the contained normal vectors and therefore planes are parallel.
-In this case, the function does not return a result, \ie a result which always evaluates to \False in boolean expressions.
+Determinants close to zero may further cause numeric issues when calculating the intersection point.
+Therefore, in this case, the function does not return a result, \ie a result which always evaluates to \False in boolean expressions.
 
 The function \textproc{PointLineDistance} computes the closest distance of a point \var{p} to the line defined by two other points \var{a} and \var{b}.
 The implemented variant to solve this problem \cite{point_line_distance}, computes the length of the cross product between the two vectors from \var{p} to both line endings.
