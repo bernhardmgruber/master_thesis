@@ -468,44 +468,44 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 	\centering
 	\begin{algorithmic}[1]
 		\Function{RegularizeCell}{$\var{cell}$}
-			\For{$ i \gets 0 \To 11 $}
-				\State $segs \gets cell.edge_i.segments$ \Comment{reference only}
-				\State $(src, dst) \gets edgeIndexToCorners_i$
-				\State $srcPoint \gets cell.realPoints_{src}$
-				\State $dstPoint \gets cell.realPoints_{dst}$
-				\State $srcOcc \gets cell.occupancy_{src}$
-				\State $dstOcc \gets cell.occupancy_{dst}$
-				\State $axis \gets edgeToAxis_{src, dst}$
+			\For{$ \var{i} \gets 0 \To 11 $}
+				\State $\var{segs} \gets \var{cell}.\var{edge}_{\var{i}}.\var{segments}$ \Comment{reference only}
+				\State $(\var{src}, \var{dst}) \gets \var{edgeIndexToCorners}_{\var{i}}$
+				\State $\var{srcPoint} \gets \var{cell}.\var{realPoints}_{\var{src}}$
+				\State $\var{dstPoint} \gets \var{cell}.\var{realPoints}_{\var{dst}}$
+				\State $\var{srcOcc} \gets \var{cell}.\var{occupancy}_{\var{src}}$
+				\State $\var{dstOcc} \gets \var{cell}.\var{occupancy}_{\var{dst}}$
+				\State $\var{axis} \gets \var{edgeToAxis}_{\var{src}, \var{dst}}$
 				
 				\LineComment{Rule 1}
-				\If{$srcOcc \wedge dstOcc$}
-					\State $n \gets Vertex()$ \Comment{Invalid normal}
-					\State $segs = \{ Segment(Node(srcPoint_{axis}, n), Node(dstPoint_{axis}, n)) \}$
+				\If{$\var{srcOcc} \wedge \var{dstOcc}$}
+					\State $\var{n} \gets \var{Vertex}()$ \Comment{Invalid normal}
+					\State $\var{segs} = \{ \var{Segment}(\var{Node}(\var{srcPoint}_{\var{axis}}, \var{n}), \var{Node}(\var{dstPoint}_{\var{axis}}, \var{n})) \}$
 				\EndIf
 				
 				\LineComment{Rule 2}
-				\If{$\neg srcOcc \wedge \neg dstOcc$}
-					\State $segs \gets \varnothing$
+				\If{$\neg \var{srcOcc} \wedge \neg \var{dstOcc}$}
+					\State $\var{segs} \gets \varnothing$
 				\EndIf
 				
 				\LineComment{Rule 3}
-				\State $n = Vertex(0, 0, 0)$
-				\State $n_{axis} = 1$
-				\If{$srcOcc \wedge \neg dstOcc$}
-					\If{$|segs| = 0 \vee segs_0.start.depth \neq srcPoint_{axis}$}
-						\State $segs.add(Segment(Node(srcPoint_{axis}, -n), Node(srcPoint_{axis} + \rho, n)))$
+				\State $\var{n} = \var{Vertex}(0, 0, 0)$
+				\State $\var{n}_{\var{axis}} = 1$
+				\If{$\var{srcOcc} \wedge \neg \var{dstOcc}$}
+					\If{$|\var{segs}| = 0 \vee \var{segs}_0.\var{start}.\var{depth} \neq \var{srcPoint}_{\var{axis}}$}
+						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{srcPoint}_{\var{axis}}, -\var{n}), \var{Node}(\var{srcPoint}_{\var{axis}} + \rho, \var{n})))$
 					\EndIf
 				\EndIf
-				\If{$\neg srcOcc \wedge dstOcc$}
-					\If{$|segs| = 0 \vee segs_{|segs| - 1}.end.depth \neq dstPoint_{axis}$}
-						\State $segs.add(Segment(Node(dstPoint_{axis} - \rho, -n), Node(dstPoint_{axis}, n)))$
+				\If{$\neg \var{srcOcc} \wedge \var{dstOcc}$}
+					\If{$|\var{segs}| = 0 \vee \var{segs}_{|\var{segs}| - 1}.\var{end}.\var{depth} \neq \var{dstPoint}_{\var{axis}}$}
+						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{dstPoint}_{\var{axis}} - \rho, -\var{n}), \var{Node}(\var{dstPoint}_{\var{axis}}, \var{n})))$
 					\EndIf
 				\EndIf
 				
 				\LineComment{Rule 4}
-				\ForAll{$s \in segs$}
-					\If{$s.start.depth \neq srcPoint_{axis} \wedge s.end.depth \neq dstPoint_{axis}$}
-						\State $segs.remove(s)$
+				\ForAll{$\var{s} \in \var{segs}$}
+					\If{$\var{s}.\var{start}.\var{depth} \neq \var{srcPoint}_{\var{axis}} \wedge \var{s}.\var{end}.\var{depth} \neq \var{dstPoint}_{\var{axis}}$}
+						\State $\var{segs}.\var{remove}(\var{s})$
 					\EndIf
 				\EndFor
 			\EndFor
@@ -691,59 +691,59 @@ Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a t
 	\begin{algorithmic}[1]
 		\Function{TriangulateCell}{$\var{cell}$}
 			%\State $loops$
-			\If{$\neg \Call{IsProblematicCase}{cell}$}
-				\State $loops \gets \Call{FindLoops}{\var{cell}, \False}$
+			\If{$\neg \Call{IsProblematicCase}{\var{cell}}$}
+				\State $\var{loops} \gets \Call{FindLoops}{\var{cell}, \False}$
 			\Else
-				\State $loops \gets \Call{ReverseLoops}{\Call{FindLoops}{\var{cell}, \True}}$
+				\State $\var{loops} \gets \Call{ReverseLoops}{\Call{FindLoops}{\var{cell}, \True}}$
 			\EndIf
-			\State $triangles \gets \varnothing$
-			\For{$loop \in loops$}
-				\State $triangles \gets triangles \cup \Call{TriangulateLoopSimple}{loop}$
+			\State $\var{triangles} \gets \varnothing$
+			\For{$\var{loop} \in \var{loops}$}
+				\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateLoopSimple}{\var{loop}}$
 			\EndFor
-			\State \Return $triangles$
+			\State \Return $\var{triangles}$
 		\EndFunction
 		\\
-		\Function{FindLoops}{$\var{cell}, occupied$}
-			\State $visited \gets (\False, \False, \False, \False, \False, \False, \False, \False)$
-			\State $loops \gets \varnothing$
-			\For{$start \gets 0 \To 7$}
-				\State $loop \gets array()$
-				\State $\Call{DepthFirstSearch}{occupied, start, -1, cell, visited, loop}$
-				\If{$|loop| > 0$}
-					\State $loops.add(loop)$
+		\Function{FindLoops}{$\var{cell}, \var{occupied}$}
+			\State $\var{visited} \gets (\False, \False, \False, \False, \False, \False, \False, \False)$
+			\State $\var{loops} \gets \varnothing$
+			\For{$\var{start} \gets 0 \To 7$}
+				\State $\var{loop} \gets \var{array}()$
+				\State $\Call{DepthFirstSearch}{\var{occupied}, \var{start}, -1, \var{cell}, \var{visited}, \var{loop}}$
+				\If{$|\var{loop}| > 0$}
+					\State $\var{loops}.\var{add}(\var{loop})$
 				\EndIf
 			\EndFor
-			\State \Return $loops$
+			\State \Return $\var{loops}$
 		\EndFunction
 		\\
-		\Function{DepthFirstSearch}{$occupied, cur, last, cell, visited, loop$}
-			\If{$cell.occupancy_{cur} = occupied \wedge \neg visited_{cur}$}
-				\State $visited_{cur} \gets \True$
-				\State $neighbors \gets \Call{RotateToStartAfter}{neighborIds_{cur}, last}$
-				\For{$n \in neighbors$}
-					\If{$cell.occupancy_{n} \neq occupied$}
-						\State $axis \gets edgeToAxis_{cur, n}$
-						\State $seg \gets cell.edges_{pointsToEdgeId_{cur, n}}.segments_0$
-						\State $curReal \gets cell.realPoints_{cur}$
-						\State $nReal \gets cell.realPoints_{n}$
-						\If{$seg.start.depth = curReal_{axis} \vee seg.start.depth = nReal_{axis}$}
-							\State $node \gets seg.end$
+		\Function{DepthFirstSearch}{$\var{occupied}, \var{cur}, \var{last}, \var{cell}, \var{visited}, \var{loop}$}
+			\If{$\var{cell}.\var{occupancy}_{\var{cur}} = \var{occupied} \wedge \neg \var{visited}_{\var{cur}}$}
+				\State $\var{visited}_{\var{cur}} \gets \True$
+				\State $\var{neighbors} \gets \Call{RotateToStartAfter}{\var{neighborIds}_{\var{cur}}, \var{last}}$
+				\For{$\var{n} \in \var{neighbors}$}
+					\If{$\var{cell}.\var{occupancy}_{\var{n}} \neq \var{occupied}$}
+						\State $\var{axis} \gets \var{edgeToAxis}_{\var{cur}, \var{n}}$
+						\State $\var{seg} \gets \var{cell}.\var{edges}_{\var{pointsToEdgeId}_{\var{cur}, \var{n}}}.\var{segments}_0$
+						\State $\var{curReal} \gets \var{cell}.\var{realPoints}_{\var{cur}}$
+						\State $\var{nReal} \gets \var{cell}.\var{realPoints}_{\var{n}}$
+						\If{$\var{seg}.\var{start}.\var{depth} = \var{curReal}_{\var{axis}} \vee \var{seg}.\var{start}.\var{depth} = \var{nReal}_{\var{axis}}$}
+							\State $\var{node} \gets \var{seg}.\var{end}$
 						\Else
-							\State $node \gets seg.start$
+							\State $\var{node} \gets \var{seg}.\var{start}$
 						\EndIf
-						\State $v \gets curReal$
-						\State $v_{axis} \gets node.depth$
-						\State $loop.add(EdgeVertex(cur, n, v, node.normal))$
+						\State $\var{v} \gets \var{curReal}$
+						\State $\var{v}_{\var{axis}} \gets \var{node}.\var{depth}$
+						\State $\var{loop}.\var{add}(\var{EdgeVertex}(\var{cur}, \var{n}, \var{v}, \var{node}.\var{normal}))$
 					\Else
-						\State $\Call{DepthFirstSearch}{occupied, n, cur, cell, visited, loop}$
+						\State $\Call{DepthFirstSearch}{\var{occupied}, \var{n}, \var{cur}, \var{cell}, \var{visited}, \var{loop}}$
 					\EndIf
 				\EndFor
 			\EndIf
 		\EndFunction
 		\\
-		\Function{TriangulateLoopSimple}{$loop$}
-			\State $vertices \gets \Call{Map}{loop, v \rightarrow v.position}$
-			\State \Return $\Call{TriangulateLoopIntoFan}{vertices}$
+		\Function{TriangulateLoopSimple}{$\var{loop}$}
+			\State $\var{vertices} \gets \Call{Map}{\var{loop}, \var{v} \rightarrow \var{v}.\var{position}}$
+			\State \Return $\Call{TriangulateLoopIntoFan}{\var{vertices}}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
@@ -798,34 +798,34 @@ These primitives are listed in algorithm \ref{alg:tri_dexel_loop_triangulation_p
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{TriangulateLoopIntoFan}{$loop, center$}
-			\If{$|loop| < 3$}
+		\Function{TriangulateLoopIntoFan}{$\var{loop}, \var{center}$}
+			\If{$|\var{loop}| < 3$}
 				\State \Return $\varnothing$
 			\EndIf
-			\State $triangles \gets \varnothing$
-			\For{$a \gets 0 \To |loop| - 1$}
-				\State $b \gets (a + 1) \mod |loop|$
-				\State $triangles.add(Triangle(center, loop_{a}, loop_{b}))$
+			\State $\var{triangles} \gets \varnothing$
+			\For{$\var{a} \gets 0 \To |\var{loop}| - 1$}
+				\State $\var{b} \gets (\var{a} + 1) \mod |\var{loop}|$
+				\State $\var{triangles}.\var{add}(\var{Triangle}(\var{center}, \var{loop}_{\var{a}}, \var{loop}_{\var{b}}))$
 			\EndFor
-			\State \Return $triangles$
+			\State \Return $\var{triangles}$
 		\EndFunction
 		\\
-		\Function{TriangulateLoopIntoFan}{$loop$}
-			\State $center \gets \Call{Sum}{loop} \div |loop|$
-			\State \Return $\Call{TriangulateLoopIntoFan}{loop, center}$
+		\Function{TriangulateLoopIntoFan}{$\var{loop}$}
+			\State $\var{center} \gets \Call{Sum}{\var{loop}} \div |\var{loop}|$
+			\State \Return $\Call{TriangulateLoopIntoFan}{\var{loop}, \var{center}}$
 		\EndFunction
 		\\
-		\Function{TriangulateLoopAtFirst}{$loop, center$}
-			\If{$|loop| < 3$}
+		\Function{TriangulateLoopAtFirst}{$\var{loop}, \var{center}$}
+			\If{$|\var{loop}| < 3$}
 				\State \Return $\varnothing$
 			\EndIf
-			\State $center \gets loop_0$
-			\State $triangles \gets \varnothing$
-			\For{$b \gets 2 \To |loop| - 1$}
-				\State $a \gets (b - 1)$
-				\State $triangles.add(Triangle(center, loop_{a}, loop_{b}))$
+			\State $\var{center} \gets \var{loop}_0$
+			\State $\var{triangles} \gets \varnothing$
+			\For{$\var{b} \gets 2 \To |\var{loop}| - 1$}
+				\State $\var{a} \gets (\var{b} - 1)$
+				\State $\var{triangles}.\var{add}(\var{Triangle}(\var{center}, \var{loop}_{\var{a}}, \var{loop}_{\var{b}}))$
 			\EndFor
-			\State \Return $triangles$
+			\State \Return $\var{triangles}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
@@ -908,45 +908,44 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriangulateLoopRefined}{$\var{loop}, \var{cell}$}
-			\State $inside \gets p \rightarrow cell.aabb.lower < p < cell.aab.upper$
-			\State $apexVertices \gets array()$
-			\State $finalLoop \gets array()$
-			\State $isEdgeVertex \gets array()$
-			\State $intermedCount = 0$
+			\State $\var{inside} \gets \var{p} \rightarrow \var{cell}.\var{aabb}.\var{lower} < \var{p} < \var{cell}.\var{aabb}.\var{upper}$
+			\State $\var{apexVertices} \gets \var{array}()$
+			\State $\var{finalLoop} \gets \var{array}()$
+			\State $\var{isEdgeVertex} \gets \var{array}()$
+			\State $\var{intermedCount} = 0$
 			\LineComment{Create new boundary loop with intermediate vertices}
-			\For{$i \gets 0 \To |loop| - 1$}
-				\State $a \gets loop_{i}$
-				\State $b \gets loop_{(i + 1) \mod |loop|}$
-				\State $finalLoop.add(a.position)$
-				\State $isEdgeVertex.add(\True)$
-				\State $points \gets \Call{Unique}{(a.point, a.neigbor, b.point, b.neighbor)}$
-				%\State $idx \gets \Call{PlaneIndex}{points_0, points_1, points_2}$
-				\State $n \gets cellPlaneNormals_{points_0, points_1, points_2}$
-				\State $cellPlane \gets Plane(n, cell.realPoints_{points_0})$
-				\State $aPlane \gets Plane(a.normal, a.position)$
-				\State $bPlane \gets Plane(b.normal, b.position)$
-				\State $intermed \gets \Call{IntersectPlanes}{cellPlane, aPlane, bPlane}$
-				\If{$intermed \wedge inside(intermediate)$}
-					\State $dist \gets \Call{PointLineDistance}{a.position, b.position, intermed}$
-					\If{$dist > \delta$}
-						\State $finalLoop.add(intermed)$
-						\State $isEdgeVertex.add(\False)$
-						\State $intermedCount \gets intermedCount + 1$
-						\State $apexVertices.add(a)$
-						\State $apexVertices.add(b)$
+			\For{$\var{i} \gets 0 \To |\var{loop}| - 1$}
+				\State $\var{a} \gets \var{loop}_{\var{i}}$
+				\State $\var{b} \gets \var{loop}_{(\var{i} + 1) \mod |\var{loop}|}$
+				\State $\var{finalLoop}.\var{add}(\var{a}.\var{position})$
+				\State $\var{isEdgeVertex}.\var{add}(\True)$
+				\State $\var{points} \gets \Call{Unique}{(\var{a}.\var{point}, \var{a}.\var{neigbor}, \var{b}.\var{point}, \var{b}.\var{neighbor})}$
+				\State $\var{n} \gets \var{cellPlaneNormals}_{\var{points}_0, \var{points}_1, \var{points}_2}$
+				\State $\var{cellPlane} \gets \var{Plane}(\var{n}, \var{cell}.\var{realPoints}_{\var{points}_0})$
+				\State $\var{aPlane} \gets \var{Plane}(\var{a}.\var{normal}, \var{a}.\var{position})$
+				\State $\var{bPlane} \gets \var{Plane}(\var{b}.\var{normal}, \var{b}.\var{position})$
+				\State $\var{intermed} \gets \Call{IntersectPlanes}{\var{cellPlane}, \var{aPlane}, \var{bPlane}}$
+				\If{$\var{intermed} \wedge \var{inside}(\var{intermediate})$}
+					\State $\var{dist} \gets \Call{PointLineDistance}{\var{a}.\var{position}, \var{b}.\var{position}, \var{intermed}}$
+					\If{$\var{dist} > \delta$}
+						\State $\var{finalLoop}.\var{add}(\var{intermed})$
+						\State $\var{isEdgeVertex}.\var{add}(\False)$
+						\State $\var{intermedCount} \gets \var{intermedCount} + 1$
+						\State $\var{apexVertices}.\var{add}(\var{a})$
+						\State $\var{apexVertices}.\var{add}(\var{b})$
 					\EndIf
 				\EndIf
 			\EndFor
 			\LineComment{Try to create an apex vertex}
-			\If{$intermedCount \geq 3$}
-				\State $apexVertices \gets \Call{Unique}{apexVertices}$
-				\State $planes \gets array()$
-				\For{$i \gets 0 \To 2$}
-					\State $planes_i \gets Plane(apexVertices_i.normal, apexVertices_i.position)$
+			\If{$\var{intermedCount} \geq 3$}
+				\State $\var{apexVertices} \gets \Call{Unique}{\var{apexVertices}}$
+				\State $\var{planes} \gets \var{array}()$
+				\For{$\var{i} \gets 0 \To 2$}
+					\State $\var{planes}_{\var{i}} \gets \var{Plane}(\var{apexVertices}_{\var{i}}.\var{normal}, \var{apexVertices}_{\var{i}}.\var{position})$
 				\EndFor
-				\State $a \gets \Call{IntersectPlanes}{planes_0, planes_1, planes_2}$
-				\If{$a \wedge inside(a)$}
-					\State $apex \gets a$
+				\State $\var{a} \gets \Call{IntersectPlanes}{\var{planes}_0, \var{planes}_1, \var{planes}_2}$
+				\If{$\var{a} \wedge \var{inside}(\var{a})$}
+					\State $\var{apex} \gets \var{a}$
 				\EndIf
 			\EndIf
 			\State $\dots$
@@ -995,47 +994,47 @@ This second part of the \textproc{TriangulateLoopRefined} function is listed in 
 	\begin{algorithmic}[1]
 		\algrestore{refinement}
 			\State $\dots$
-			\If{$apex$}
-				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop, apex}$
-			\ElsIf{$intermedCount = 0$}
-				\State \Return $\Call{TriangulateLoopIntoFan}{finalLoop}$
-			\ElsIf{$intermedCount = 1$}
-				\State $\Call{Rotate}{finalLoop, \Call{FindFirst}{isEdgeVertex, \False}}$
-				\State \Return $\Call{TriangulateLoopAtFirst}{finalLoop}$
+			\If{$\var{apex}$}
+				\State \Return $\Call{TriangulateLoopIntoFan}{\var{finalLoop}, \var{apex}}$
+			\ElsIf{$\var{intermedCount} = 0$}
+				\State \Return $\Call{TriangulateLoopIntoFan}{\var{finalLoop}}$
+			\ElsIf{$\var{intermedCount} = 1$}
+				\State $\Call{Rotate}{\var{finalLoop}, \Call{FindFirst}{\var{isEdgeVertex}, \False}}$
+				\State \Return $\Call{TriangulateLoopAtFirst}{\var{finalLoop}}$
 			\Else
-				\State $triangles \gets \varnothing$
-				\For{$first \gets 0 \To |finalLoop| - 1$} \Comment{Reevaluated at each iteration}
-					\If{$\neg isEdgeVertex_{first}$}
-						\State $last \gets (first + 1) \mod |finalLoop|$
-						\While{$isEdgeVertex_{last}$}
-							\State $last \gets (last + 1) \mod |finalLoop|$
+				\State $\var{triangles} \gets \varnothing$
+				\For{$\var{first} \gets 0 \To |\var{finalLoop}| - 1$} \Comment{Reevaluated at each iteration}
+					\If{$\neg \var{isEdgeVertex}_{\var{first}}$}
+						\State $\var{last} \gets (\var{first} + 1) \mod |\var{finalLoop}|$
+						\While{$\var{isEdgeVertex}_{\var{last}}$}
+							\State $\var{last} \gets (\var{last} + 1) \mod |\var{finalLoop}|$
 						\EndWhile
-						\State $subLoop \gets array()$
-						\For{$i \gets (first \To last) \mod |finalLoop|$}
-							\State $subLoop.add(finalLoop_{i})$
+						\State $\var{subLoop} \gets \var{array}()$
+						\For{$\var{i} \gets (\var{first} \To \var{last}) \mod |\var{finalLoop}|$}
+							\State $\var{subLoop}.\var{add}(\var{finalLoop}_{\var{i}})$
 						\EndFor
-						\State $triangles \gets triangles \cup \Call{TriangulateLoopIntoFan}{subLoop}$
-						\State $\Call{RemoveCyclicRange}{finalLoop, first + 1, last - 1}$
-						\State $\Call{RemoveCyclicRange}{isEdgeVertex, first + 1, last - 1}$
+						\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateLoopIntoFan}{\var{subLoop}}$
+						\State $\Call{RemoveCyclicRange}{\var{finalLoop}, \var{first} + 1, \var{last} - 1}$
+						\State $\Call{RemoveCyclicRange}{\var{isEdgeVertex}, \var{first} + 1, \var{last} - 1}$
 					\EndIf
 				\EndFor
-				\State $triangles \gets triangles \cup \Call{TriangulateLoopIntoFan}{finalLoop}$
-				\State \Return $triangles$
+				\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateLoopIntoFan}{\var{finalLoop}}$
+				\State \Return $\var{triangles}$
 			\EndIf
 		\EndFunction
 		\\
-		\Function{IntersectPlanes}{$a, b, c$}
-			\State $det \gets \begin{vmatrix} a.normal & b.normal & c.normal \end{vmatrix}$
-			\If{$det \neq 0$}
-				\State \Return $((b.normal \times c.normal) \cdot a.dist + {}$\hfill\break
-				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(c.normal \times a.normal) \cdot b.dist + {}$\hfill\break
-				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(a.normal \times b.normal) \cdot c.dist) \div det$
+		\Function{IntersectPlanes}{$\var{a}, \var{b}, \var{c}$}
+			\State $\var{det} \gets \begin{vmatrix} \var{a}.\var{normal} & \var{b}.\var{normal} & \var{c}.\var{normal} \end{vmatrix}$
+			\If{$\var{det} \neq 0$}
+				\State \Return $((\var{b}.\var{normal} \times \var{c}.\var{normal}) \cdot \var{a}.\var{dist} + {}$\hfill\break
+				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(\var{c}.\var{normal} \times \var{a}.\var{normal}) \cdot \var{b}.\var{dist} + {}$\hfill\break
+				\hspace*{\dimexpr\algorithmicindent*2}\phantom{\Return $($}$(\var{a}.\var{normal} \times \var{b}.\var{normal}) \cdot \var{c}.\var{dist}) \div \var{det}$
 			\EndIf
 			\LineComment{Otherwise, return nothing}
 		\EndFunction
 		\\
-		\Function{PointLineDistance}{$a, b, p$}
-			\State \Return $|(p - a) \times (p - b)| \div |a - b|$
+		\Function{PointLineDistance}{$\var{a}, \var{b}, \var{p}$}
+			\State \Return $|(\var{p} - \var{a}) \times (\var{p} - \var{b})| \div |\var{a} - \var{b}|$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
