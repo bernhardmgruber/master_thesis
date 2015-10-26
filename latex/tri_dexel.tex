@@ -454,7 +454,7 @@ These rules are illustrated in figure \ref{fig:tri_dexel_regularization} and are
 	\item If two adjacent grid points are not marked as occupied, the incident edge must not contain any dexel segments.
 	Figure \ref{fig:tri_dexel_regularization_2} shows the removal of the leftmost segment from an edge beween two non-occupied grid points.
 
-	\item If any edge, which is only incident to exactly one occupied grid point, does not contain a dexel segment touching this point, a short segment is added.
+	\item If an edge, which is incident to only one occupied grid point, does not contain a dexel segment touching this point, a short segment is added, or, if a segment exists and is close enough to the occupied grid point, it is extended to touch the occupied point.
 	Figure \ref{fig:tri_dexel_regularization_3} shows the creation of two small dexel segments at both lower grid points as the left and right edge do not contain any segments.
 
 	\item If any segment does not touch any of the two incident grid points, it is removed.
@@ -471,40 +471,48 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 			\For{$ \var{i} \gets 0 \To 11 $}
 				\State $\var{segs} \gets \var{cell}.\var{edge}_{\var{i}}.\var{segments}$ \Comment{reference only}
 				\State $(\var{src}, \var{dst}) \gets \var{edgeIndexToCorners}_{\var{i}}$
+				\State $\var{axis} \gets \var{edgeToAxis}_{\var{src}, \var{dst}}$
 				\State $\var{srcPoint} \gets \var{cell}.\var{realPoints}_{\var{src}}$
 				\State $\var{dstPoint} \gets \var{cell}.\var{realPoints}_{\var{dst}}$
+				\State $\var{srcDepth} \gets \var{srcPoint}_{axis}$
+				\State $\var{dstDepth} \gets \var{dstPoint}_{axis}$
 				\State $\var{srcOcc} \gets \var{cell}.\var{occupancy}_{\var{src}}$
 				\State $\var{dstOcc} \gets \var{cell}.\var{occupancy}_{\var{dst}}$
-				\State $\var{axis} \gets \var{edgeToAxis}_{\var{src}, \var{dst}}$
-				
+
 				\LineComment{Rule 1}
 				\If{$\var{srcOcc} \wedge \var{dstOcc}$}
 					\State $\var{n} \gets \var{Vertex}()$ \Comment{Invalid normal}
-					\State $\var{segs} = \{ \var{Segment}(\var{Node}(\var{srcPoint}_{\var{axis}}, \var{n}), \var{Node}(\var{dstPoint}_{\var{axis}}, \var{n})) \}$
+					\State $\var{segs} = \{ \var{Segment}(\var{Node}(\var{srcDepth}, \var{n}), \var{Node}(\var{dstDepth}, \var{n})) \}$
 				\EndIf
-				
+
 				\LineComment{Rule 2}
 				\If{$\neg \var{srcOcc} \wedge \neg \var{dstOcc}$}
 					\State $\var{segs} \gets \varnothing$
 				\EndIf
-				
+
 				\LineComment{Rule 3}
 				\State $\var{n} = \var{Vertex}(0, 0, 0)$
 				\State $\var{n}_{\var{axis}} = 1$
 				\If{$\var{srcOcc} \wedge \neg \var{dstOcc}$}
-					\If{$|\var{segs}| = 0 \vee \var{segs}_0.\var{start}.\var{depth} \neq \var{srcPoint}_{\var{axis}}$}
-						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{srcPoint}_{\var{axis}}, -\var{n}), \var{Node}(\var{srcPoint}_{\var{axis}} + \rho, \var{n})))$
+					\If{$|\var{segs}| = 0 \vee \var{segs}_0.\var{start}.\var{depth} - \rho > \var{srcDepth}$}
+						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{srcDepth}, -\var{n}), \var{Node}(\var{srcDepth} + \rho, \var{n})))$ % TODO: check if add_front is necessary
+					\ElsIf{$|\var{segs}| > 0 \wedge \var{segs}_0.\var{start}.\var{depth} > \var{srcDepth} \wedge {}$\hfill\break
+						\hspace*{\dimexpr\algorithmicindent*4}$\var{segs}_0.\var{start}.\var{depth} - \rho \leq \var{srcDepth}$}
+						\State $\var{segs}_0.\var{start}.\var{depth} \gets \var{srcDepth}$
 					\EndIf
 				\EndIf
 				\If{$\neg \var{srcOcc} \wedge \var{dstOcc}$}
-					\If{$|\var{segs}| = 0 \vee \var{segs}_{|\var{segs}| - 1}.\var{end}.\var{depth} \neq \var{dstPoint}_{\var{axis}}$}
-						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{dstPoint}_{\var{axis}} - \rho, -\var{n}), \var{Node}(\var{dstPoint}_{\var{axis}}, \var{n})))$
+					\If{$|\var{segs}| = 0 \vee \var{segs}_{|\var{segs}| - 1}.\var{end}.\var{depth} + \rho < \var{dstDepth}$}
+						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{dstDepth} - \rho, -\var{n}), \var{Node}(\var{dstDepth}, \var{n})))$
+					\ElsIf{$|\var{segs}| > 0 \wedge \var{segs}_{|\var{segs}| - 1}.\var{end}.\var{depth} < \var{dstDepth} \wedge {}$\hfill\break
+						\hspace*{\dimexpr\algorithmicindent*4}$\var{segs}_{|\var{segs}| - 1}.\var{end}.\var{depth} + \rho \geq \var{dstDepth}$}
+						\State $\var{segs}_{|\var{segs}| - 1}.\var{end}.\var{depth} \gets \var{dstDepth}$
 					\EndIf
 				\EndIf
-				
+
 				\LineComment{Rule 4}
 				\ForAll{$\var{s} \in \var{segs}$}
-					\If{$\var{s}.\var{start}.\var{depth} \neq \var{srcPoint}_{\var{axis}} \wedge \var{s}.\var{end}.\var{depth} \neq \var{dstPoint}_{\var{axis}}$}
+					\If{$\var{s}.\var{start}.\var{depth} \neq \var{srcDepth} \wedge \var{s}.\var{end}.\var{depth} \neq \var{dstDepth}$}
 						\State $\var{segs}.\var{remove}(\var{s})$
 					\EndIf
 				\EndFor
@@ -606,12 +614,13 @@ The second rule states that if both grid points are not occupied, the incident e
 Thus, in this case, all segments are simply removed.
 %
 Rule three is applied if only one grid point is marked as occupied.
-If segments are present on the current edge, the algorithm tests whether the first or last segment touches the grid point which is marked as occupied.
-If the source point is marked, the first segment's start must touch it, \ie must have equal depth than the grid point.
-In case the destination point is marked, the last segment's end must touch it.
-If there are no segments on the edge or the present segments do not touch their appropriate points, a new dexel segment is added.
-The new segment starts at the occupied grid point and has a small length of $\rho$.
+If segments are present on the current edge, the algorithm tests whether the first or last segment touches the grid point, which is marked as occupied, or is very close to it.
+If the source point is marked, the first segment's start must touch or be near to it, \ie the start node's depth must not be further away from the grid point than a small $\rho$.
 This length can be chosen arbitrarily, but as it's purpose is to correct a numeric issue, a tiny value is sufficient.
+In case the destination point is marked, the last segment's end must touch or be near it.
+If existing segments are nearer than $\rho$ to an occupied grid point, they are extended to reach them.
+If there are no segments on the edge or the present segments are not in close proximity to their appropriate points, a new dexel segment is added.
+The new segment starts at the occupied grid point and has a small length of $\rho$.
 Regarding the normal, the surface intersection represented by the newly added segment might be used by a later triangulation.
 However, the true normal is stored on the numerically too short segment in the appropriate neighboring cell, which is hard to retrieve as the tri-dexel grid's cells are isolated to allow independent processing.
 Hence, an artificial normal is added in the direction of the edge's axis.
