@@ -168,7 +168,11 @@ Based on the discussed tri-dexel types, the basic reconstruction algorithm is sh
 		\Function{TriDexel}{$\var{grid}, \var{resolution}$}
 			\State $\var{box} = \var{Extends}(\var{grid}.\var{aabb}.\var{lower} - \epsilon, \var{grid}.\var{aabb}.\var{upper} + \epsilon)$
 			\State $\var{res} = \Call{UniformResolution}{\var{box}, \var{resolution}}$
-			\State $\var{img} = \var{TriDexelImage}(\var{res})$
+			\State \Call{Reconstruct}{$grid, box, resolution$}
+		\EndFunction
+		\\
+		\Function{Reconstruct}{$grid, box, resolution$}
+			\State $\var{img} = \var{TriDexelImage}(\var{res})$ \label{alg:line:tri_dexel_begin}
 			\State $\Call{AxisParallelRaycast}{\var{grid}, \var{box}, \var{res},\hfill\break
 				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{img}.\var{images}_{\var{axis}}.\var{dexels}_{\var{x}, \var{y}}.\var{nodes}.\var{add}(\var{Node}(\var{v}_{\var{axis}}, \var{n}))}$
 			\State $\var{dgrid} = \Call{CreateTriDexelGrid}{\var{img}, \var{box}}$
@@ -190,7 +194,7 @@ At the beginning, a slightly enlarged bounding box is calculated for the size of
 In this way, edge cases with a surface exactly at the grid's border are avoided.
 The \textproc{UniformResolution} function takes the user-specified resolution and the tri-dexel grid's bounding box and calculates three resolutions, one for each axis.
 The longest one is equal to the specified resolution and the other two are calculated in such a way that the resulting cells of the tri-dexel grid are as cubic as possible.
-This resolution is used to preallocate space for the tri-dexel image which is then filled in the subsequent raycasting process.
+The tri-dexel grid resolution is used to preallocate space for the tri-dexel image which is then filled in the subsequent raycasting process.
 The remaining part of the algorithm closely follows the concept discussed in the previous section\ref{sec:tri_dexel_concept}.
 The subsequent sections discuss the functions and procedures of the algorithm in the order they are used.
 
@@ -1124,10 +1128,108 @@ This value is the doubled area of the triangle \var{a}, \var{b}, \var{c}, where 
 Dividing the doubled area by the triangle's base, \ie the length of the line \var{a}, \var{b}, the point to line distance is obtained.
 
 
-\subsection{Subslicing *experimential*}
-\label{sec:tri_dexel_subslicing}
+\subsection{Cell slicing *experimential*}
+\label{sec:tri_dexel_cellslicing}
 
+With the additional refinement and feature reconstruction introduced in section \ref{sec:tri_dexel_refinement}, the quality of the tri-dexel surface reconstruction is improved appreciably.
+Still, features within a cell and especially thin features not crossing any grid points are almost fully discarded.
+The reason therefore is the the destructive regularization step described in section \ref{sec:tri_dexel_regularization}, which sacrifices smaller dexel segments in favor of regularity, thus throwing away useful information, especially of smaller features.
+To preserve this information and still obtain regular tri-dexel cells which can be passed into the triangulation routines of sections \ref{sec:tri_dexel_triangulation} and \ref{sec:tri_dexel_refinement}, an alternative to the regularization algorithm has been developed.
+This novel approach depends on the ability to resample dexels at any time, an ability usually not given in scenarios where the dexel model is the main data model, \ie typical, dexel-based machining simulations.
+However, as the dexel model used for surface reconstruction is derived from the VML's internal data model, dexels can be arbitrarily recreated.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/tri_dexel_cellslicing}
+	\caption{
+		Creating regular cells by slicing two irregular cells sharing an irregular edge.
+		The actual surface is drawn in green, the reconstructed one in orange.
+	}
+	\label{fig:tri_dexel_cellslicing}
+\end{figure}
+
+The main problem of small dexel segments is that they are always lost during regularization if they do not pass a grid point of the tri-dexel grid.
+If a lot of fine features are lost this way, an obvious solution is to increase the resolution of the dexel grid.
+However, this solution dramatically increases memory and computational demands and also adds detail where it is not necessary, \eg large flat surfaces or empty space.
+A more elegant solution is to increase the grid resolution locally.
+More specifically, each irregular cell, \ie a cell which contains irregular edges, \ie edges which have to be modified by the regularization, is subdivided in such a way that all irregular edges become regular, without modifying the segments.
+This subdivision is accomplished by calculating divider planes for each irregular cell.
+As much planes as necessary are created to slice all segments or empty spaces between segments, which would be discarded by the regularization.
+Figure \ref{fig:tri_dexel_cellslicing} shows this procedure by an example.
+The left drawing shows a small feature which will be lost due to regularization as the edge shared by both cells is irregular; regularization rule 2 will remove the segment.
+As the calculated intermediate points lie outside the lower cell, \cf dotted lines in orange, the quality of the reconstructed surface is poor.
+The right image shows the same situation with an additional divider line (plane in 3D).
+The divider is resampled, creating new dexel segments.
+All resulting 4 cells are now regular and, after triangulation, produce a good surface approximation.
+
+Nevertheless, after slicing irregular cells to ensure regularity on the original irregular edges, the resampled dexels within the cell might again produce irregular cells.
+Therefore, this cell slicing technique is applied recursively.
+As the detail of the reconstructed surface is increased on each subdivision at the cost of more and finer triangles, the use of a maximum recursion depth is advised.
+When this limit is hit, the cell, despite being irregular, is passed to the standard regularization algorithm, discarding the now hopefully expendable features.
+
+The cells resulting from slicing are resampled, regularized and triangulated by reusing all existing classes and algorithms.
+A new tri-dexel image is created with a resolution of 2 in each dimension with exactly the same bounding box as a cell.
+The reconstruction proceeds analogously to the one of the main tri-dexel image, \cf algorithm \ref{alg:tri_dexel} line \ref{alg:line:tri_dexel_begin}. %TODO
+
+This new cell slicing algorithm is integrated into the existing code by adapting the base tri-dexel reconstruction algorithm, algorithm \ref{alg:tri_dexel}, as shown in algorithm \ref{alg:tri_dexel_2}.
+%
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\setalglineno{6}
+		\Function{Reconstruct}{$grid, box, resolution$}\hfill\break
+			\hspace*{\dimexpr\algorithmicindent*1}\dots
+			\setalglineno{11}
+			\ForAll{$\var{c} \in \var{dgrid}.\var{cells}()$}
+				\If{$\Call{RegularizeCell}{\var{c}, \True}$}
+					\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{c}}$
+				\Else
+					\State $\var{triangles} \gets \var{triangles} \cup \Call{SliceCell}{c, grid}$
+				\EndIf
+			\EndFor
+			\State \Return $\var{triangles}$
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Adation to the abstract workflow given in algorithm \ref{alg:tri_dexel} to support cell slicing.
+	}
+	\label{alg:tri_dexel_2}
+\end{algorithm}
+%
+The \textproc{RegularizeCell} procedure is slightly adapted.
+A boolean value is added to its interface and, if cell slicing is allowed, a value \True is passed to \textproc{RegularizeCell}, indicating that only numeric regularizations, \cf regularization rule 3, are allowed and other necessary regularizations, \ie irregular edges, are only detected but not applied.
+A boolean return value of \textproc{RegularizeCell} informs the caller in case such irregular edges have been detected.
+In this case, the cell is not sent to triangulation but to a new cell slicing algorithm, the \textproc{SliceCell} function given in algorithm \ref{alg:tri_dexel_cell_slicing}.
+%
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{SliceCell}{$cell, grid$}
+			\State $(xdiv, ydiv, zdiv) \gets \Call{FindDividers}{cell}$
+			\State $triangles \gets \varnothing$
+			\ForAll{$x \gets 0 \To |xdiv| - 2, y \gets 0 \To |ydiv| - 2, z \gets 0 \To |zdiv| - 2$}
+				\State $lower \gets Vertex(xdiv_{x}, ydiv_{y}, zdiv_{z})$
+				\State $upper \gets Vertex(xdiv_{x + 1}, ydiv_{y + 1}, zdiv_{z + 1})$
+				\State $box \gets Extends(lower, upper)$
+				\State $\var{triangles} \gets \var{triangles} \cup \Call{Reconstruct}{grid, box, (2, 2, 2)}$
+			\EndFor
+			\State \Return $triangles$
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Adaption to the abstract workflow given in algorithm \ref{alg:tri_dexel} to support cell slicing.
+	}
+	\label{alg:tri_dexel_cell_slicing}
+\end{algorithm}
+%
+Cell slicing starts by finding axis aligned divider planes along the x-, y- and z-axis.
+Each list of dividers along one axis starts with the depth of the corresponding source grid points, then contains a list of depths along the edges of that axis, and then finally contains the depth of the destination grid points, \cf \var{srcDepth} and \var{dstDepth} in \textproc{RegularizeCell}.
+Afterwards, the Cartesian product of all dividers, except the last one on each axis, is formed.
+Each tuple in this product forms the lower point of a bounding box, the succeeding divider on each axis the upper point.
+This way, the loop enumerates all bounding boxes of the cells resulting from slicing the cell at all dividers.
+These boxes are then used to launch subsequent tri-dexel reconstructions, by recursively calling \textproc{Reconstruct} with the bounding box becoming the new size of the tri-dexel image and grid and a resolution of 2 in each dimension.
+
+%TODO finddividers
 
 \subsection{Parallelization}
 \label{sec:tri_dexel_parallelization}

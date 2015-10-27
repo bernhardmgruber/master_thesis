@@ -96,6 +96,12 @@ draft,
 
 \newcommand{\out}{\mathord{\uparrow}}
 
+% from: http://tex.stackexchange.com/questions/80140/line-numbering-in-algorithmic
+\makeatletter
+\newcommand{\setalglineno}[1]{%
+	\setcounter{ALG@line}{\numexpr#1-1}}
+\makeatother
+
 %
 % chngcntr
 %
