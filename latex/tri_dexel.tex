@@ -474,6 +474,7 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 		\Function{RegularizeCell}{$\var{cell}$}
 			\For{$ \var{i} \gets 0 \To 11 $}
 				\State $\var{segs} \gets \var{cell}.\var{edge}_{\var{i}}.\var{segments}$ \Comment{reference only}
+				\label{alg:line:reg_vars_begin}
 				\State $(\var{src}, \var{dst}) \gets \var{edgeIndexToCorners}_{\var{i}}$
 				\State $\var{axis} \gets \var{edgeToAxis}_{\var{src}, \var{dst}}$
 				\State $\var{srcPoint} \gets \var{cell}.\var{realPoints}_{\var{src}}$
@@ -482,6 +483,7 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 				\State $\var{dstDepth} \gets \var{dstPoint}_{axis}$
 				\State $\var{srcOcc} \gets \var{cell}.\var{occupancy}_{\var{src}}$
 				\State $\var{dstOcc} \gets \var{cell}.\var{occupancy}_{\var{dst}}$
+				\label{alg:line:reg_vars_end}
 
 				\LineComment{Rule 1}
 				\If{$\var{srcOcc} \wedge \var{dstOcc}$}
@@ -1215,9 +1217,56 @@ In this case, the cell is not sent to triangulation but to a new cell slicing al
 			\EndFor
 			\State \Return $triangles$
 		\EndFunction
+		\\
+		\Function{FindDividers}{$cell$}
+			\State $rangesPerAxis \gets array(3, array())$
+			\For{$ \var{i} \gets 0 \To 11 $}
+				\LineComment{Same vars as in regularization, algorithm \ref{alg:tri_dexel_regularization}, line \ref{alg:line:reg_vars_begin} to \ref{alg:line:reg_vars_end}}
+				\If{$(srcOcc \wedge dstOcc \wedge |segs| > 1) \vee (\neg srcOcc \wedge \neg dstOcc \wedge |segs| > 0) \vee (srcOcc \neq dstOcc \wedge |segs| > 1)$}
+					\State $rangesPerAxis_{axis}.add(\Call{SegmentsToRanges}{segs, srcDepth, dstDepth})$
+				\EndIf
+			\EndFor
+			\State $dividers \gets (array(), array(), array())$
+			\For{$axis \gets 0 \To 2$}
+				\State $ranges \gets rangesPerAxis_{axis}$
+				\State $\Call{Sort}{ranges}$ \Comment{Sort by range start}
+				\State $dividers_{axis}.add(cell.aabb.lower_{axis})$
+				\State $(start, end) \gets ranges_0$
+				\For{$i \gets 1 \To |ranges| - 1$}
+					\If{${ranges_{i}}_0 > end$}
+						\State $dividers_{axis}.add((start + end) \div 2)$
+						\State $(start, end) \gets ranges_i$
+					\Else
+						\State $start \gets {ranges_i}_0$
+						\State $end \gets \Call{Min}{end, {ranges_i}_1}$
+					\EndIf
+				\EndFor
+				\State $dividers_{axis}.add((start + end) \div 2)$
+				\State $dividers_{axis}.add(cell.aabb.upper_{axis})$
+			\EndFor
+			\State \Return $dividers$
+		\EndFunction
+		\\
+		\Function{SegmentsToRanges}{$segs, srcDepth, dstDepth$}
+			\State $depths \gets array()$
+			\ForAll{$seg \in segs$}
+				\If{$seg.start.depth \neq srcDepth$}
+					\State $depths.add(seg.start.depth)$
+				\EndIf
+				\If{$seg.end.depth \neq dstDepth$}
+					\State $depths.add(seg.end.depth)$
+				\EndIf
+			\EndFor
+			\State $ranges \gets array()$
+			\For{$i \gets 0 \To |depths| - 2$}
+				\State $ranges.add((depths_{i}, depths_{i + 1}))$
+			\EndFor
+			\State \Return $ranges$
+		\EndFunction
 	\end{algorithmic}
 	\caption{
-		Adaption to the abstract workflow given in algorithm \ref{alg:tri_dexel} to support cell slicing.
+		Cell slicing algorithm.
+		The \textproc{SliceCell} function is indirectly recursive with \textproc{Reconstruct}.
 	}
 	\label{alg:tri_dexel_cell_slicing}
 \end{algorithm}
@@ -1229,7 +1278,56 @@ Each tuple in this product forms the lower point of a bounding box, the succeedi
 This way, the loop enumerates all bounding boxes of the cells resulting from slicing the cell at all dividers.
 These boxes are then used to launch subsequent tri-dexel reconstructions, by recursively calling \textproc{Reconstruct} with the bounding box becoming the new size of the tri-dexel image and grid and a resolution of 2 in each dimension.
 
-%TODO finddividers
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/cellslicing_dividers}
+	\caption{
+		Setting divider planes to slice the ranges derived from the dexel segments and the space between them.
+		Segments are red, ranges in orange, dividers in dotted green lines.
+		On the left drawing, dividers are set using a simple algorithm reducing the total number of dividers needed.
+		On the right drawing, a divider is set at the mid point of each range, resulting in more dividers but maintaining consistency with neighboring cells.
+	}
+	\label{fig:cellslicing_dividers}
+\end{figure}
+
+Most of the work when slicing cells is done in the \textproc{FindDiviers} function, which computes depth values for axis aligned planes along which an irregular cell should be sliced.
+The function consists of two steps.
+The first is to define depth ranges along each axis which have to be split.
+These ranges are basically dexel segments as well as the space between two segments.
+Secondly, each of this ranges has to be split by at least one divider plane.
+Figure \ref{fig:cellslicing_dividers} illustrates these steps on a cell with calculated depth ranges in orange and two possible divider configurations in green.
+
+The depth ranges are computed for each axis, by iterating over all 12 edges of the cell and computing the same variables as in the regularization algorithm \ref{alg:tri_dexel_regularization}, line \ref{alg:line:reg_vars_begin} to \ref{alg:line:reg_vars_end}.
+Using these variables, the algorithm checks if the current edge is irregular.
+If both grid points are occupied and more than one segment is present, the edge is irregular.
+If both grid points are non-occupied and any segment is present, the edge is also irregular.
+Finally, if only one of the grid points is occupied and more than one segment is present, the edge is irregular as well.
+The segments of each irregular edge are then passed to the \textproc{SegmentsToRanges} function which determines the depth ranges which have to be sliced.
+
+After all depth ranges have been computed, dividers are calculated.
+There are multiple possibilities for setting dividers.
+Two variations are given in figure \ref{fig:cellslicing_dividers}.
+The first one tries to collect as many ranges as possible which are able to be sliced by the same divider.
+The second one just creates a divider at the midpoint of each range.
+Whereas the first method creates fewer dividers and therefore fewer sub cells which have to be reprocessed, the second one is consistent across neighboring cells as two cells attached to the same irregular edge will create the same dividers.
+In algorithm \ref{alg:tri_dexel_cell_slicing}, the first method is implemented as it produces overall better results.
+Dividers are also computed per axis from the list of ranges found for the current axis, sorted by the ranges' start.
+On each axis, the first divider is the bounding box itself, \ie the component of the box's lower vertex corresponding to the current axis.
+Then, an interval $(start, end)$ is set to the first range, indicating a range of possible dividers.
+This interval is now iteratively adapted/narrowed to span as many ranges as possible.
+For this purpose, a loop iterates over all remaining ranges.
+If the start of the current range does exceed the current interval, \ie the range's start is larger than the interval's end, a divider is created for the current interval and the interval reset to the current range.
+If the current range does not exceed the current interval, \ie the range's start lies within the interval, it is narrowed by moving it's start to the start of the current range.
+After looping over all ranges has completed, a further divider is also calculated for the remaining interval.
+Finally, the bounding box's upper vertex is used to create a last divider.
+After the dividers have been calculated for each axis, they are returned to and used for creating the bounding boxes of sub cells.
+
+The \textproc{SegmentsToRanges} function is a simple selector and translator of dexel segments and their space between.
+The algorithm creates the ranges on each axis which must be sliced, \ie for which a divider has to be created.
+In order to do so all segments of an edge are flattened into a list of start and end depth values, except values which are at the cell's border, \ie equal to \var{srcDepth} or \var{dstDepth}.
+Then, each pair of neighboring depth values are grouped into a tuple, creating a list of depth ranges.
+These ranges are shown in orange in figure \ref{fig:cellslicing_dividers} and returned at the end of the function.
+
 
 \subsection{Parallelization}
 \label{sec:tri_dexel_parallelization}
