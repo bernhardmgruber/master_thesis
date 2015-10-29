@@ -350,7 +350,7 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 								\If{$\var{s}.\var{end}.\var{depth} > \var{depthTo}$}
 									\State $\var{s}.\var{end}.\var{depth} \gets \var{depthTo}$
 								\EndIf
-								\State $\var{grid}.\var{edges}_{\var{axis0}, \var{gridFrom}}.\var{segments}.\var{add}(\var{s})$
+								\State $\var{grid}.\var{edges}_{\var{axis0}, \var{gridFrom}}.\var{segments}.\var{add}(\var{s})$ \label{alg:line:grid_edge_insertion}
 							\EndFor
 						\EndFor
 					\EndFor
@@ -1336,15 +1336,57 @@ The tri-dexel surface reconstruction algorithm shown in this chapter consists of
 The first one is the creation of a tri-dexel image by raycasting the VML's data model.
 The size of the tri-dexel image and therefore the number of created rays is parameterized by the user.
 Typical resolutions range from 50 for quick approximations up to several hundreds\footnote{Resolutions of up to 600 were successfully tested before hitting the 16GiB physical RAM limit on the used machine.} for fine and detailed reconstructions.
+As the number of created rays for a cubic grid with a resolution of $n$ is $3n^2$ and the ray traversal and intersection is perfectly isolated, parallelization of the raycast is embarrassingly simple and usually yields a high number of independent work items.
+Concerning the implementation, all 3 for loops in algorithm \ref{alg:tri_dexel_raycast} are viable candidates for parallel execution.
+These are the loop iterating over the three coordinate system axes as well as the loops enumerating all ray origins.
+Note that the closure called for each hit, \var{hitFunc}, is invoked concurrently.
+However, as the number of required dexels is derived from the user specified resolution, the tri-dexel image can preallocate all space required for the raycast result, except the list of nodes per dexel, allowing parallel access.
+As a single dexel is only filled by a single ray, no concurrent access occurs on the dynamically resizing dexel lists.
+%
+The efficiency of the raycast could be furthered pushed by vectorization or GPU acceleration.
+Both of these techniques have been implemented for the raycast used for visualization, \cf section \ref{sec:raycasting}.
+However, as consistency of the dexel image is regarded more important than the speed of its creation, a considerable amount of additional correction code has been added to the raycast.
+This code complicates vectorization and GPU acceleration, especially as the latter still does not support dynamic memory allocation on every platform\footnote{CUDA offers malloc in kernels, OpenCL has no equivalent.}.
+Furthermore, the list of dexel nodes is a dynamic data structure and filled differently by each ray/thread/work item leading to even more complex vector code or branch divergence on scalar GPUs.
+
+After the raycast, when the creation of the tri-dexel image has completed, the tri-dexel grid is built by assigning all cell edges and grid point occupancies.
+This task is also embarrassingly parallel at dexel level.
+Considering algorithm \ref{alg:tri_dexel_grid_generation}, the outer three for loops, iterating over the three axes and then over all dexels, are almost completely independent and offer good parallelization candidates.
+Assigning the segments on each dexel in parallel is also possible, but requires concurrent segment insertion at a cell edge to be safely, \cf line \ref{alg:line:grid_edge_insertion}.
+If the outmost loop on the three axes is parallelized, note that the grid point occupancies are then written concurrently as the occupancy of a single grid point is determined by one dexel from each axis image.
+This race condition might not be a problem on some architectures, as the same value, \True, is written concurrently to the same memory location.
+However, the result depends on several hardware parameters and the memory model of the language.
+For portable consistency, either the outmost loop on the axes must be serial, or the writes to the grid point occupancies atomic.
+
+After the tri-dexel grid has been constructed, all cells have to be processed.
+The required algorithms, \ie regularization, triangulation and slicing, operate independently on each cell and may therefore run in parallel.
+However, the information a cell contains, \ie grid point occupancies and segments on edges, is shared between neighboring cells.
+Algorithms modifying a cells data are therefore subject to race conditions.
+This mainly concerns the regularization which changes the segments on cell edges.
+Several solutions are available to mitigate this issue.
+One possibility is locking a cell's edge during regularization.
+Neighboring cells regularized later would then see this edge as already regularized.
+Unfortunately, this solution does not work well with the detection of irregular edges and cell slicing strategy, where cells are intentionally kept irregular during regularization.
+Furthermore, a huge amount of locks, \mathcal{O}(n^3), would be necessary, putting pressure on the operating system kernel.
+A lock-free implementation of the edge's data structure and regularization rules using atomic operations might be possible, but is probably highly difficult to achieve.
+A more pragmatic solution, which has been implemented, is to just copy the data of each cell out of the tri-dexel grid before sending a cell to the regularization and subsequent algorithms.
+This allows fully independent cell processing, enabling the loop on all cells in \textproc{Reconstruct} in algorithm \ref{alg:tri_dexel} to run in parallel.
+
+The following algorithms still offer a bit of parallelism.
+However, as the independent processing of each cell already offers enough work items to saturate a large number of cores, further, nested parallelism is probably unneeded.
+Nevertheless, for completeness, they are mentioned shortly.
+The regularization of a cell immediately boils down to regularizing all 12 edges of the cell.
+These might be regularized in parallel.
+The \textproc{FindLoops} routine starting the depth-first searches on the cell might run its 8 searches in parallel, accumulating the loops on a concurrent data structure.
+These loops might then also be triangulated in parallel in \textproc{TriangulateCell}.
+Intermediate point calculation during refinement on each vertex pair of a loop might also be done in parallel, but is probably not worth the overhead.
+
+
+\section{Results}
+\label{sec:tri_dexel_results}
 
 
 
-Regularization on shared tri-dexel grid limits parallelization, costs memory, atomics/locks, other algorithm?
-
-Triangulation full parallel possible GPU).
-
-
-raycast, parallel cell processing
 
 \begin{figure}
 	\centering
@@ -1354,10 +1396,4 @@ raycast, parallel cell processing
 	}
 	\label{fig:td_hq_impeller_cpu}
 \end{figure}
-
-
-
-\section{Results}
-\label{sec:tri_dexel_results}
-
 
