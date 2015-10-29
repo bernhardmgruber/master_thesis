@@ -1512,3 +1512,94 @@ On third of the memory is allocated before the raycast, another third during the
 While cells are processed, cell data is aggregated, regularized, triangulated and immediately freed again.
 Therefore, the memory consumption remains almost constant during the further execution after the grid construction.
 
+Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cube2}
+		\caption{cube2}
+		\label{fig:td_cube2}
+	\end{subfigure}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinder_head}
+		\caption{cylinder\_head}
+		\label{fig:td_cylinder_head}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinders}
+		\caption{cylinders}
+		\label{fig:td_cylinders}
+	\end{subfigure}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinders_d}
+		\caption{cylinders\_d}
+		\label{fig:td_cylinders_delaunay}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_hq_impeller}
+		\caption{impeller}
+		\label{fig:td_hq_impeller}
+	\end{subfigure}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_hq_impeller_2}
+		\caption{impeller\_2}
+		\label{fig:td_hq_impeller_2}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_turbine}
+		\caption{turbine}
+		\label{fig:td_turbine}
+	\end{subfigure}
+	\caption{
+		Renderings of the result meshes using MeshLab after applying the tri-dexel reconstruction approach on the selected test scenes in table \ref{tbl:test_scenes}.
+	}
+	\label{fig:td_results}
+\end{figure}
+%
+
+
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_turbine_groove_50}
+		\caption{50}
+		\label{fig:td_turbine_groove_50}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_turbine_groove_100}
+		\caption{100}
+		\label{fig:td_turbine_groove_100}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_turbine_groove_200}
+		\caption{200}
+		\label{fig:td_turbine_groove_200}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_turbine_groove_400}
+		\caption{400}
+		\label{fig:td_turbine_groove_400}
+	\end{subfigure}
+	\caption{
+		Detailed renderings with the same perspective of a groove of the turbine scene using MeshLab.
+		The meshes were created using the tri-dexel reconstruction algorithm with the resolutions 50, 100, 200 and 400.
+	}
+	\label{fig:td_grooves}
+\end{figure}
