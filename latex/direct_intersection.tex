@@ -891,7 +891,7 @@ Table \ref{tbl:direct_intersection_results} contains the runtime and output size
 \begin{table}[!]
 	\centering
 	\begin{tabular}{lrrrr}
-		Scene          & SVs  & t\textsubscript{in} & t\textsubscript{out} & time \\
+		scene          & SVs  & t\sub{in} & t\sub{out} & time \\
 		\hline
 		cube2          &    1 &   0.8k &    1k &   1ms \\
 		cylinders\_d   &    1 &     7k &   10k &   6ms \\
@@ -940,6 +940,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 	\includegraphics[width=0.8\textwidth]{di_hq_impeller_cpu}
 	\caption{
 		CPU utilization during a run of the direct intersection algorithm to reconstruct the surface of the impeller scene.
+		Measured using the profiler of Visual Studio 2013.
 	}
 	\label{fig:di_cpu}
 \end{figure}
@@ -949,6 +950,7 @@ Afterwards, the workload drops done to zero within the last 3 seconds of the run
 The PPL's default scheduler already does a pretty good job by keeping all cores utilized for 85\% of the runtime.
 This slow drop at the end of the test run might be improved by employing a better scheduling strategy.
 However, more complex scheduling usually also increases the parallelization overhead.
+%
 Concerning memory, the regular grid holding the impeller requires approximately 600 MiB memory.
 During the algorithm, 300 MiB additional memory has been allocated, mostly for the temporary union structures and the buffer holding the resulting surface.
 
