@@ -1562,15 +1562,58 @@ Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes
 		\label{fig:td_turbine}
 	\end{subfigure}
 	\caption{
-		Renderings of the result meshes using MeshLab after applying the tri-dexel reconstruction approach on the selected test scenes in table \ref{tbl:test_scenes}.
+		Renderings of the result meshes using MeshLab after applying the tri-dexel reconstruction approach with a resolution of 400 on the selected test scenes in table \ref{tbl:test_scenes}.
 	}
 	\label{fig:td_results}
 \end{figure}
 %
+The cube2 scene has been extracted flawlessly.
+All features, \ie edges and corners, of the cube have been perfectly reconstructed.
+The only flaw is the high number of triangles outputted, \cf table \ref{tbl:tri_dexel_results}.
+However, this number is steered by the dexel grid's resolution and may be set very low for this simple scene.
+Furthermore, an additional post-processing pass may be used to recombine adjacent triangles facing in the same direction.
 
+Both of the cylinders scenes deliver great results as well.
+They show perfect edges at the stock as well as at the intersection with the smaller cylindrical swept volume.
+However, the cylinders scene, on the top and bottom side, contains a small notch beside the hole drilled out.
+This small error is the result of a numeric miscalculation in the raycaster, due to the thin triangles, which could not correctly identify the surface entry and exit for two incident rays.
+Therefore, two dexels are completely empty at this location.
+This case is handled by regularization rule 3, which creates small segments at the grid's occupied points where the two dexels are empty.
+The cylinders\_d scene does not contain any notches or other errors.
+Concerning the feature reconstruction capabilities, the algorithm also managed to recover the shape of the original triangulation, which is clearly visible at the side of the stock and at the drilled hole.
 
+Furthermore, the impeller scenes have been extracted very well too.
+Figure \ref{fig:td_hq_impeller_details} shows two detailed renderings.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_hq_impeller_drillings}
+		\caption{impeller drillings}
+		\label{fig:td_hq_impeller_drillings}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_hq_impeller_blades}
+		\caption{impeller blades}
+		\label{fig:td_hq_impeller_blades}
+	\end{subfigure}
+	\caption{
+		Details of the impeller scene rendered using MeshLab.
+		The meshes have been extracted using the tri-dexel approach with a resolution of 400.
+	}
+	\label{fig:td_hq_impeller_details}
+\end{figure}
+%
+The drillings in the middle resemble the cylindrical swept volumes perfectly, \cf figure \ref{fig:td_hq_impeller_drillings}.
+The impeller's blades have sharp edges and, between them, even the rills of the single swept volumes are slightly visible, \cf figure \ref{fig:td_hq_impeller_drillings}.
+Nonetheless, similarly to the the cylinders scene, several numeric issues occurred during the dexel image creation by the raycaster, resulting in numerous notches at the surface.
 
-
+Finally, the turbine scene looks good as well.
+However, as the turbine's grooves contain mostly concave features, a sufficient resolution is required to capture the scenes small peculiarities.
+Figure \ref{fig:td_grooves} shows renderings of a detailed view on one of the turbines grooves in different resolutions.
+%
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.24\textwidth}
@@ -1603,3 +1646,42 @@ Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes
 	}
 	\label{fig:td_grooves}
 \end{figure}
+%
+At a resolution of 50, the groove itself is spanned by a bit of geometry.
+Doubling the resolution lets the tri-dexel algorithm reconstruct the groove but leaves some geometry left in the wavy sides of the groove.
+Increasing the level of detail to a resolution of 200 already retrieves a quite good surface with only a few missing subtleties at the tips of the waves.
+These are finally reconstructed using a resolution of 400.
+Nonetheless, a few errors still remain due to irregularities on the dexel image caused by misjudgments of the raycaster.
+
+Concluding, all extracted meshes offer great detail.
+Especially convex features like sharp corners and edges are retrieved almost perfectly.
+Concave features, like the ones of the turbine, seem a bit harder to reconstruct and require an appropriate resolution.
+Without using cell slicing, all meshes are manifold, closed and orientable.
+Enhancing the tri-dexel approach by slicing irregular cells greatly reduces dropping valuable information during regularization, resulting in far better refined features.
+But the improvement may create holes and T-vertices in the mesh at the border between regular cells and sliced cells, making the mesh orientable but not manifold and closed.
+Figure \ref{fig:td_turbine_issues} shows these issues by the example of the outmost rip of the cylinder\_head.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinder_head_t_vertex}
+		\caption{t-vertices}
+		\label{fig:td_cylinder_head_t_vertex}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinder_head_hole}
+		\caption{hole}
+		\label{fig:td_cylinder_head_hole}
+	\end{subfigure}
+	\caption{
+		Details of the cylinder\_head scene rendered using MeshLab.
+		The renderings show the creation of T-vertices and holes at the border of normal and sliced cells.
+		The meshes have been extracted using the tri-dexel approach with cell slicing at a resolution of 100.
+	}
+	\label{fig:td_turbine_issues}
+\end{figure}
+%
+Still, these holes are usually thin and can be closed by a post processing step.
+If all T-vertices are also fixed, \eg by splitting triangles at the edge spanning the T-vertex, meshes created with cell slicing enabled may still be converted into a manifold and closed result.

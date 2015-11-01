@@ -1014,7 +1014,7 @@ All intersecting triangles have been properly split and retriangulated.
 There is one small hole at one of the edges and a few falsely remaining ones at the bottom left of the cutting surface, \cf figure \ref{fig:di_cube2}.
 These errors are due to a wrong outcome of the inside test, \cf \textproc{IsTriangleInsideStructure} in algorithm \ref{alg:triangle_inside_test}.
 Nevertheless, the errors in the reconstructed surface are small and may be corrected manually using an appropriate 3D modeling tool, creating a closed mesh.
-%
+
 Both cylinder scenes delivered good results.
 The variant with the small and thin triangles even resulted in an almost perfect surface with zero holes and no leftover triangles.
 Surprisingly, the other variant with the quality triangulation contained 9 holes and 1 un-eliminated triangle.
@@ -1027,7 +1027,7 @@ Furthermore, a lot if ray-triangle intersections are performed where triangle no
 All these tests become numerically unstable, if the ray becomes parallel to the tested triangles.
 In theory, the tested triangle should always lie clearly inside or outside the structure it is tested against, otherwise there must have been an intersection and the triangle would have been split.
 In practice, if an intersection has been missed and the triangle spans the structure or the tested triangle is almost degenerated and very close to the structure, errors may occur.
-%
+
 Concerning the more complex scenes, the impeller and turbine surfaces look quite good from a distance, but fail horribly reviewing the details.
 Figure \ref{fig:di_scenes_artifacts} shows two detailed views, one centered on a smaller blade of the impeller and one centered on a milling groove of the turbine.
 %
@@ -1059,7 +1059,7 @@ Especially the cells which contain triangles from many swept volumes, \ie cells 
 The triangle inside test still does an acceptable job and the final surface does somehow resemble the surface of the machining result.
 Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles.
 Regarding the quality of the produced mesh, the result is probably worthless for subsequent tasks, like using it for simulations.
-%
+
 The turbine scene seems to have a similar problem.
 Most of the intersections between stock and swept volume triangles have not been caught.
 As the total number of swept volumes is relatively low compared to the impeller scene and only very few of them intersect each other, the surface errors are considerably smaller.
