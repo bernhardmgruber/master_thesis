@@ -719,13 +719,13 @@ Algorithm \ref{alg:tri_dexel_triangulation} shows the basic triangulation of a t
 		\EndFunction
 		\\
 		\Function{FindLoops}{$\var{cell}, \var{occupied}$}
-			\State $\var{visited} \gets (\False, \False, \False, \False, \False, \False, \False, \False)$
+			\State $\var{visited} \gets \var{array}(8, \False)$
 			\State $\var{loops} \gets \varnothing$
 			\For{$\var{start} \gets 0 \To 7$}
 				\State $\var{loop} \gets \var{array}()$
 				\State $\Call{DepthFirstSearch}{\var{occupied}, \var{start}, -1, \var{cell}, \var{visited}, \var{loop}}$
 				\If{$|\var{loop}| > 0$}
-					\State $\var{loops}.\var{add}(\var{loop})$
+					$\var{loops}.\var{add}(\var{loop})$
 				\EndIf
 			\EndFor
 			\State \Return $\var{loops}$
@@ -1249,8 +1249,7 @@ In this case, the cell is not sent to triangulation but to a new cell slicing al
 			\EndFor
 			\State $\var{dividers} \gets (\var{array}(), \var{array}(), \var{array}())$
 			\For{$\var{axis} \gets 0 \To 2$}
-				\State $\var{ranges} \gets \var{axisRanges}_{\var{axis}}$
-				\State $\Call{Sort}{\var{ranges}}$ \Comment{Sort by range start}
+				\State $\var{ranges} \gets \Call{Sort}{\var{axisRanges}_{\var{axis}}}$ \Comment{Sort by range start}
 				\State $\var{dividers}_{\var{axis}}.\var{add}(\var{cell}.\var{aabb}.\var{lower}_{\var{axis}})$
 				\State $(\var{start}, \var{end}) \gets \var{ranges}_0$
 				\For{$\var{i} \gets 1 \To |\var{ranges}| - 1$}
@@ -1272,10 +1271,10 @@ In this case, the cell is not sent to triangulation but to a new cell slicing al
 			\State $\var{depths} \gets \var{array}()$
 			\ForAll{$\var{seg} \in \var{segs}$}
 				\If{$\var{seg}.\var{start}.\var{depth} \neq \var{srcDepth}$}
-					\State $\var{depths}.\var{add}(\var{seg}.\var{start}.\var{depth})$
+					$\var{depths}.\var{add}(\var{seg}.\var{start}.\var{depth})$
 				\EndIf
 				\If{$\var{seg}.\var{end}.\var{depth} \neq \var{dstDepth}$}
-					\State $\var{depths}.\var{add}(\var{seg}.\var{end}.\var{depth})$
+					$\var{depths}.\var{add}(\var{seg}.\var{end}.\var{depth})$
 				\EndIf
 			\EndFor
 			\State $\var{ranges} \gets \var{array}()$
