@@ -1169,6 +1169,25 @@ Therefore, this cell slicing technique is applied recursively.
 As the detail of the reconstructed surface is increased on each subdivision at the cost of more and finer triangles, the use of a maximum recursion depth is advised.
 When this limit is hit, the cell, despite being irregular, is passed to the standard regularization algorithm, discarding the now hopefully expendable features.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/tri_dexel_hole_creation}
+	\caption{
+		Creating a hole at the border of a normal and a sliced cell by estimating different feature points.
+		The original surface is drawn in green, the reconstructed one in orange.
+	}
+	\label{fig:tri_dexel_hole_creation}
+\end{figure}
+
+Adaptively slicing cells and resampling the model to a higher level of detail in distinct places is dangerous and may create thin holes on the surface.
+The tri-dexel reconstruction algorithm usually generates a closed manifold by assuming that the same feature points and edges are created by two adjacent cells at their common border.
+If one of the cells is sliced however, feature points might be estimated differently.
+Figure \ref{fig:tri_dexel_hole_creation} shows an example of a case where a hole is created between a normal and a sliced cell.
+The sketch on the left shows a cell side estimating a feature point based on the dexel segments at the cells edges.
+The sketch on the right shows the adjacent cell's side, which has been sliced, \eg by another irregular edge at the opposite cell side.
+Due to the additional information gathered by the resampled dexel at the slicing plane, two feature points are calculated in the sliced cell, instead of one in the unsliced cell.
+Thus, a different surface is created at the border, resulting in a typically thin hole.
+
 The cells resulting from slicing are resampled, regularized and triangulated by reusing all existing classes and algorithms.
 A new tri-dexel image is created with a resolution of 2 in each dimension with exactly the same bounding box as a cell.
 The reconstruction proceeds analogously to the one of the main tri-dexel image, \cf algorithm \ref{alg:tri_dexel} line \ref{alg:line:tri_dexel_begin}. %TODO
