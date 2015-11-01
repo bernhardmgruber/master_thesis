@@ -321,23 +321,23 @@ To allow the extraction methods presented in this thesis to interface with the r
 This information conceptually reflects the actual implementation, providing a simplified but sufficient abstraction.
 %
 The regular grid data structure relies on a few classes which are shown in figure \ref{fig:vml_datamodel}.
-The \lstinline!RegularGrid! class basically stores a bit of meta data together with a large set of cells.
-The meta data consists of the grid's axis-aligned bounding box (AABB), \lstinline!aabb!, the size of a cell in one dimension, \lstinline!cellSize!, as well as the number of cells in each dimension, \lstinline!cellCount!.
+The \var{RegularGrid} class basically stores a bit of meta data together with a large set of cells.
+The meta data consists of the grid's axis-aligned bounding box (AABB), \var{aabb}, the size of a cell in one dimension, \var{cellSize}, as well as the number of cells in each dimension, \var{cellCount}.
 The grid's cells are stored linearized in a flat array.
 %
-An axis-aligned bounding box is represented by the \lstinline!Extends! class.
-It stores two vertices, \lstinline!lower! and \lstinline!upper!, which contain the minimum and maximum values for each Cartesian coordinate axis.
+An axis-aligned bounding box is represented by the \var{Extends} class.
+It stores two vertices, \var{lower} and \var{upper}, which contain the minimum and maximum values for each Cartesian coordinate axis.
 %
-The cells of the regular grid are modeled by the \lstinline!Cell! class.
-Each cell contains its own bounding box, \lstinline!aabb!, the classification of the cell, \lstinline!classification!, and an array of the triangles contained within this cell, \lstinline!triangles!.
+The cells of the regular grid are modeled by the \var{Cell} class.
+Each cell contains its own bounding box, \var{aabb}, the classification of the cell, \var{classification}, and an array of the triangles contained within this cell, \var{triangles}.
 %
-Each triangle, described by the class \lstinline!Triangle!, stores its three vertices in counterclockwise order in the member \lstinline!vertices!.
-Additionally, the normal of the triangle is stored in \lstinline!normal!, computed from the triangle's vertices for performance reasons.
+Each triangle, described by the class \var{Triangle}, stores its three vertices in counterclockwise order in the member \var{vertices}.
+Additionally, the normal of the triangle is stored in \var{normal}, computed from the triangle's vertices for performance reasons.
 Especially intersection tests, \eg during ray casting or classification, read this field very frequently and benefit from precomputation.
-Each triangle also stores an unsigned integer, \lstinline!structure!, referencing the swept volume/structure this triangle belongs to.
+Each triangle also stores an unsigned integer, \var{structure}, referencing the swept volume/structure this triangle belongs to.
 This field is used to group triangles inside a cell by the swept volume they originated from.
 %
-Finally, the \lstinline!Vertex! class represents a simple 3-dimensional spatial point, storing the coordinates in its \lstinline!values! member.
+Finally, the \var{Vertex} class represents a simple 3-dimensional spatial point, storing the coordinates in its \var{values} member.
 
 \begin{figure}
 	\centering

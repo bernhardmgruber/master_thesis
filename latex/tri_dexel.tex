@@ -234,8 +234,8 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 		\\
 		\Function{CreateRay}{$\var{box}, \var{axis0}, \var{axis1}, \var{axis2}, \var{\Delta x}, \var{\Delta y}, \var{x}, \var{y}, \var{xCount}, \var{yCount}$}
 			\State $\var{origin} \gets \var{box}.\var{lower}$
-			\State $\var{origin}_{\var{axis1}} \gets \var{origin}_{\var{axis1}} + \var{x} * \var{\Delta x}$
-			\State $\var{origin}_{\var{axis2}} \gets \var{origin}_{\var{axis2}} + \var{y} * \var{\Delta y}$
+			\State $\var{origin}_{\var{axis1}} \gets \var{origin}_{\var{axis1}} + \var{x} \cdot \var{\Delta x}$
+			\State $\var{origin}_{\var{axis2}} \gets \var{origin}_{\var{axis2}} + \var{y} \cdot \var{\Delta y}$
 			\State $\var{direction} = \var{Vertex}(0, 0, 0)$
 			\State $\var{direction}_{\var{axis0}} \gets 1$
 			\State \Return $\var{Ray}(\var{origin}, \var{direction})$
@@ -327,7 +327,7 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 							\State $\var{start} \gets \Call{DepthToGrid}{\var{seg}.\var{start}.\var{depth}, \var{axis0}, \var{res}, \var{box}}$
 							\State $\var{end} \gets \Call{DepthToGrid}{\var{seg}.\var{end}.\var{depth}, \var{axis0}, \var{res}, \var{box}}$
 							\For{$\var{axis0Val} \gets \var{start} \To \var{end}$}
-								\State $\var{gridFrom}$
+								\State $\var{gridFrom} \gets (0, 0, 0)$
 								\State $\var{gridFrom}_{\var{axis0}} \gets \var{axis0Val}$
 								\State $\var{gridFrom}_{\var{axis1}} \gets \var{axis1Val}$
 								\State $\var{gridFrom}_{\var{axis2}} \gets \var{axis2Val}$
@@ -1238,16 +1238,18 @@ In this case, the cell is not sent to triangulation but to a new cell slicing al
 		\EndFunction
 		\\
 		\Function{FindDividers}{$\var{cell}$}
-			\State $\var{rangesPerAxis} \gets \var{array}(3, \var{array}())$
+			\State $\var{axisRanges} \gets \var{array}(3, \var{array}())$
 			\For{$ \var{i} \gets 0 \To 11 $}
 				\LineComment{Same vars as in regularization, algorithm \ref{alg:tri_dexel_regularization}, line \ref{alg:line:reg_vars_begin} to \ref{alg:line:reg_vars_end}}
-				\If{$(\var{srcOcc} \wedge \var{dstOcc} \wedge |\var{segs}| > 1) \vee (\neg \var{srcOcc} \wedge \neg \var{dstOcc} \wedge |\var{segs}| > 0) \vee (\var{srcOcc} \neq \var{dstOcc} \wedge |\var{segs}| > 1)$}
-					\State $\var{rangesPerAxis}_{\var{axis}}.\var{add}(\Call{SegmentsToRanges}{\var{segs}, \var{srcDepth}, \var{dstDepth}})$
+				\If{$(\var{srcOcc} \wedge \var{dstOcc} \wedge |\var{segs}| > 1) \vee {}$\hfill\break
+					\hspace*{\dimexpr\algorithmicindent*3}$(\neg \var{srcOcc} \wedge \neg \var{dstOcc} \wedge |\var{segs}| > 0) \vee {}$\hfill\break
+					\hspace*{\dimexpr\algorithmicindent*3}$ (\var{srcOcc} \neq \var{dstOcc} \wedge |\var{segs}| > 1)$}
+					\State $\var{axisRanges}_{\var{axis}}.\var{add}(\Call{SegmentsToRanges}{\var{segs}, \var{srcDepth}, \var{dstDepth}})$
 				\EndIf
 			\EndFor
 			\State $\var{dividers} \gets (\var{array}(), \var{array}(), \var{array}())$
 			\For{$\var{axis} \gets 0 \To 2$}
-				\State $\var{ranges} \gets \var{rangesPerAxis}_{\var{axis}}$
+				\State $\var{ranges} \gets \var{axisRanges}_{\var{axis}}$
 				\State $\Call{Sort}{\var{ranges}}$ \Comment{Sort by range start}
 				\State $\var{dividers}_{\var{axis}}.\var{add}(\var{cell}.\var{aabb}.\var{lower}_{\var{axis}})$
 				\State $(\var{start}, \var{end}) \gets \var{ranges}_0$
@@ -1332,7 +1334,7 @@ Whereas the first method creates fewer dividers and therefore fewer sub cells wh
 In algorithm \ref{alg:tri_dexel_cell_slicing}, the first method is implemented as it produces overall better results.
 Dividers are also computed per axis from the list of ranges found for the current axis, sorted by the ranges' start.
 On each axis, the first divider is the bounding box itself, \ie the component of the box's lower vertex corresponding to the current axis.
-Then, an interval $(start, end)$ is set to the first range, indicating a range of possible dividers.
+Then, an interval $(\var{start}, \var{end})$ is set to the first range, indicating a range of possible dividers.
 This interval is now iteratively adapted/narrowed to span as many ranges as possible.
 For this purpose, a loop iterates over all remaining ranges.
 If the start of the current range does exceed the current interval, \ie the range's start is larger than the interval's end, a divider is created for the current interval and the interval reset to the current range.

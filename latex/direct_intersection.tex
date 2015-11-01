@@ -106,16 +106,16 @@ It returns a list of structures, where each structure is a set of triangles.
 	\begin{algorithmic}[1]
 		\Function{DirectIntersection}{$\var{grid}$}
 			\State $\var{result} \gets \varnothing$
-			\ForAll{$\var{c} \in \var{grid.cells}$}
-				\If{$\var{c.classification} = \var{surface}$}
-					\State $\var{structures} \gets \Call{SeparateStructures}{\var{c.triangles}}$
+			\ForAll{$\var{cell} \in \var{grid}.\var{cells}$}
+				\If{$\var{cell}.\var{classification} = \var{surface}$}
+					\State $\var{structures} \gets \Call{SeparateStructures}{\var{cell}.\var{triangles}}$
 					\If{$\left\vert{\var{structures}}\right\vert = 1$}
-						\State $\var{result} \gets \var{result} \cup \Call{ClipStructure}{\var{structures.pop()}, \var{c.aabb}}$
+						\State $\var{result} \gets \var{result} \cup \Call{ClipStructure}{\var{structures}.\var{pop}(), \var{cell}.\var{aabb}}$
 					\ElsIf{$\left\vert{\var{structures}}\right\vert > 1$}
-						\State $\var{acc} \gets \var{structures.pop()}$
+						\State $\var{acc} \gets \var{structures}.\var{pop}()$
 						\While{$\left\vert{\var{structures}}\right\vert > 0$}
-							\State $\var{s} \gets \var{structures.pop()}$
-							\State $\var{acc} \gets \Call{UnionStructure}{\var{acc}, \var{s}, \var{c.aabb}}$
+							\State $\var{s} \gets \var{structures}.\var{pop}()$
+							\State $\var{acc} \gets \Call{UnionStructure}{\var{acc}, \var{s}, \var{cell}.\var{aabb}}$
 						\EndWhile
 						\State $\var{result} \gets \var{result} \cup \var{acc}$
 					\EndIf
@@ -124,19 +124,19 @@ It returns a list of structures, where each structure is a set of triangles.
 			\State \Return $\var{result}$
 		\EndFunction
 		\\
-		\Function{UnionStructure}{$\var{s_1}, \var{s_2}, \var{cellBox}$}
-			\ForAll{$\var{s} \in \{\var{s_1}, \var{s_2\}}$}
+		\Function{UnionStructure}{$\var{s}_1, \var{s}_2, \var{cellBox}$}
+			\ForAll{$\var{s} \in \{\var{s}_1, \var{s}_2\}$}
 				\State $s \gets \Call{ClipStructure}{\var{s}, \var{cellBox}}$
 			\EndFor
-			\State $\var{lines} \gets \var{map()}$ \Comment{maps each triangle to a set of lines}
-			\ForAll{$(\var{t_1}, \var{t_2}) \in \var{s_1} \times \var{s_2}$}
-				\State $\var{l} \gets \Call{IntersectTriangles}{\var{t_1}, \var{t_2}}$
+			\State $\var{lines} \gets \var{map}()$ \Comment{maps each triangle to a set of lines}
+			\ForAll{$(\var{t}_1, \var{t}_2) \in \var{s}_1 \times \var{s}_2$}
+				\State $\var{l} \gets \Call{IntersectTriangles}{\var{t}_1, \var{t}_2}$
 				\If{$\var{l}$} \Comment{no intersection line may be found}
-					\State $\var{lines}(\var{t_1}) \gets \var{lines}(\var{t_1}) \cup \{\var{l}\}$
-					\State $\var{lines}(\var{t_2}) \gets \var{lines}(\var{t_2}) \cup \{\var{l}\}$
+					\State $\var{lines}(\var{t}_1) \gets \var{lines}(\var{t}_1) \cup \{\var{l}\}$
+					\State $\var{lines}(\var{t}_2) \gets \var{lines}(\var{t}_2) \cup \{\var{l}\}$
 				\EndIf
 			\EndFor
-			\ForAll{$\var{s} \in \{\var{s_1}, \var{s_2}\}$}
+			\ForAll{$\var{s} \in \{\var{s}_1, \var{s}_2\}$}
 				\State $\var{s'} \gets \varnothing$
 				\ForAll{$\var{t} \in \var{s}$}
 					\State $\var{s'} \gets \var{s'} \cup \Call{SplitTriangle}{\var{t}, \var{lines}(\var{t})}$
@@ -144,7 +144,7 @@ It returns a list of structures, where each structure is a set of triangles.
 				\State $\var{s} \gets \var{s'}$
 			\EndFor
 			\State $\var{result} \gets \varnothing$
-			\ForAll{$(\var{s}, \var{s'}) \in \{(\var{s_1}, \var{s_2}), (\var{s_2}, \var{s_1})\}$}
+			\ForAll{$(\var{s}, \var{s'}) \in \{(\var{s}_1, \var{s}_2), (\var{s}_2, \var{s}_1)\}$}
 				\ForAll{$\var{t} \in \var{s}$}
 					\If{$\neg \Call{IsTriangleInsideStructure}{\var{t}, \var{s'}}$}
 						\State $\var{result} \gets \var{result} \cup \{\var{t}\}$
@@ -210,18 +210,18 @@ After all vertices have been processed, the result list is return, representing 
 		\Function{ClipStructure}{$\var{s}, \var{aabb}$}
 			\State $\var{s'} \gets \varnothing$
 			\ForAll{$\var{t} \in \var{s}$}
-				\State $\var{s'} \gets \var{s'} \cup \Call{ClipPolygonAABB}{\var{t.vertices}, \var{aabb}}$
+				\State $\var{s'} \gets \var{s'} \cup \Call{ClipPolygonAABB}{\var{t}.\var{vertices}, \var{aabb}}$
 			\EndFor
 			\State \Return $\var{s'}$
 		\EndFunction
 		\\
 		\Function{ClipPolygonAABB}{$\var{vertices}, \var{aabb}$}
-			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 1, 0, 0), \var{aabb.lower.x}}$
-			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}(-1, 0, 0), \var{aabb.upper.x}}$
-			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 1, 0), \var{aabb.lower.y}}$
-			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0,-1, 0), \var{aabb.upper.y}}$
-			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0, 1), \var{aabb.lower.z}}$
-			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0,-1), \var{aabb.upper.z}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 1, 0, 0), \var{aabb}.\var{lower}.\var{x}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}(-1, 0, 0), \var{aabb}.\var{upper}.\var{x}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 1, 0), \var{aabb}.\var{lower}.\var{y}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0,-1, 0), \var{aabb}.\var{upper}.\var{y}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0, 1), \var{aabb}.\var{lower}.\var{z}}$
+			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0,-1), \var{aabb}.\var{upper}.\var{z}}$
 			
 			\State \Return $\Call{Trianglulate}{\Call{Unique}{\var{vertices}}}$
 		\EndFunction
@@ -229,20 +229,20 @@ After all vertices have been processed, the result list is return, representing 
 		\Function{ClipPolygonPlane}{$\var{vertices}, \var{n}, \var{d}$}
 			\State $\var{result} \gets \var{array}()$
 			\State $\var{prev} \gets |\var{vertices}| - 1$
-			\State $\var{prevDist} \gets \var{vertices_{prev}} * \var{n} - \var{d};$
+			\State $\var{prevDist} \gets \var{vertices}_\var{prev} \cdot \var{n} - \var{d};$
 			\For{$\var{i} \gets 0 \To |\var{vertices}| - 1$}
-				\State $\var{dist} \gets \var{vertices_i} * \var{n} - \var{d}$;
+				\State $\var{dist} \gets \var{vertices}_\var{i} \cdot \var{n} - \var{d}$;
 				\If{$(\var{dist} < 0 \wedge \var{prevDist} \geq 0) \vee (\var{dist} \geq 0 \wedge \var{prevDist} < 0)$}
-					\State $\var{edge} \gets (\var{vertices_i} - \var{vertices_{prev}})$
-					\State $\var{edge} \gets \var{edge} * \frac{\var{dist}}{\var{n} * \var{edge}}$
-					\State $\var{v} \gets \var{vertices_i} - \var{edge}$
-					\State $\var{result.add}(\var{v})$
+					\State $\var{edge} \gets (\var{vertices}_\var{i} - \var{vertices}_\var{prev})$
+					\State $\var{edge} \gets \var{edge} \cdot (\var{dist} \div (\var{n} \cdot \var{edge}))$
+					\State $\var{v} \gets \var{vertices}_\var{i} - \var{edge}$
+					\State $\var{result}.\var{add}(\var{v})$
 				\EndIf
 				\If{$\var{dist} \geq 0$}
-					\State $\var{result.add}(\var{vertices_i});$
+					\State $\var{result}.\var{add}(\var{vertices}_\var{i})$
 				\EndIf
-				\State $\var{prev} \gets i$;
-				\State $\var{prevDist} \gets \var{dist}$;
+				\State $\var{prev} \gets i$
+				\State $\var{prevDist} \gets \var{dist}$
 			\EndFor
 			\State \Return $\var{result}$
 		\EndFunction
@@ -250,9 +250,9 @@ After all vertices have been processed, the result list is return, representing 
 		\Function{Triangulate}{$\var{vertices}$}
 			\State $\var{result} \gets \varnothing$
 			\If{$|vertices| \geq 3$}
-				\State $\var{c} \gets \var{vertices_0}$
+				\State $\var{c} \gets \var{vertices}_0$
 				\For{$\var{i} \gets 2 \To |\var{vertices}| - 1$}
-					\State $\var{result} \gets \var{result} \cup \{\var{Triangle}(\var{c}, \var{vertices_{i - 1}}, \var{vertices_i})\}$
+					\State $\var{result} \gets \var{result} \cup \{\var{Triangle}(\var{c}, \var{vertices}_{\var{i} - 1}, \var{vertices}_\var{i})\}$
 				\EndFor
 			\EndIf
 			\State \Return $\var{result}$
@@ -279,20 +279,20 @@ The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{IntersectTriangles}{$\var{t_1}, \var{t_2}$}
+		\Function{IntersectTriangles}{$\var{t}_1, \var{t}_2$}
 			\State $\var{hasIntersected} =$ \Call{tri\_tri\_intersect\_with\_isectline}{$\hfill\break
 				% the phantoms at the line starts make sure all hspaces start at the same position
-				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t_1.vertices_0}, \var{t_1.vertices_1}, \var{t_1.vertices_2},\hfill\break
-				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t_2.vertices_0}, \var{t_2.vertices_1}, \var{t_2.vertices_2},\hfill\break
-				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\out\var{isCoplanar}, \out\var{p_1}, \out\var{p_2}$} \Comment{Output parameters}
-			\If{$hasIntersected \wedge \neg isCoplanar$}
-				\State \Return $(\var{p_1}, \var{p_2})$ \Comment{Otherwise return nothing}
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t}_1.\var{vertices}_0, \var{t}_1.\var{vertices}_1, \var{t}_1.\var{vertices}_2,\hfill\break
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t}_2.\var{vertices}_0, \var{t}_2.\var{vertices}_1, \var{t}_2.\var{vertices}_2,\hfill\break
+				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\out\var{isCoplanar}, \out\var{p}_1, \out\var{p}_2$} \Comment{Output parameters}
+			\If{$\var{hasIntersected} \wedge \neg \var{isCoplanar}$}
+				\State \Return $(\var{p}_1, \var{p}_2)$ \Comment{Otherwise return nothing}
 			\EndIf
 		\EndFunction
 	\end{algorithmic}
 	\caption{
 		Adapter to the Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
-		This algorithm calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p_1}$ and $\var{p_2}$ as output parameters.
+		This algorithm calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p}_1$ and $\var{p}_2$ as output parameters.
 	}
 	\label{alg:triangle_intersection}
 \end{algorithm}
@@ -390,31 +390,31 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 	\centering
 	\begin{algorithmic}[1]
 		\Function{SplitTriangle}{$\var{t}, \var{lines}$}
-			\State $\var{points} \gets \{\var{t.a}, \var{t.b}, \var{t.c}\}$ \Comment{Ordered set}
-			\ForAll{$\var{(p_1, p_2)} \in \var{lines}$}
-				\State $\var{points} \gets \var{points} \cup \{\var{p_1}, \var{p_2}\}$
+			\State $\var{points} \gets \{\var{t}.\var{a}, \var{t}.\var{b}, \var{t}.\var{c}\}$ \Comment{Ordered set}
+			\ForAll{$(\var{p}_1, \var{p}_2) \in \var{lines}$}
+				\State $\var{points} \gets \var{points} \cup \{\var{p}_1, \var{p}_2\}$
 			\EndFor
-			\State $\var{axis_0} \gets \Call{LargestAxis}{t.normal}$
-			\State $\var{axis_1} \gets (\var{axis_0} + 1) \bmod 3$ 
-			\State $\var{axis_2} \gets (\var{axis_0} + 2) \bmod 3$
+			\State $\var{axis}_0 \gets \Call{LargestAxis}{\var{t}.\var{normal}}$
+			\State $\var{axis}_1 \gets (\var{axis}_0 + 1) \bmod 3$ 
+			\State $\var{axis}_2 \gets (\var{axis}_0 + 2) \bmod 3$
 			\State $\var{points2} \gets \varnothing$ \Comment{Project 3D to 2D points, order must remain}
 			\ForAll{$\var{p} \in points$}
-				\State $\var{points2} \gets \var{points2} \cup \{\var{Vector2}(\var{p_{axis_1}}, \var{p_{axis_2}})\}$
+				\State $\var{points2} \gets \var{points2} \cup \{\var{Vector2}(\var{p}_{\var{axis}_1}, \var{p}_{\var{axis}_2})\}$
 			\EndFor
 			\State $\var{cdt} \gets \var{ConstrainedDelaunay2()}$
-			\ForAll{$(\var{p_1}, \var{p_2}) \in \var{lines}$} \Comment{Add constraints}
-				\State $\var{cdt.Insert}((\var{points.indexof}(\var{p_1}), \var{points.indexof}(\var{p_2})), \dots)$
+			\ForAll{$(\var{p}_1, \var{p}_2) \in \var{lines}$} \Comment{Add constraints}
+				\State $\var{cdt}.\var{Insert}((\var{points}.\var{indexof}(\var{p}_1), \var{points}.\var{indexof}(\var{p}_2)), \dots)$
 			\EndFor
 			\State $\var{cdt}(|\var{points2}|, \var{points2}, \epsilon)$ \Comment{Compute CDT}
-			\State $\var{indices} \gets \var{cdt.GetIndices()}$
+			\State $\var{indices} \gets \var{cdt}.\var{GetIndices}()$
 			\State $\var{triangles} \gets \varnothing$
-			\For{$\var{i} \gets 0 \To \frac{|\var{indices}|}{3} - 1$}
+			\For{$\var{i} \gets 0 \To |\var{indices}| \div 3 - 1$}
 				\State $\var{f} \gets \var{triangle()}$
 				\For{$\var{j} \gets 0 \To 2$}
-					\State $\var{index} \gets \var{indices_{i * 3 + j}}$
-					\State $\var{f_j} = \var{points_{index}}$
+					\State $\var{index} \gets \var{indices}_{3\var{i} + \var{j}}$
+					\State $\var{f}_\var{j} = \var{points}_{\var{index}}$
 				\EndFor
-				%\If{$\var{f.normal} * \var{t.normal} < 0$}
+				%\If{$\var{f.normal} \cdot \var{t.normal} < 0$}
 				%	\State $\var{swap}(\var{f.a}, \var{f.b})$ \Comment{Swap two vertices to reverse winding}
 				%\EndIf
 				\State $\var{triangles} \gets \var{triangles} \cup \{\var{f}\}$
@@ -423,14 +423,14 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 		\EndFunction
 		\\
 		\Function{LargestAxis}{$\var{v}$}
-			\If{$\var{v.x} > \var{v.y}$}
-				\If{$\var{v.x} > \var{v.z}$}
+			\If{$\var{v}.\var{x} > \var{v}.\var{y}$}
+				\If{$\var{v}.\var{x} > \var{v}.\var{z}$}
 					\State \Return $0$
 				\Else
 					\State \Return $2$
 				\EndIf
 			\Else 
-				\If{$\var{v.y} > \var{v.z}$}
+				\If{$\var{v}.\var{y} > \var{v}.\var{z}$}
 					\State \Return $1$
 				\Else
 					\State \Return $2$
@@ -440,7 +440,7 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 	\end{algorithmic}
 	\caption{
 		Adapter to the CDT routine provided by the GTE library.
-		Uses the $\var{ConstrainedDelaunay2}$ class template to generate a CDT for a given triangle and a set of constrained edges.
+		Uses the \var{ConstrainedDelaunay2} class template to generate a CDT for a given triangle and a set of constrained edges.
 		The resulting triangulation is returned.
 	}
 	\label{alg:triangle_splitting}
@@ -493,35 +493,35 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algo
 	\centering
 	\begin{algorithmic}[1]
 		\Function{IsTriangleInsideStructure}{$\var{t}, \var{s}$}
-			\State $\var{origin} \gets \frac{\var{t.a} + \var{t.b} + \var{t.c}}{3}$ \Comment{Origin is triangle center}
-			\State $\var{target} \gets \frac{\var{s_0.a} + \var{s_0.b} + \var{s_0.c}}{3}$ \Comment{Target ray at center of $\var{s_0}$}
+			\State $\var{origin} \gets (\var{t}.\var{a} + \var{t}.\var{b} + \var{t}.\var{c}) \div 3$ \Comment{Origin is triangle center}
+			\State $\var{target} \gets (\var{s}_0.\var{a} + \var{s}_0.\var{b} + \var{s}_0.\var{c}) \div 3$ \Comment{Target ray at center of $\var{s}_0$}
 			\State $\var{ray} \gets \var{target} - \var{origin}$
-			\State $\var{d_{nearest}} \gets \var{ray.length}()$
-			\State $\var{n_{nearest}} \gets \var{s_0.normal}$
-			\State $\var{raydir} \gets \var{ray.normalized()}$
-			\ForAll{$\var{f} \in \var{s} \setminus \{\var{s_0}\}$} \Comment{Retarget ray at closer triangle if intersected}
+			\State $\var{d}_{\var{nearest}} \gets \var{ray}.\var{length}()$
+			\State $\var{n}_{\var{nearest}} \gets \var{s}_0.\var{normal}$
+			\State $\var{raydir} \gets \var{ray}.\var{normalized}()$
+			\ForAll{$\var{f} \in \var{s} \setminus \{\var{s}_0\}$} \Comment{Retarget ray at closer triangle if intersected}
 				\If{$\Call{IntersectRayTriangle}{\var{origin}, \var{raydir}, \var{f}, \out\var{d}, \out\var{u}, \out\var{v}}$}
-					\If{$\var{d} > 0 \wedge \var{d} < \var{d_{nearest}}$}
-						\State $\var{d_{nearest}} \gets \var{d}$
-						\State $\var{n_{nearest}} \gets \var{f.normal}$
+					\If{$\var{d} > 0 \wedge \var{d} < \var{d}_{\var{nearest}}$}
+						\State $\var{d}_{\var{nearest}} \gets \var{d}$
+						\State $\var{n}_{\var{nearest}} \gets \var{f}.\var{normal}$
 					\EndIf
 				\EndIf
 			\EndFor
-			\State \Return $\var{n_{nearest}} * \var{rayDir} \geq 0$
+			\State \Return $\var{n}_{\var{nearest}} \cdot \var{rayDir} \geq 0$
 		\EndFunction
 		\\
-		\Function{IntersectRayTriangle}{$origin, direction, t, d, u, v$}
-			\State $\var{vertex_0} \gets \var{t.a}$
-			\State $\var{edge_1} \gets \var{t.b} - \var{t.a}$
-			\State $\var{edge_2} \gets \var{t.c} - \var{t.a}$
-			\State $\var{tVec} \gets \var{origin} - \var{vertex_0}$
-			\State $\var{pVec} \gets \var{direction} \times \var{edge_2}$
-			\State $\var{det} \gets \var{edge_1} \cdot \var{pVec}$
+		\Function{IntersectRayTriangle}{$\var{origin}, \var{direction}, \var{t}, \var{d}, \var{u}, \var{v}$}
+			\State $\var{vertex}_0 \gets \var{t}.\var{a}$
+			\State $\var{edge}_1 \gets \var{t}.\var{b} - \var{t}.\var{a}$
+			\State $\var{edge}_2 \gets \var{t}.\var{c} - \var{t}.\var{a}$
+			\State $\var{tVec} \gets \var{origin} - \var{vertex}_0$
+			\State $\var{pVec} \gets \var{direction} \times \var{edge}_2$
+			\State $\var{det} \gets \var{edge}_1 \cdot \var{pVec}$
 			\State $\var{u} \gets \var{tVec} \cdot \var{pVec}$
-			\State $\var{qVec} \gets \var{tVec} \times \var{edge_1}$
-			\State $\var{v} \gets \var{qVec} *\cdot \var{direction}$
-			\State $\var{invDet} \gets \frac{1}{\var{det}}$
-			\State $\var{d} \gets \var{edge_2} \cdot \var{qVec} \cdot \var{invDet}$
+			\State $\var{qVec} \gets \var{tVec} \times \var{edge}_1$
+			\State $\var{v} \gets \var{qVec} \cdot \var{direction}$
+			\State $\var{invDet} \gets 1 \div \var{det}$
+			\State $\var{d} \gets \var{edge}_2 \cdot \var{qVec} \cdot \var{invDet}$
 			\State $\var{u} \gets \var{u} \cdot \var{invDet}$
 			\State $\var{v} \gets \var{v} \cdot \var{invDet}$
 			\State \Return $(\var{u} \geq 0) \wedge (\var{v} \geq 0) \wedge (\var{u} + \var{v} \leq 1)$
@@ -545,7 +545,7 @@ If they point into the same half space, the ray's origin and therefore the teste
 
 For ray-triangle intersection the famous Möller-Trumbore intersection test is used \cite{ray_triangle_intersection_moller}.
 An implementation of their algorithm in C is already given in the corresponding paper.
-The original version has a few early exit tests on $u$ and $v$, which might save some work in case the ray misses the triangle.
+The original version has a few early exit tests on \var{u} and \var{v}, which might save some work in case the ray misses the triangle.
 However, branching is becoming increasingly expensive on modern hardware architectures, especially in vectorized code paths or GPU code.
 A branch-free version of Möller-Trumbore's code, which is currently used and performs slightly better, is shown in algorithm \ref{alg:triangle_inside_test}.
 
