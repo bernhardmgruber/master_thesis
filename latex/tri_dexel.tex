@@ -168,18 +168,18 @@ Based on the discussed tri-dexel types, the basic reconstruction algorithm is sh
 		\Function{TriDexel}{$\var{grid}, \var{resolution}$}
 			\State $\var{box} = \var{Extends}(\var{grid}.\var{aabb}.\var{lower} - \epsilon, \var{grid}.\var{aabb}.\var{upper} + \epsilon)$
 			\State $\var{res} = \Call{UniformResolution}{\var{box}, \var{resolution}}$
-			\State \Call{Reconstruct}{$grid, box, resolution$}
+			\State $\Call{Reconstruct}{\var{grid}, \var{box}, \var{resolution}}$
 		\EndFunction
 		\\
-		\Function{Reconstruct}{$grid, box, resolution$}
+		\Function{Reconstruct}{$\var{grid}, \var{box}, \var{resolution}$}
 			\State $\var{img} = \var{TriDexelImage}(\var{res})$ \label{alg:line:tri_dexel_begin}
 			\State $\Call{AxisParallelRaycast}{\var{grid}, \var{box}, \var{res},\hfill\break
 				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{img}.\var{images}_{\var{axis}}.\var{dexels}_{\var{x}, \var{y}}.\var{nodes}.\var{add}(\var{Node}(\var{v}_{\var{axis}}, \var{n}))}$
 			\State $\var{dgrid} = \Call{CreateTriDexelGrid}{\var{img}, \var{box}}$
 			\State $\var{triangles} \gets \varnothing$
-			\ForAll{$\var{c} \in \var{dgrid}.\var{cells}()$}
-				\State $\Call{RegularizeCell}{\var{c}}$
-				\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{c}}$
+			\ForAll{$\var{cell} \in \var{dgrid}.\var{cells}()$}
+				\State $\Call{RegularizeCell}{\var{cell}}$
+				\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{cell}}$
 			\EndFor
 			\State \Return $\var{triangles}$
 		\EndFunction
@@ -224,7 +224,7 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 				\State $\Delta \var{y} \gets (\var{box}.\var{upper}_{\var{axis2}} - \var{box}.\var{lower}_{\var{axis2}}) \div (\var{yCount} - 1)$
 				\For{$\var{y} \gets 0 \To \var{yCount} - 1$}
 					\For{$\var{x} \gets 0 \To \var{xCount} - 1$}
-						\State $ray = \Call{CreateRay}{\var{box}, \var{axis0}, \var{axis1}, \var{axis2}, \var{\Delta x}, \var{\Delta y}, \var{x}, \var{y}}$
+						\State $\var{ray} = \Call{CreateRay}{\var{box}, \var{axis0}, \var{axis1}, \var{axis2}, \var{\Delta x}, \var{\Delta y}, \var{x}, \var{y}}$
 						\State $\Call{CastRay}{\var{grid}, \var{axis0}, \var{axis1}, \var{axis2}, \var{ray},\hfill\break
 							\hspace*{\dimexpr\algorithmicindent*5}(\var{v}, \var{n}) \rightarrow \var{hitFunc}(\var{axis0}, \var{x}, \var{y}, \var{v}, \var{n})}$
 					\EndFor
@@ -234,8 +234,8 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 		\\
 		\Function{CreateRay}{$\var{box}, \var{axis0}, \var{axis1}, \var{axis2}, \var{\Delta x}, \var{\Delta y}, \var{x}, \var{y}, \var{xCount}, \var{yCount}$}
 			\State $\var{origin} \gets \var{box}.\var{lower}$
-			\State $\var{origin}_{axis1} \gets \var{origin}_{\var{axis1}} + \var{x} * \var{\Delta x}$
-			\State $\var{origin}_{axis2} \gets \var{origin}_{\var{axis2}} + \var{y} * \var{\Delta y}$
+			\State $\var{origin}_{\var{axis1}} \gets \var{origin}_{\var{axis1}} + \var{x} * \var{\Delta x}$
+			\State $\var{origin}_{\var{axis2}} \gets \var{origin}_{\var{axis2}} + \var{y} * \var{\Delta y}$
 			\State $\var{direction} = \var{Vertex}(0, 0, 0)$
 			\State $\var{direction}_{\var{axis0}} \gets 1$
 			\State \Return $\var{Ray}(\var{origin}, \var{direction})$
@@ -314,14 +314,14 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 	\begin{algorithmic}[1]
 		\Function{CreateTriDexelGrid}{$\var{triImage}, \var{box}$}
 			\State $\var{res} = \var{triImage}.\var{res}$
-			\State $\var{grid} = \var{TriDexelGrid}(\var{res}, \var{box})$ \Comment{$\forall x, y, z : grid.occupancy_{x, y, z} = \False$}
+			\State $\var{grid} = \var{TriDexelGrid}(\var{res}, \var{box})$ \Comment{$\forall \var{x}, \var{y}, \var{z} : \var{grid}.\var{occupancy}_{\var{x}, \var{y}, \var{z}} = \False$}
 			\For{$\var{axis0} \gets 0 \To 2$}
 				\State $\var{axis1} \gets (\var{axis0} + 1) \bmod 3$
 				\State $\var{axis2} \gets (\var{axis0} + 2) \bmod 3$
-				\State $\var{image} \gets \var{triImage.images}_{\var{axis0}}$
+				\State $\var{image} \gets \var{triImage}.\var{images}_{\var{axis0}}$
 				\For{$\var{axis1Val} \gets 0 \To \var{res}_{\var{axis1}} - 1$}
 					\For{$\var{axis2Val} \gets 0 \To \var{res}_{\var{axis2}} - 1$}
-						\State $\var{dexel} \gets image.\var{dexels}_{\var{axis1Val}, \var{axis2Val}}$
+						\State $\var{dexel} \gets \var{image}.\var{dexels}_{\var{axis1Val}, \var{axis2Val}}$
 						\ForAll{$\var{seg} \in \var{dexel}.\var{segments}()$}
 							\LineComment{Compute affected grid point range}
 							\State $\var{start} \gets \Call{DepthToGrid}{\var{seg}.\var{start}.\var{depth}, \var{axis0}, \var{res}, \var{box}}$
@@ -332,7 +332,7 @@ Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{Cr
 								\State $\var{gridFrom}_{\var{axis1}} \gets \var{axis1Val}$
 								\State $\var{gridFrom}_{\var{axis2}} \gets \var{axis2Val}$
 								\State $\var{gridTo} \gets \var{gridFrom}$
-								\State $\var{gridTo}_{axis0} \gets \var{gridTo}_{\var{axis0}} + 1$
+								\State $\var{gridTo}_{\var{axis0}} \gets \var{gridTo}_{\var{axis0}} + 1$
 								\State $\var{depthFrom} = \Call{GridToDepth}{\var{gridFrom}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
 								\State $\var{depthTo}   = \Call{GridToDepth}{\var{gridTo}_{\var{axis0}}, \var{axis0}, \var{res}, \var{box}}$
 								\LineComment{Point occupancy}
@@ -479,8 +479,8 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 				\State $\var{axis} \gets \var{edgeToAxis}_{\var{src}, \var{dst}}$
 				\State $\var{srcPoint} \gets \var{cell}.\var{realPoints}_{\var{src}}$
 				\State $\var{dstPoint} \gets \var{cell}.\var{realPoints}_{\var{dst}}$
-				\State $\var{srcDepth} \gets \var{srcPoint}_{axis}$
-				\State $\var{dstDepth} \gets \var{dstPoint}_{axis}$
+				\State $\var{srcDepth} \gets \var{srcPoint}_{\var{axis}}$
+				\State $\var{dstDepth} \gets \var{dstPoint}_{\var{axis}}$
 				\State $\var{srcOcc} \gets \var{cell}.\var{occupancy}_{\var{src}}$
 				\State $\var{dstOcc} \gets \var{cell}.\var{occupancy}_{\var{dst}}$
 				\label{alg:line:reg_vars_end}
@@ -1201,11 +1201,11 @@ This new cell slicing algorithm is integrated into the existing code by adapting
 		\Function{Reconstruct}{$grid, box, resolution$}\hfill\break
 			\hspace*{\dimexpr\algorithmicindent*1}\dots
 			\setalglineno{11}
-			\ForAll{$\var{c} \in \var{dgrid}.\var{cells}()$}
-				\If{$\Call{RegularizeCell}{\var{c}, \True}$}
-					\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{c}}$
+			\ForAll{$\var{cell} \in \var{dgrid}.\var{cells}()$}
+				\If{$\Call{RegularizeCell}{\var{cell}, \True}$}
+					\State $\var{triangles} \gets \var{triangles} \cup \Call{TriangulateCell}{\var{cell}}$
 				\Else
-					\State $\var{triangles} \gets \var{triangles} \cup \Call{SliceCell}{c, grid}$
+					\State $\var{triangles} \gets \var{triangles} \cup \Call{SliceCell}{\var{cell}, \var{grid}}$
 				\EndIf
 			\EndFor
 			\State \Return $\var{triangles}$
@@ -1225,62 +1225,62 @@ In this case, the cell is not sent to triangulation but to a new cell slicing al
 \begin{algorithm}
 	\centering
 	\begin{algorithmic}[1]
-		\Function{SliceCell}{$cell, grid$}
-			\State $(xdiv, ydiv, zdiv) \gets \Call{FindDividers}{cell}$
-			\State $triangles \gets \varnothing$
-			\ForAll{$x \gets 0 \To |xdiv| - 2, y \gets 0 \To |ydiv| - 2, z \gets 0 \To |zdiv| - 2$}
-				\State $lower \gets Vertex(xdiv_{x}, ydiv_{y}, zdiv_{z})$
-				\State $upper \gets Vertex(xdiv_{x + 1}, ydiv_{y + 1}, zdiv_{z + 1})$
-				\State $box \gets Extends(lower, upper)$
-				\State $\var{triangles} \gets \var{triangles} \cup \Call{Reconstruct}{grid, box, (2, 2, 2)}$
+		\Function{SliceCell}{$\var{cell}, \var{grid}$}
+			\State $(\var{xdiv}, \var{ydiv}, \var{zdiv}) \gets \Call{FindDividers}{\var{cell}}$
+			\State $\var{triangles} \gets \varnothing$
+			\ForAll{$\var{x} \gets 0 \To |\var{xdiv}| - 2, \var{y} \gets 0 \To |\var{ydiv}| - 2, \var{z} \gets 0 \To |\var{zdiv}| - 2$}
+				\State $\var{lower} \gets \var{Vertex}(\var{xdiv}_{\var{x}    }, \var{ydiv}_{\var{y}    }, \var{zdiv}_{\var{z}    })$
+				\State $\var{upper} \gets \var{Vertex}(\var{xdiv}_{\var{x} + 1}, \var{ydiv}_{\var{y} + 1}, \var{zdiv}_{\var{z} + 1})$
+				\State $\var{box} \gets \var{Extends}(\var{lower}, \var{upper})$
+				\State $\var{triangles} \gets \var{triangles} \cup \Call{Reconstruct}{\var{grid}, \var{box}, (2, 2, 2)}$
 			\EndFor
-			\State \Return $triangles$
+			\State \Return $\var{triangles}$
 		\EndFunction
 		\\
-		\Function{FindDividers}{$cell$}
-			\State $rangesPerAxis \gets array(3, array())$
+		\Function{FindDividers}{$\var{cell}$}
+			\State $\var{rangesPerAxis} \gets \var{array}(3, \var{array}())$
 			\For{$ \var{i} \gets 0 \To 11 $}
 				\LineComment{Same vars as in regularization, algorithm \ref{alg:tri_dexel_regularization}, line \ref{alg:line:reg_vars_begin} to \ref{alg:line:reg_vars_end}}
-				\If{$(srcOcc \wedge dstOcc \wedge |segs| > 1) \vee (\neg srcOcc \wedge \neg dstOcc \wedge |segs| > 0) \vee (srcOcc \neq dstOcc \wedge |segs| > 1)$}
-					\State $rangesPerAxis_{axis}.add(\Call{SegmentsToRanges}{segs, srcDepth, dstDepth})$
+				\If{$(\var{srcOcc} \wedge \var{dstOcc} \wedge |\var{segs}| > 1) \vee (\neg \var{srcOcc} \wedge \neg \var{dstOcc} \wedge |\var{segs}| > 0) \vee (\var{srcOcc} \neq \var{dstOcc} \wedge |\var{segs}| > 1)$}
+					\State $\var{rangesPerAxis}_{\var{axis}}.\var{add}(\Call{SegmentsToRanges}{\var{segs}, \var{srcDepth}, \var{dstDepth}})$
 				\EndIf
 			\EndFor
-			\State $dividers \gets (array(), array(), array())$
-			\For{$axis \gets 0 \To 2$}
-				\State $ranges \gets rangesPerAxis_{axis}$
-				\State $\Call{Sort}{ranges}$ \Comment{Sort by range start}
-				\State $dividers_{axis}.add(cell.aabb.lower_{axis})$
-				\State $(start, end) \gets ranges_0$
-				\For{$i \gets 1 \To |ranges| - 1$}
-					\If{${ranges_{i}}_0 > end$}
-						\State $dividers_{axis}.add((start + end) \div 2)$
-						\State $(start, end) \gets ranges_i$
+			\State $\var{dividers} \gets (\var{array}(), \var{array}(), \var{array}())$
+			\For{$\var{axis} \gets 0 \To 2$}
+				\State $\var{ranges} \gets \var{rangesPerAxis}_{\var{axis}}$
+				\State $\Call{Sort}{\var{ranges}}$ \Comment{Sort by range start}
+				\State $\var{dividers}_{\var{axis}}.\var{add}(\var{cell}.\var{aabb}.\var{lower}_{\var{axis}})$
+				\State $(\var{start}, \var{end}) \gets \var{ranges}_0$
+				\For{$\var{i} \gets 1 \To |\var{ranges}| - 1$}
+					\If{${\var{ranges}_{\var{i}}}_0 > \var{end}$}
+						\State $\var{dividers}_{\var{axis}}.\var{add}((\var{start} + \var{end}) \div 2)$
+						\State $(\var{start}, \var{end}) \gets \var{ranges}_{\var{i}}$
 					\Else
-						\State $start \gets {ranges_i}_0$
-						\State $end \gets \Call{Min}{end, {ranges_i}_1}$
+						\State $\var{start} \gets {\var{ranges}_{\var{i}}}_0$
+						\State $\var{end} \gets \Call{Min}{\var{end}, {\var{ranges}_{\var{i}}}_1}$
 					\EndIf
 				\EndFor
-				\State $dividers_{axis}.add((start + end) \div 2)$
-				\State $dividers_{axis}.add(cell.aabb.upper_{axis})$
+				\State $\var{dividers}_{\var{axis}}.\var{add}((\var{start} + \var{end}) \div 2)$
+				\State $\var{dividers}_{\var{axis}}.\var{add}(\var{cell}.\var{aabb}.\var{upper}_{\var{axis}})$
 			\EndFor
-			\State \Return $dividers$
+			\State \Return $\var{dividers}$
 		\EndFunction
 		\\
-		\Function{SegmentsToRanges}{$segs, srcDepth, dstDepth$}
-			\State $depths \gets array()$
-			\ForAll{$seg \in segs$}
-				\If{$seg.start.depth \neq srcDepth$}
-					\State $depths.add(seg.start.depth)$
+		\Function{SegmentsToRanges}{$\var{segs}, \var{srcDepth}, \var{dstDepth}$}
+			\State $\var{depths} \gets \var{array}()$
+			\ForAll{$\var{seg} \in \var{segs}$}
+				\If{$\var{seg}.\var{start}.\var{depth} \neq \var{srcDepth}$}
+					\State $\var{depths}.\var{add}(\var{seg}.\var{start}.\var{depth})$
 				\EndIf
-				\If{$seg.end.depth \neq dstDepth$}
-					\State $depths.add(seg.end.depth)$
+				\If{$\var{seg}.\var{end}.\var{depth} \neq \var{dstDepth}$}
+					\State $\var{depths}.\var{add}(\var{seg}.\var{end}.\var{depth})$
 				\EndIf
 			\EndFor
-			\State $ranges \gets array()$
-			\For{$i \gets 0 \To |depths| - 2$}
-				\State $ranges.add((depths_{i}, depths_{i + 1}))$
+			\State $\var{ranges} \gets \var{array}()$
+			\For{$\var{i} \gets 0 \To |\var{depths}| - 2$}
+				\State $\var{ranges}.\var{add}((\var{depths}_{\var{i}}, \var{depths}_{\var{i} + 1}))$
 			\EndFor
-			\State \Return $ranges$
+			\State \Return $\var{ranges}$
 		\EndFunction
 	\end{algorithmic}
 	\caption{
