@@ -177,7 +177,7 @@ Based on the discussed tri-dexel types, the basic reconstruction algorithm is sh
 	\centering
 	\begin{algorithmic}[1]
 		\Function{TriDexel}{$\var{grid}, \var{resolution}$}
-			\State $\var{box} = \var{Extends}(\var{grid}.\var{aabb}.\var{lower} - \epsilon, \var{grid}.\var{aabb}.\var{upper} + \epsilon)$
+			\State $\var{box} = \var{Extends}(\var{grid}.\var{aabb}.\var{lower} - \epsilon_{\var{box}}, \var{grid}.\var{aabb}.\var{upper} + \epsilon_{\var{box}})$
 			\State $\var{res} = \Call{UniformResolution}{\var{box}, \var{resolution}}$
 			\State $\Call{Reconstruct}{\var{grid}, \var{box}, \var{resolution}}$
 		\EndFunction
@@ -962,7 +962,7 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 				\State $\var{intermed} \gets \Call{IntersectPlanes}{\var{cellPlane}, \var{aPlane}, \var{bPlane}}$
 				\If{$\var{intermed} \wedge \var{inside}(\var{intermediate})$}
 					\State $\var{dist} \gets \Call{PointLineDistance}{\var{a}.\var{position}, \var{b}.\var{position}, \var{intermed}}$
-					\If{$\var{dist} > \delta$}
+					\If{$\var{dist} > \epsilon_{\var{line}}$}
 						\State $\var{finalLoop}.\var{add}(\var{intermed})$
 						\State $\var{isEdgeVertex}.\var{add}(\False)$
 						\State $\var{intermedCount} \gets \var{intermedCount} + 1$
@@ -1011,7 +1011,7 @@ By calling \textproc{IntersectPlanes}, the intersection point of the three plane
 The returned result in \var{intermed} is tested for validity as \textproc{IntersectPlanes} may return an empty result if no intersection could be found.
 Furthermore, the intersection point must lie within the bounds of the cell.
 If these conditions are satisfied, the distance from the line between the pair of vertices to the calculated intersection point is measured.
-If this distance is larger than a specified and small $\delta$, the intersection point is accepted as an intermediate vertex.
+If this distance is larger than a specified and small $\epsilon_{\var{line}}$, the intersection point is accepted as an intermediate vertex.
 It is therefore added to the final loop.
 As it is not an edge vertex, \False is added to the \var{isEdgeVertex} list.
 Furthermore, the intermediate vertex counter is incremented and both edge vertices are added to the list of candidates for apex creation.
@@ -1386,7 +1386,7 @@ These ranges are shown in orange in figure \ref{fig:cellslicing_dividers} and re
 The tri-dexel surface reconstruction algorithm shown in this chapter consists of a number of steps.
 The first one is the creation of a tri-dexel image by raycasting the VML's data model.
 The size of the tri-dexel image and therefore the number of created rays is parameterized by the user.
-Typical resolutions range from 50 for quick approximations up to several hundred\footnote{Resolutions of up to 600 were successfully tested before hitting the 16GiB physical RAM limit on the used machine.} for fine and detailed reconstructions.
+Typical resolutions range from 50 for quick approximations up to several hundred\footnote{Resolutions of up to 600 were successfully tested before hitting the \SI{16}{\gibi\byte} physical RAM limit on the used machine.} for fine and detailed reconstructions.
 As the number of created rays for a cubic grid with a resolution of $n$ is $3n^2$ and the ray traversal and intersection is perfectly isolated, parallelization of the raycast is embarrassingly simple and usually yields a high number of independent work items.
 
 Concerning the implementation, all 3 for loops in algorithm \ref{alg:tri_dexel_raycast} are viable candidates for parallel execution.
@@ -1447,14 +1447,14 @@ Table \ref{tbl:tri_dexel_results} contains the runtime and output size of the te
 		\begin{tabular}{l|rr|rr|rr|rr}
 			resolution     & \multicolumn{2}{c}{50} & \multicolumn{2}{c}{100} & \multicolumn{2}{c}{200} & \multicolumn{2}{c}{400} \\
 			scene          & t\sub{out} & time & t\sub{out} & time & t\sub{out} & time & t\sub{out} & time \\
-			\hline
-			cube2          & 55k & 137ms & 222k & 1.1s & 901k & 10.5s & 3.6m & 203s \\
-			cylinders\_d   & 33k &  39ms & 112k & 0.3s & 436k &  2.1s & 1.7m &  27s \\
-			cylinders      & 30k &  34ms & 112k & 0.3s & 435k &  2.1s & 1.7m &  26s \\
-			cylinder\_head & 74k &  56ms & 263k & 0.4s & 965k &  2.9s & 3.8m &  32s \\
-			impeller       & 76k & 135ms & 242k & 0.6s & 853k &  3.3s & 3.0m &  27s \\
-			impeller\_2    & 62k &  95ms & 195k & 0.5s & 696k &  3.1s & 2.5m &  31s \\
-			turbine        & 38k & 179ms & 162k & 0.8s & 629k &  3.7s & 2.3m &  21s \\
+			\midrule
+			cube2          & \SI{55}{\kilo\nothing} & \SI{137}{\milli\second} & \SI{222}{\kilo\nothing} & \SI{1.1}{\second} & \SI{901}{\kilo\nothing} & \SI{10.5}{\second} & \SI{3.6}{\mega\nothing} & \SI{203}{\second} \\
+			cylinders\_d   & \SI{33}{\kilo\nothing} & \SI{ 39}{\milli\second} & \SI{112}{\kilo\nothing} & \SI{0.3}{\second} & \SI{436}{\kilo\nothing} & \SI{ 2.1}{\second} & \SI{1.7}{\mega\nothing} & \SI{ 27}{\second} \\
+			cylinders      & \SI{30}{\kilo\nothing} & \SI{ 34}{\milli\second} & \SI{112}{\kilo\nothing} & \SI{0.3}{\second} & \SI{435}{\kilo\nothing} & \SI{ 2.1}{\second} & \SI{1.7}{\mega\nothing} & \SI{ 26}{\second} \\
+			cylinder\_head & \SI{74}{\kilo\nothing} & \SI{ 56}{\milli\second} & \SI{263}{\kilo\nothing} & \SI{0.4}{\second} & \SI{965}{\kilo\nothing} & \SI{ 2.9}{\second} & \SI{3.8}{\mega\nothing} & \SI{ 32}{\second} \\
+			impeller       & \SI{76}{\kilo\nothing} & \SI{135}{\milli\second} & \SI{242}{\kilo\nothing} & \SI{0.6}{\second} & \SI{853}{\kilo\nothing} & \SI{ 3.3}{\second} & \SI{3.0}{\mega\nothing} & \SI{ 27}{\second} \\
+			impeller\_2    & \SI{62}{\kilo\nothing} & \SI{ 95}{\milli\second} & \SI{195}{\kilo\nothing} & \SI{0.5}{\second} & \SI{696}{\kilo\nothing} & \SI{ 3.1}{\second} & \SI{2.5}{\mega\nothing} & \SI{ 31}{\second} \\
+			turbine        & \SI{38}{\kilo\nothing} & \SI{179}{\milli\second} & \SI{162}{\kilo\nothing} & \SI{0.8}{\second} & \SI{629}{\kilo\nothing} & \SI{ 3.7}{\second} & \SI{2.3}{\mega\nothing} & \SI{ 21}{\second} \\
 		\end{tabular}
 		\caption{
 			Without cell slicing.
@@ -1467,14 +1467,14 @@ Table \ref{tbl:tri_dexel_results} contains the runtime and output size of the te
 		\begin{tabular}{l|rr|rr|rr|rr}
 			resolution     & \multicolumn{2}{c}{50} & \multicolumn{2}{c}{100} & \multicolumn{2}{c}{200} & \multicolumn{2}{c}{400} \\
 			scene          & t\sub{out} & time & t\sub{out} & time & t\sub{out} & time & t\sub{out} & time \\
-			\hline
-			cube2          & 55k &  138ms & 222k & 1.1s & 901k & 10.5s & 3.6m & 198s \\
-			cylinders\_d   & 33k &   38ms & 113k & 0.3s & 436k &  2.1s & 1.7m &  27s \\
-			cylinders      & 30k &   33ms & 112k & 0.3s & 435k &  2.1s & 1.7m &  26s \\
-			cylinder\_head & 81k &  102ms & 276k & 0.5s & 988k &  3.0s & 3.8m &  32s \\
-			impeller       & 82k &  743ms & 252k & 1.8s & 872k &  6.3s & 3.0m &  51s \\
-			impeller\_2    & 66k &  358ms & 200k & 1.0s & 708k &  3.9s & 2.5m &  38s \\
-			turbine        & 47k & 3068ms & 180k & 8.1s & 657k & 23.5s & 2.3m & 145s \\
+			\midrule
+			cube2          & \SI{55}{\kilo\nothing} & \SI{ 138}{\milli\second} & \SI{222}{\kilo\nothing} & \SI{1.1}{\second} & \SI{901}{\kilo\nothing} & \SI{10.5}{\second} & \SI{3.6}{\mega\nothing} & \SI{198}{\second} \\
+			cylinders\_d   & \SI{33}{\kilo\nothing} & \SI{  38}{\milli\second} & \SI{113}{\kilo\nothing} & \SI{0.3}{\second} & \SI{436}{\kilo\nothing} & \SI{ 2.1}{\second} & \SI{1.7}{\mega\nothing} & \SI{ 27}{\second} \\
+			cylinders      & \SI{30}{\kilo\nothing} & \SI{  33}{\milli\second} & \SI{112}{\kilo\nothing} & \SI{0.3}{\second} & \SI{435}{\kilo\nothing} & \SI{ 2.1}{\second} & \SI{1.7}{\mega\nothing} & \SI{ 26}{\second} \\
+			cylinder\_head & \SI{81}{\kilo\nothing} & \SI{ 102}{\milli\second} & \SI{276}{\kilo\nothing} & \SI{0.5}{\second} & \SI{988}{\kilo\nothing} & \SI{ 3.0}{\second} & \SI{3.8}{\mega\nothing} & \SI{ 32}{\second} \\
+			impeller       & \SI{82}{\kilo\nothing} & \SI{ 743}{\milli\second} & \SI{252}{\kilo\nothing} & \SI{1.8}{\second} & \SI{872}{\kilo\nothing} & \SI{ 6.3}{\second} & \SI{3.0}{\mega\nothing} & \SI{ 51}{\second} \\
+			impeller\_2    & \SI{66}{\kilo\nothing} & \SI{ 358}{\milli\second} & \SI{200}{\kilo\nothing} & \SI{1.0}{\second} & \SI{708}{\kilo\nothing} & \SI{ 3.9}{\second} & \SI{2.5}{\mega\nothing} & \SI{ 38}{\second} \\
+			turbine        & \SI{47}{\kilo\nothing} & \SI{3068}{\milli\second} & \SI{180}{\kilo\nothing} & \SI{8.1}{\second} & \SI{657}{\kilo\nothing} & \SI{23.5}{\second} & \SI{2.3}{\mega\nothing} & \SI{145}{\second} \\
 		\end{tabular}
 		\caption{
 			With cell slicing.
@@ -1525,7 +1525,7 @@ The answer to this vast increase, especially in feature rich scenes like impelle
 The functions doing most individual work\footnote{
 	Functions having the most exclusive samples, \ie samples where the execution was inside the body of a function when the sample was taken, without samples of further functions called from the body.}
 are all found within the raycasting component.
-They are \textproc{IntersectCell} with 24\%, \textproc{IntersectTriangle} with 17\% and a operating system function handling heap allocations.
+They are \textproc{IntersectCell} with \SI{24}{\percent}, \textproc{IntersectTriangle} with \SI{17}{\percent} and a operating system function handling heap allocations with \SI{9}{\percent}.
 Of further interest is also the stage of the algorithm at which these functions are heavily used.
 Apart from the initial raycast, these functions still make up almost half of the used CPU power.
 The reason therefore is the high cost of traversing rays through the VML's regular grid and intersecting them with the encountered triangles.
@@ -1559,7 +1559,7 @@ However, as fully occupied and non-occupied cells do not need any processing, on
 In the last second, triangulation has been finished for almost all cells.
 Most of the work left is freeing allocated resources, which takes quite a while and is again serialized by the operating system, causing the utilization to drop drastically for the last second.
 
-Regarding the allocated memory, in addition to the VML's regular grid holding the impeller scene in 600 MiB, the tri-dexel algorithm requires approximately 425 MiB additional memory, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
+Regarding the allocated memory, in addition to the VML's regular grid holding the impeller scene in \SI{600}{\mebi\byte}, the tri-dexel algorithm requires approximately \SI{425}{\mebi\byte} additional memory, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
 On third of the memory is allocated before the raycast, another third during the raycast and the last third when building the tri-dexel grid.
 While cells are processed, cell data is aggregated, regularized, triangulated and immediately freed again.
 Therefore, the memory consumption remains almost constant during the further execution after the grid construction.

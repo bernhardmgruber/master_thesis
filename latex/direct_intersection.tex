@@ -352,7 +352,7 @@ As output they generate a Delaunay mesh, with the convex hull of the point cloud
 	\centering
 	\begin{tabular}{p{3cm} l l p{2.1cm} p{3.9cm}}
 		Library                                          &                           & Language & License                                  & Notes                                                             \\
-		\hline
+		\midrule
 		poly2tri                                         & \cite{poly2tri}           & C++      & BSD                                      & Constrains via polylines must not touch each other                \\
 		Triangle                                         & \cite{triangle_lib}       & C        & Custom, free for non-commercial use      & Difficult interface and memory management                         \\
 		Geometric Tools Engine (GTE)                     & \cite{gte}                & C++      & Boost License                            & modern C++11, SIMD and GPGPU support, high standard documentation \\
@@ -710,14 +710,14 @@ The test scenes and their configurations are shown in table \ref{tbl:test_scenes
 	\centering
 	\begin{tabular}{lrrrrrrrr}
 		Scene          & SVs  & cells & surf. & tri.  & s\textsubscript{max} & s\textsubscript{avg} \\
-		\hline
-		cube2          &    1 &   1k & 47 \% &   0.8k &  2 & 1.1 \\
-		cylinders\_d   &    1 &   1k & 22 \% &     7k &  2 & 1.1 \\
-		cylinders      &    1 &   1k & 22 \% &     4k &  2 & 1.1 \\
-		cylinder\_head &   20 &  75k & 21 \% &    80k &  3 & 1.2 \\
-		impeller       & 2383 & 400k & 16 \% &  6000k & 64 & 5.5 \\
-		impeller\_2    & 1191 & 400k & 13 \% &  3000k & 64 & 3.6 \\
-		turbine        &  480 & 200k & 17 \% & 16000k &  6 & 2.3 \\
+		\midrule
+		cube2          &    1 & \SI{  1}{\kilo\nothing} & \SI{47}{\percent} & \SI{  0.8}{\kilo\nothing} &  2 & 1.1 \\
+		cylinders\_d   &    1 & \SI{  1}{\kilo\nothing} & \SI{22}{\percent} & \SI{    7}{\kilo\nothing} &  2 & 1.1 \\
+		cylinders      &    1 & \SI{  1}{\kilo\nothing} & \SI{22}{\percent} & \SI{    4}{\kilo\nothing} &  2 & 1.1 \\
+		cylinder\_head &   20 & \SI{ 75}{\kilo\nothing} & \SI{21}{\percent} & \SI{   80}{\kilo\nothing} &  3 & 1.2 \\
+		impeller       & 2383 & \SI{400}{\kilo\nothing} & \SI{16}{\percent} & \SI{ 6000}{\kilo\nothing} & 64 & 5.5 \\
+		impeller\_2    & 1191 & \SI{400}{\kilo\nothing} & \SI{13}{\percent} & \SI{ 3000}{\kilo\nothing} & 64 & 3.6 \\
+		turbine        &  480 & \SI{200}{\kilo\nothing} & \SI{17}{\percent} & \SI{16000}{\kilo\nothing} &  6 & 2.3 \\
 	\end{tabular}
 	\caption{
 		Table containing the selected test scenes and several parameters of them.
@@ -891,25 +891,25 @@ Table \ref{tbl:direct_intersection_results} contains the runtime and output size
 \begin{table}[!]
 	\centering
 	\begin{tabular}{lrrrr}
-		scene          & SVs  & t\sub{in} & t\sub{out} & time \\
-		\hline
-		cube2          &    1 &   0.8k &    1k &   1ms \\
-		cylinders\_d   &    1 &     7k &   10k &   6ms \\
-		cylinders      &    1 &     4k &    7k &   9ms \\
-		cylinder\_head &   20 &    80k &  149k & 229ms \\
-		impeller       & 2383 &  6000k & 1677k &  21s  \\
-		impeller\_2    & 1191 &  3000k & 1296k &  11s  \\
-		turbine        &  480 & 16000k &  752k & 280s  \\
+		scene          & SVs  & t\sub{in} & t\sub{out} & {time} \\
+		\midrule
+		cube2          &    1 & \SI{  0.8}{\kilo\nothing} & \SI{   1}{\kilo\nothing} & \SI{  1.0}{\milli\second} \\
+		cylinders\_d   &    1 & \SI{    7}{\kilo\nothing} & \SI{  10}{\kilo\nothing} & \SI{  6.0}{\milli\second} \\
+		cylinders      &    1 & \SI{    4}{\kilo\nothing} & \SI{   7}{\kilo\nothing} & \SI{  9.0}{\milli\second} \\
+		cylinder\_head &   20 & \SI{   80}{\kilo\nothing} & \SI{ 149}{\kilo\nothing} & \SI{229.0}{\milli\second} \\
+		impeller       & 2383 & \SI{ 6000}{\kilo\nothing} & \SI{1677}{\kilo\nothing} & \SI{ 21.0}{      \second} \\
+		impeller\_2    & 1191 & \SI{ 3000}{\kilo\nothing} & \SI{1296}{\kilo\nothing} & \SI{ 11.0}{      \second} \\
+		turbine        &  480 & \SI{16000}{\kilo\nothing} & \SI{ 752}{\kilo\nothing} & \SI{280.0}{      \second} \\
 	\end{tabular}
 	\caption{
 		Test results for the direct intersection surface extraction approach.
-		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at 3.4 GHz with 16 GiB RAM.
+		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
 		Runtime is averaged over 10 runs.
 	}
 	\label{tbl:direct_intersection_results}
 \end{table}
 %
-The timings vary a lot from 1ms for the simple cube2 scene up to 280s for the turbine scene.
+The timings vary a lot from \SI{1}{\milli\second} for the simple cube2 scene up to \SI{280}{\second} for the turbine scene.
 The runtime depends on multiple characteristics of the input.
 The number of swept volumes increase the runtime linearly, as seen when comparing the timings of the impeller and impeller\_2 scene.
 This consequence can also be derived from algorithm \ref{alg:direct_intersection} where the \textproc{DirectIntersection} function performs a pairwise reduction of all structures of a single cell, a linear operation.
@@ -922,7 +922,7 @@ As the grid resolution is almost identical in these scenes, the parts of a swept
 An increase in the number of triangles per structure, raises the runtime quadratically in several sub-algorithms.
 Having a look on the basic structure of the direct intersection approach in algorithm \ref{alg:direct_intersection}, the \textproc{ClipStructure} and the \textproc{SplitTriangle} functions run linearly with the number of triangles per structure, whereas the \textproc{IntersectTriangle} and \textproc{IsTriangleInsideStructure} form nested loops on all triangles of the structure, \ie require quadratic time.
 Considering the additional code required to increase numeric stability discussed in section \ref{sec:numeric_improvements}, the collapsing of near points of a structure is also a quadratic operation.
-The algorithms with quadratic runtime also light up in profiling sessions with \textproc{IntersectTriangle} consuming 38\%, near points collapsing 26\% and \textproc{IsTriangleInsideStructure} 18\% of the total runtime.
+The algorithms with quadratic runtime also light up in profiling sessions with \textproc{IntersectTriangle} consuming \SI{38}{\percent}, near points collapsing \SI{26}{\percent} and \textproc{IsTriangleInsideStructure} \SI{18}{\percent} of the total runtime.
 The grid resolution affects the runtime by partitioning the whole problem into smaller parts.
 A finer grid causes structures to be smaller and the output to contain fewer errors as cells contain fewer structures and triangles.
 Especially the quadratic functions benefit from smaller structures.
@@ -947,12 +947,12 @@ The CPU utilization during an single run of the direct intersection approach on 
 %
 The CPU cores are almost perfectly utilized for the first 20 seconds.
 Afterwards, the workload drops done to zero within the last 3 seconds of the run.
-The PPL's default scheduler already does a pretty good job by keeping all cores utilized for 85\% of the runtime.
+The PPL's default scheduler already does a pretty good job by keeping all cores utilized for \SI{85}{\percent} of the runtime.
 This slow drop at the end of the test run might be improved by employing a better scheduling strategy.
 However, more complex scheduling usually also increases the parallelization overhead.
 %
-Concerning memory, the regular grid holding the impeller requires approximately 600 MiB memory.
-During the algorithm, 300 MiB additional memory has been allocated, mostly for the temporary union structures and the buffer holding the resulting surface.
+Concerning memory, the regular grid holding the impeller requires approximately \SI{600}{\mebi\byte} memory.
+During the algorithm, \SI{300}{\mebi\byte} additional memory has been allocated, mostly for the temporary union structures and the buffer holding the resulting surface.
 
 Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes.
 %
