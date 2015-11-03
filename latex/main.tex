@@ -15,6 +15,8 @@ draft,
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[binary-units=true]{siunitx}
 \usepackage[final]{graphicx}
 \usepackage{subcaption}
 \usepackage[style=numeric,backend=biber,urldate=iso8601]{biblatex}
@@ -109,6 +111,11 @@ draft,
 \counterwithout{table}{chapter}
 
 %
+% siunitx
+%
+\DeclareSIUnit{\nothing}{\relax}
+
+%
 % misc
 %
 % Increase line spacing for wbackfrieder for corrections
@@ -144,6 +151,8 @@ draft,
 
 \newcommand{\sub}[1]{\textsubscript{#1}}
 
+\renewcommand{\mod}{\bmod}
+
 \begin{document}
 % ====================================================================================================
 % ===   Front matter                                                                               ===
@@ -177,15 +186,15 @@ draft,
 
 %\pagenumbering{arabic}
 
-\input{introduction}
-\input{fundamentals}
-\input{previous_work}
-\input{state_of_the_art}
-\input{direct_intersection}
-\input{tri_dexel}
-\input{bpa}
-\input{benchmarks}
-\input{conclusion}
+\include{introduction}
+\include{fundamentals}
+\include{previous_work}
+\include{state_of_the_art}
+\include{direct_intersection}
+\include{tri_dexel}
+\include{bpa}
+\include{benchmarks}
+\include{conclusion}
 
 % ====================================================================================================
 % ===   Back matter                                                                                ===
