@@ -101,12 +101,12 @@ Figure \ref{fig:tri_dexel_cell} shows the structure of a tri-dexel cell.
 	\label{fig:tri_dexel_cell}
 \end{figure}
 %
-Before a cell can be triangulated, a few consistency checks and corrections are applied to the cell.
+Before a cell is triangulated, a few consistency checks and corrections are applied to the cell.
 This process is called regularization and ensures a successful triangulation into a water-tight mesh.
 Afterwards, the cell is triangulated.
 For this purpose, a depth-first search process is iteratively started at non-occupied grid points of the cell to discover boundary loops.
-Basically, the found loops can be triangulated right away to obtain a water tight mesh.
-However, the quality of the triangulation can be further enhanced by taking normal information at the dexel nodes into account.
+Basically, the found loops may be triangulated right away to obtain a water tight mesh.
+However, the quality of the triangulation may be further enhanced by taking normal information at the dexel nodes into account.
 This is especially necessary to reconstruct features of the model.
 This optional feature reconstruction pass is run on the loops found in the previous step and may create additional vertices.
 
@@ -218,7 +218,7 @@ The raycast is performed with parallel, axis-aligned and equidistant rays.
 All rays start at the intersection points of a uniform, 2-dimensional grid placed on one side of the data model's slightly enlarged bounding box and end at the opposite side, \cf figure \ref{fig:dexel_image}.
 Three of these raycasts along the three axes of the coordinate system result in three dexel images.
 As the raycasting code is kept separated from the tri-dexel data structures, a function is passed to the raycasting code which is invoked each time a ray has found a surface intersection.
-Therefore, the same code can be used to create other data structures as well, \cf chapter \ref{ch:point_cloud_based}.
+Therefore, the same code is capable of creating other data structures as well, \cf chapter \ref{ch:point_cloud_based}.
 
 The entry routine and ray creation code of the raycasting algorithm is shown in algorithm \ref{alg:tri_dexel_raycast}.
 %
@@ -303,7 +303,7 @@ Furthermore, minor inconsistencies are tolerable and may result in a few pixel e
 However, when creating dexels, a consistent number of surface entries and exits as well as numerically correct ordering of the intersections is substantial.
 Consequently, such an intersection routine must employ a great deal of numeric precautions and extra checks to deliver a correct result, even sacrificing intersections for the sake of consistency.
 This procedure forms the heart of the raycasting algorithm.
-As it is quite comprehensive and highly tailored to the VML's internal data structures, the detailed pseudocode of the \textproc{IntersectCell} routine is omitted from the thesis.
+As it is quite comprehensive and highly tailored to the VML's internal data structures, the detailed pseudocode of the \textproc{IntersectCell} routine is omitted.
 
 
 \subsection{Tri-dexel image and grid generation}
@@ -641,7 +641,7 @@ Thus, in this case, all segments are simply replaced by an empty set.
 Rule three is applied if only one grid point is marked as occupied.
 If segments are present on the current edge, the algorithm tests whether the first or last segment touches the occupied grid point, or is very close to it.
 If the source point is marked, the first segment's start must touch or be near to it, \ie the start node's depth must not be further away from the grid point than a small $\rho$.
-This length can be chosen arbitrarily, but as its purpose is to correct a numeric issue, a tiny value is sufficient.
+This length may be chosen arbitrarily, but as its purpose is to correct a numeric issue, a tiny value is sufficient.
 In case the destination point is marked, the last segment's end must touch or be near it.
 If existing segments are nearer than $\rho$ to an occupied grid point, they are extended to reach it.
 If there are no segments on the edge or the present segments are not in close proximity to their appropriate points, a new dexel segment is added.
@@ -1164,7 +1164,7 @@ Still, features within a cell and especially thin features not crossing any grid
 The reason therefore is the the destructive regularization step described in section \ref{sec:tri_dexel_regularization}, which sacrifices smaller dexel segments in favor of regularity, throwing away useful information, especially of smaller features.
 To preserve this information and still obtain regular tri-dexel cells, which can be passed into the triangulation routines of sections \ref{sec:tri_dexel_triangulation} and \ref{sec:tri_dexel_refinement}, an alternative to the regularization algorithm has been developed.
 This novel approach depends on the ability to resample dexels at any time, an ability usually not given in scenarios where the dexel model is the main data model, \ie typical, dexel-based machining simulations.
-However, as the dexel model used for surface reconstruction is derived from the VML's internal data model, dexels can be arbitrarily recreated.
+However, as the dexel model used for surface reconstruction is derived from the VML's internal data model, it allows to arbitrarily recreate dexels.
 
 \begin{figure}
 	\centering
@@ -1737,5 +1737,5 @@ Figure \ref{fig:td_turbine_issues} shows these issues by the example of the outm
 	\label{fig:td_turbine_issues}
 \end{figure}
 %
-Still, these holes are usually thin and can be closed by a post processing step.
+Still, these holes are usually thin and closable by a post processing step.
 If all T-vertices are also fixed, \eg by splitting triangles at the edge spanning the T-vertex, meshes created with cell slicing enabled may still be converted into a manifold and closed result.
