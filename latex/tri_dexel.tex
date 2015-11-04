@@ -551,7 +551,8 @@ For each edge a bit of meta information is retrieved using some lookup tables.
 These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corners, edges and axes.
 %
 \begin{figure}
-	\begin{subfigure}[t]{0.24\textwidth}
+	\centering
+	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
 			\shortintertext{neighborIds:}
@@ -564,8 +565,8 @@ These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corn
 			6 &\colon (2, 4, 7) \\
 			7 &\colon (3, 6, 5)
 		\end{align*}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.24\textwidth}
+	\end{subfigure}%
+	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
 			\shortintertext{edgeToPointIds:}
@@ -582,8 +583,8 @@ These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corn
 			10 &\colon (2, 6) \\
 			11 &\colon (3, 7)
 		\end{align*}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.24\textwidth}
+	\end{subfigure}%
+	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
 			\shortintertext{pointsToEdgeId:}
@@ -600,8 +601,8 @@ These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corn
 			(2, 6), (6, 2) &\colon 10 \\
 			(3, 7), (7, 3) &\colon 11
 		\end{align*}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.24\textwidth}
+	\end{subfigure}%
+	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
 			\shortintertext{edgeToAxis:}
@@ -617,6 +618,18 @@ These tables are shown in figure \ref{fig:tri_dexel_tables} and relate cell corn
 			(1, 5), (5, 1) &\colon 2 \\
 			(2, 6), (6, 2) &\colon 2 \\
 			(3, 7), (7, 3) &\colon 2
+		\end{align*}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.4\textwidth}
+		\centering
+		\begin{align*}
+			\shortintertext{cellSideNormals:}
+			\binom{\{0, 2, 4, 6\}}{3} &\colon (         - 1,\phantom{-}0,\phantom{-}0) \\
+			\binom{\{1, 3, 5, 7\}}{3} &\colon (\phantom{-}1,\phantom{-}0,\phantom{-}0) \\
+			\binom{\{0, 1, 4, 5\}}{3} &\colon (\phantom{-}0,         - 1,\phantom{-}0) \\
+			\binom{\{2, 3, 6, 7\}}{3} &\colon (\phantom{-}0,\phantom{-}1,\phantom{-}0) \\
+			\binom{\{4, 5, 6, 7\}}{3} &\colon (\phantom{-}0,\phantom{-}0,         - 1) \\
+			\binom{\{0, 1, 2, 3\}}{3} &\colon (\phantom{-}0,\phantom{-}0,\phantom{-}1) \\
 		\end{align*}
 	\end{subfigure}
 	\caption{
@@ -955,7 +968,7 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 				\State $\var{finalLoop}.\var{add}(\var{a}.\var{position})$
 				\State $\var{isEdgeVertex}.\var{add}(\True)$
 				\State $\var{points} \gets \Call{Unique}{(\var{a}.\var{point}, \var{a}.\var{neigbor}, \var{b}.\var{point}, \var{b}.\var{neighbor})}$
-				\State $\var{n} \gets \var{cellPlaneNormals}_{\var{points}_0, \var{points}_1, \var{points}_2}$
+				\State $\var{n} \gets \var{cellSideNormals}_{\var{points}_0, \var{points}_1, \var{points}_2}$
 				\State $\var{cellPlane} \gets \var{Plane}(\var{n}, \var{cell}.\var{realPoints}_{\var{points}_0})$
 				\State $\var{aPlane} \gets \var{Plane}(\var{a}.\var{normal}, \var{a}.\var{position})$
 				\State $\var{bPlane} \gets \var{Plane}(\var{b}.\var{normal}, \var{b}.\var{position})$
@@ -1004,7 +1017,7 @@ A loop then iterates over all vertices \var{a} and their successors \var{b}, \ie
 Vertex \var{a} is added to the final loop and \True to \var{isEdgeVertex}.
 Afterwards, the four grid point indices of both edge vertices are collected and uniqued.
 As both edge vertices share a common side of the cell, the result is a list of grid point indices with either 4 or 3 elements, depending on whether or not one of them is shared.
-Three of these indices uniquely identify one of the cell's sides and are used as indices into another lookup table, \var{cellPlaneNormals}, storing the cell side's normal for each combination of three grid points. %TODO: add table
+Three of these indices uniquely identify one of the cell's sides and are used as indices into another lookup table, \var{cellSideNormals}, storing the cell side's normal for each combination of three grid points.
 The normal is retrieved using the first three grid points of the current edge vertex pair and stored in \var{n}.
 Now, three planes are created, one using the cell side's normal and the coordinate of a grid point on this cell side and two others from the pair of edge vertices.
 By calling \textproc{IntersectPlanes}, the intersection point of the three planes is calculated, which is a possible intermediate vertex.
