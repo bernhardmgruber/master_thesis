@@ -890,21 +890,22 @@ Table \ref{tbl:direct_intersection_results} contains the runtime and output size
 %
 \begin{table}[!]
 	\centering
-	\begin{tabular}{lrrrr}
-		scene          & SVs  & t\sub{in} & t\sub{out} & {time} \\
+	\begin{tabular}{lrrrrr}
+		scene          & SVs  & t\sub{in} & t\sub{out} & {time} & b. edges\\
 		\midrule
-		cube2          &    1 & \SI{  0.8}{\kilo\nothing} & \SI{   1}{\kilo\nothing} & \SI{  1.0}{\milli\second} \\
-		cylinders\_d   &    1 & \SI{    7}{\kilo\nothing} & \SI{  10}{\kilo\nothing} & \SI{  6.0}{\milli\second} \\
-		cylinders      &    1 & \SI{    4}{\kilo\nothing} & \SI{   7}{\kilo\nothing} & \SI{  9.0}{\milli\second} \\
-		cylinder\_head &   20 & \SI{   80}{\kilo\nothing} & \SI{ 149}{\kilo\nothing} & \SI{229.0}{\milli\second} \\
-		impeller       & 2383 & \SI{ 6000}{\kilo\nothing} & \SI{1677}{\kilo\nothing} & \SI{ 21.0}{      \second}\phantom{m} \\
-		impeller\_2    & 1191 & \SI{ 3000}{\kilo\nothing} & \SI{1296}{\kilo\nothing} & \SI{ 11.0}{      \second}\phantom{m} \\
-		turbine        &  480 & \SI{16000}{\kilo\nothing} & \SI{ 752}{\kilo\nothing} & \SI{280.0}{      \second}\phantom{m} \\
+		cube2          &    1 & \SI{  0.8}{\kilo\nothing} & \SI{   1}{\kilo\nothing} & \SI{  1.0}{\milli\second}            & \SI{ 75}{     \nothing} \\
+		cylinders\_d   &    1 & \SI{    7}{\kilo\nothing} & \SI{  10}{\kilo\nothing} & \SI{  6.0}{\milli\second}            & \SI{ 69}{     \nothing} \\
+		cylinders      &    1 & \SI{    4}{\kilo\nothing} & \SI{   7}{\kilo\nothing} & \SI{  9.0}{\milli\second}            & \SI{  1}{\kilo\nothing} \\ %   1078
+		cylinder\_head &   20 & \SI{   80}{\kilo\nothing} & \SI{ 149}{\kilo\nothing} & \SI{229.0}{\milli\second}            & \SI{ 22}{\kilo\nothing} \\ %  22432
+		impeller       & 2383 & \SI{ 6000}{\kilo\nothing} & \SI{1677}{\kilo\nothing} & \SI{ 21.0}{      \second}\phantom{m} & \SI{660}{\kilo\nothing} \\ % 659695
+		impeller\_2    & 1191 & \SI{ 3000}{\kilo\nothing} & \SI{1296}{\kilo\nothing} & \SI{ 11.0}{      \second}\phantom{m} & \SI{326}{\kilo\nothing} \\ % 326171
+		turbine        &  480 & \SI{16000}{\kilo\nothing} & \SI{ 752}{\kilo\nothing} & \SI{280.0}{      \second}\phantom{m} & \SI{402}{\kilo\nothing} \\ % 401917
 	\end{tabular}
 	\caption{
 		Test results for the direct intersection surface extraction approach.
 		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
 		Runtime is averaged over 10 runs.
+		The number of boundary edges were measured using MeshLab.
 	}
 	\label{tbl:direct_intersection_results}
 \end{table}
@@ -1057,14 +1058,20 @@ These errors may then cause consequential errors in \eg the triangle inside test
 As the impeller's grid contains cells with up to 64 structures, small mistakes add up iteratively and may cause huge defects on the final surface.
 Especially the cells which contain triangles from many swept volumes, \ie cells at the blade edges, suffer from this effect.
 The triangle inside test still does an acceptable job and the final surface does somehow resemble the surface of the machining result.
-Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles.
+Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles, \cf table \ref{tbl:direct_intersection_results}.
 Regarding the quality of the produced mesh, the result is probably worthless for subsequent tasks, like using it for simulations.
 
 The turbine scene seems to have a similar problem.
 Most of the intersections between stock and swept volume triangles have not been caught.
 As the total number of swept volumes is relatively low compared to the impeller scene and only very few of them intersect each other, the surface errors are considerably smaller.
-By deleting self-intersecting triangles from the outcome, an intelligent hole closing algorithm might be able to recover a closed surface, \eg an adaption of the ball-pivoting algorithm. %TODO cite BPA close boundary loops.
+By deleting self-intersecting triangles from the outcome, an intelligent hole closing algorithm might be able to recover a closed surface, \eg an adaption of the ball-pivoting algorithm \cite{bpa}.
 
 All extracted meshes in general have issues with neighboring triangles not having identical shared vertices.
 The difference however is neglectable and can easily be corrected in a post processing step which merges close vertices, \eg using the Merge Close Vertices filter of MeshLab.
 Furthermore, the result contains many T-vertices around intersected triangles which result from clipping a cell's triangles after the triangle-triangle intersections and retriangulations instead of before, \cf section \ref{sec:clipping}.
+
+In addition to timings and triangle counts, the results table \ref{tbl:direct_intersection_results} also lists the number of created boundary edges.
+These numbers are fairly high, especially at the real-world and complicated scenes.
+However, these numbers specify the number of edges at a boundary, not the number of holes, which is considerably smaller.
+In fact, most of the boundary edges in simpler scenes, \eg cylinders and cylinder\_head, are attributed to T-vertices.
+Nevertheless, more complex scenes like the impeller or turbine truly contain an extensive amount of holes, as sceen in their detailed renderings, \cf figure \ref{fig:di_scenes_artifacts}.

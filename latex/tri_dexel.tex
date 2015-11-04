@@ -1724,8 +1724,47 @@ Concave features, like the ones of the turbine, seem a bit harder to reconstruct
 
 Without using cell slicing, all meshes are manifold, closed and orientable.
 Enhancing the tri-dexel approach by slicing irregular cells greatly reduces dropping valuable information during regularization, resulting in far better refined features.
-But the improvement may create holes and T-vertices in the mesh at the border between regular cells and sliced cells, making the mesh orientable but not manifold and closed.
-Figure \ref{fig:td_turbine_issues} shows these issues by the example of the outmost rip of the cylinder\_head.
+Figure \ref{fig:td_features_and_cell_slicing} shows the difference of the reconstructed mesh when using no refinement/feature reconstruction, when using feature reconstruction and when using feature reconstruction and cell slicing.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.67\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinder_head_drilling_no_features}
+		\caption{no feature reconstruction}
+		\label{fig:td_cylinder_head_drilling_no_features}
+	\end{subfigure}
+	\bigskip\\
+	\begin{subfigure}[b]{0.67\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinder_head_drilling_features}
+		\caption{feature reconstruction}
+		\label{fig:td_cylinder_head_drilling_features}
+	\end{subfigure}
+	\bigskip\\
+	\begin{subfigure}[b]{0.67\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{td_cylinder_head_drilling_cell_slicing}
+		\caption{feature reconstruction and cell slicing}
+		\label{fig:td_cylinder_head_drilling_cell_slicing}
+	\end{subfigure}
+	\caption{
+		Details of the cylinder\_head scene rendered with the same perspective using MeshLab.
+		The renderings show the effects of refinement, feature reconstruction and cell slicing.
+		The meshes have been extracted using the tri-dexel approach at a resolution of 100.
+	}
+	\label{fig:td_features_and_cell_slicing}
+\end{figure}
+%
+Without feature reconstruction, almost no edges are reconstructed correctly.
+This is very well observable at drilling and the flat surface around it.
+Also the edges of the cylinder\_head's fins lack sharpness.
+Enabling feature reconstruction, \cf section \ref{sec:tri_dexel_refinement}, achieves a lot of correctness by using the normal information of the dexel image to calculate good intermediate/feature points and apex vertices.
+In addition to the feature reconstruction, the cell slicing strategy, \cf section \ref{sec:tri_dexel_cellslicing}, finally manages to also capture thin features, which were previously thrown away by the regularization.
+
+Although improving the outcome significantly, slicing cells is dangerous.
+It may create holes and T-vertices in the mesh, at the border between regular cells and sliced cells, making the mesh orientable but not manifold and closed.
+Figure \ref{fig:td_cylinder_head_issues} shows these issues by the example of the outmost rip of the cylinder\_head.
 %
 \begin{figure}
 	\centering
@@ -1747,8 +1786,47 @@ Figure \ref{fig:td_turbine_issues} shows these issues by the example of the outm
 		The hole is created at the border of a cell and a sliced cell, which is discussed in figure \ref{fig:tri_dexel_hole_creation}.
 		The meshes have been extracted using the tri-dexel approach with cell slicing at a resolution of 100.
 	}
-	\label{fig:td_turbine_issues}
+	\label{fig:td_cylinder_head_issues}
 \end{figure}
 %
 Still, these holes are usually thin and closable by a post processing step.
 If all T-vertices are also fixed, \eg by splitting triangles at the edge spanning the T-vertex, meshes created with cell slicing enabled may still be converted into a manifold and closed result.
+
+Table \ref{tbl:tri_dexel_boundary edges} contains the number of boundary edges for the tested scenes and resolutions and the tri-dexel variant using cell slicing.
+%
+\begin{table}
+\centering
+		\begin{tabular}{l|r|r|r|r}
+			resolution     &   50 &  100 &  200 &   400 \\
+			\midrule
+			cube2          &    0 &    0 &    0 &     0 \\
+			cylinders\_d   &    0 &  128 &  238 &   846 \\
+			cylinders      &    0 &    0 &    0 &     0 \\
+			cylinder\_head &  871 & 1880 & 4136 &  4966 \\
+			impeller       & 1129 & 2380 & 4654 & 11940 \\
+			impeller\_2    &  574 & 1191 & 3033 &  6050 \\
+			turbine        & 2006 & 3703 & 7181 & 13803 \\
+		\end{tabular}
+		\caption{
+			Created boundary edges by the tri-dexel surface extraction using cell-slicing and the test scenes described in \ref{tbl:test_scenes}.
+			All values were measured using MeshLab.
+			The meshes created without cell-slicing do not contain boundary edges.
+		}
+		\label{tbl:tri_dexel_boundary edges}
+\end{table}
+%
+These numbers are fairly smaller than the ones produced by the direct intersection approach discussed in chapter \ref{ch:direct_intersection}, \cf figure \ref{tbl:direct_intersection_results}.
+The cube2 and cylinders scene even contain no boundary edges at all, as no cells have been sliced.
+The reason therefore is that the geometry of both scenes is completely convex, resulting in very regular dexel images with long dexels typically spanning the whole workpiece.
+The cylinders\_d's triangulation, compared with the cylinders', for example is slightly concave at the lateral surface.
+Thus, close rays along these surfaces alternatingly enter and exit the surface, sometimes yielding short dexel segments which lead to irregular edges later.
+
+The more complex scenes produce a larger number of boundary edges, mostly attributed to T-vertices, although the results show, that the number of boundaries is not related to the scene's input triangle or swept volume count, \cf table \ref{tbl:test_scenes}.
+The number of boundaries is directly related to the number of irregular cells, which depends on the feature richness, \ie the shape, of the workpiece.
+The impeller\_2 scene, for example, contains roughly half as much feature-rich geometry as the impeller scene.
+In contrast, the cylinder\_head, despite consisting of two orders of magnitude less swept volumes as the impeller, still produces a third of the impeller's boundary edge count.
+
+Concerning the scenes themselves, the cylinder\_head creates almost all irregular cells and boundaries at the sharp edges of the fins, where subdivision is vital to extract these features.
+The impeller scene contains its boundary vertices distributed equally over the machined area.
+Finally, the turbine suffers a lot from numerical issues at the rays parallel and to the stock surface which are tinily underneath it, continually entering and exiting the flat surface.
+The sliced cells are again irregular and caught by the recursion limit of the cell slicing algorithm.
