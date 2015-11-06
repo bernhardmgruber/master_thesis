@@ -30,14 +30,14 @@ After a survey of existing approaches to surface reconstruction from models simi
 	Edelsbrunner \etal present a generalization of the convex hull called $\alpha$-shape \cite{alpha_shape} which constructs a Delaunay triangulation of the surface described by a set of points.
 	The algorithm is subject to a configured $\alpha$ which directly influences the amount of generated holes and the quality of features.
 	
-	Amenta \etal present the crust and power crust algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees, \eg water-tightness, for \enquote{good} inputs \cite{crust, power_crust}.
-	Amenta \etal further introduce the cocone algorithm \cite{cocone} which is extended by Dey \etal with tight cocone and robust cocone \cite{tight_cocone, robust_cocone}.
+	Based on the computation of Voronoi diagrams and medial axes, Amenta \etal present the crust and power crust algorithm for reconstructing Delaunay triangulations from point clouds with certain quality guarantees, \eg water-tightness, for \enquote{good} inputs \cite{crust, power_crust}.
+	Amenta \etal further introduce the cocone algorithm \cite{cocone} which is extended by Dey \etal with tight cocone, robust cocone and recently singular cocone \cite{tight_cocone, robust_cocone, singular_cocone}.
 	The crust and cocone families where originally designed to reconstruct surfaces from laser scans and can, partially, handle noise on the input data.
 	
 	Hoppe \etal present an algorithm which uses a signed distance function to describe the distance from each point to the estimated surface, \ie functional representation.
 	The contour of this function is then traced by a marching cubes variant to extract an iso surface, \ie triangle mesh \cite{sdf_surface_reconstruction}.
 	Further algorithms of this class are Poisson \cite{poisson}, Moving least squares (MLS) \cite{mls} and radial basis function (RBF) \cite{rbf}.
-	As all of these approaches are based on fitting an implicit function into the point cloud, they are robust against noisy clouds, \eg from laser scans.
+	As all of these approaches are based on fitting a function into the point cloud, they are robust against noisy clouds, \eg from laser scans.
 	
 	Bernardini \etal describe the ball-pivoting algorithm (BPA) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
 	Based on the BPA, the G2S algorithm, named after the Gabriel 2-simplex criterion, further improved speed and triangle quality by assuming local surface continuity \cite{g2s}.
