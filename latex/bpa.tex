@@ -1,10 +1,98 @@
 
-\chapter{Method 3: Ball pivoting algorithm}
-\label{ch:bpa}
+\chapter{Point cloud based methods}
+\label{ch:point_cloud_based}
 
-a.	Basic idea (1)
-b.	Point cloud (3)
-•	Triple orthogonal raycast, (adaptive?)
-c.	Ball pivoting algorithm (8)
-d.	(G2S algorithm) (6)
-e.	 Feature reconstruction??
+Reconstructing surfaces from point clouds is a lively branch in computational geometry.
+As discussed when summarizing the state of the art, \cf chapter \ref{ch:state_of_the_art}, several well-working methods have been developed to convert a set of points into a polyhedral surface, \ie triangle meshes in most cases.
+One possible explanation for this richness in algorithms is that point clouds are heavily used for their simplicity when digitizing real-world objects, \eg by scanning their surface with lasers or depth-sensing cameras.
+
+Some algorithms temporarily create intermediate representations, \eg Voronoi diagrams and medial axes, like the cocone \cite{cocone, tight_cocone, robust_cocone} and crust \cite{crust, power_crust} family, or functional ones, like the MLS \cite{mls}, RBF \cite{rbf} or signed distance functions \cite{sdf_surface_reconstruction} approaches.
+Thus, some of these algorithms have other uses as well beside surface reconstruction.
+Other methods create surface triangles directly, mostly by growing a region on the sampled surface.
+They are typically faster but more susceptible to noisy input, \eg BPA and G2S.
+Nevertheless, this collection of algorithms should also be available for reconstructing surfaces from the VML's data model.
+
+In the previous chapter \ref{ch:tri_dexel}, the tri-dexel based surface reconstruction approach relied on a raycast to sample the VML's regular grid into dexels.
+This raycast may just as well be used to sample other data structures as well.
+In its simplest form, by only collecting the surface hits, a point cloud is obtained.
+This point cloud may then be used as input to probably all point cloud based surface reconstruction algorithms, including the ones mentioned above.
+
+
+\section{Concept}
+\label{sec:point_cloud_concept}
+
+Using any kind of point cloud based algorithm for surface reconstruction from the VML's data model, boils down to two steps.
+Firstly, a point cloud has to be created from the VML's data model.
+This step is very similar and even simpler than the creation of the dexel image discussed in the previous chapter \ref{ch:tri_dexel}.
+The same raycasting technique, with all its error correcting and robustness enhancing code, will be used to sample surface intersections on the VML's data model.
+The resolution of the raycasting grid for each of the three axis-aligned casts is again supplied by the user, again providing a good parameter for steering quality and computational demands.
+%
+Secondly, after the point cloud has been created, a surface reconstruction algorithm is run on it.
+
+Regarding its quality, a point cloud sampled from the VML's regular grid using a uniform, axis-aligned raycast has a few properties:
+\begin{itemize}
+	\item
+	All surface points, excluding numeric errors, are usually perfect samples, lying directly on the workpiece's surface.
+	There is neither noise on the surface nor are there irrelevant inner or outer points.
+	\item
+	Each surface sample provides a perfect surface normal.
+	\item
+	The regularity of the raycaster guarantees a minimum and maximum density of the cloud, which may be derived from the ray distances along each axis.
+\end{itemize}
+
+Despite these quality guarantees, a point cloud is still less rich in semantics when compared with a tri-dexel image.
+The most prominent differences and commonalities are:
+\begin{itemize}
+	\item
+	Point clouds only store surface information, whereas a tri-dexel image also holds volumetric information, \ie the dexel segments and point occupancy of the tri-dexel grid.
+	\item
+	Although a sufficient density is necessary, point clouds do not profit from the regular and uniform sampling.
+	This property is fundamental for the tri-dexel approach, as it enables the construction of the regular tri-dexel grid and breaks down the problem of triangulation.
+	\item
+	The regularization of the tri-dexel cells provides a good way of detecting feature-rich regions which should be resampled with increased density.
+	Such regions are harder to find with a point cloud, although local point distance and normal variance might give good hints.
+	\item
+	Although no regularization step is needed for small peculiarities of the cloud, it depends solely on the used reconstruction algorithm whether such information can be extracted or is left unused.
+	Regarding the tri-dexel approach presented in chapter \ref{ch:tri_dexel}, such behavior is well-defined by either regularizing, \ie dropping, or slicing a cell with small features.
+	\item
+	In both cases, features which are not discovered by the raycaster are not present in the built data structures.
+	Subsequent algorithms have to implement some kind of feature reconstruction.
+	\item
+	Point clouds are simpler data structures and easier to exchange with other 3D software.
+	\item
+	Point clouds have a substantially smaller memory footprint than tri-dexel images.
+\end{itemize}
+
+
+\section{Implementation}
+\label{sec:point_cloud_implementation}
+
+Reusing the axis-aligned raycast from section \ref{sec:tri_dexel_raycast}, all reported surface intersections are just accumulated into a set of points.
+Afterwards, any kind of surface reconstruction algorithm may used to proceed.
+
+Algorithm \ref{alg:point_cloud_based} shows the basic routine used to obtain a point cloud and call a subsequent reconstruction algorithm.
+%
+\begin{algorithm}
+	\centering
+	\begin{algorithmic}[1]
+		\Function{PointCloudBased}{$\var{grid}, \var{resolution}$}
+			\State $\var{res} = \Call{UniformResolution}{\var{grid}.\var{aabb}, \var{resolution}}$
+			\State $\var{cloud} = \varnothing$
+			\State $\Call{AxisParallelRaycast}{\var{grid}, \var{grid}.\var{aabb}, \var{res},\hfill\break
+				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{cloud}.\var{add}((\var{v}, \var{n}))}$
+			\State \Return $\Call{ReconstructFromPointCloud}{\var{cloud}}$
+		\EndFunction
+	\end{algorithmic}
+	\caption{
+		Abstract workflow of the surface reconstruction using an arbitrary point cloud reconstruction algorithm \textproc{ReconstructFromPointCloud}.
+	}
+	\label{alg:point_cloud_based}
+\end{algorithm}
+%
+
+
+
+
+
+
+
