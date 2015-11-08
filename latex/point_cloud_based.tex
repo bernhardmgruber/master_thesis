@@ -70,6 +70,9 @@ The most prominent differences and commonalities are:
 Reusing the axis-aligned raycast from section \ref{sec:tri_dexel_raycast}, all reported surface intersections are just accumulated into a set of points.
 Afterwards, any kind of surface reconstruction algorithm may used to proceed.
 
+\subsection{Point cloud creation}
+\label{sec:point_cloud_creation}
+
 Algorithm \ref{alg:point_cloud_based} shows the basic routine used to obtain a point cloud and call a subsequent reconstruction algorithm.
 %
 \begin{algorithm}
@@ -79,7 +82,7 @@ Algorithm \ref{alg:point_cloud_based} shows the basic routine used to obtain a p
 			\State $\var{res} = \Call{UniformResolution}{\var{grid}.\var{aabb}, \var{resolution}}$
 			\State $\var{cloud} = \varnothing$
 			\State $\Call{AxisParallelRaycast}{\var{grid}, \var{grid}.\var{aabb}, \var{res},\hfill\break
-				\hspace*{\dimexpr\algorithmicindent*2}(\var{axis}, \var{x}, \var{y}, \var{v}, \var{n}) \rightarrow \var{cloud}.\var{add}((\var{v}, \var{n}))}$
+				\hspace*{\dimexpr\algorithmicindent*2}(\var{\_}, \var{\_}, \var{\_}, \var{v}, \var{n}) \rightarrow \var{cloud}.\var{add}((\var{v}, \var{n}))}$
 			\State \Return $\Call{ReconstructFromPointCloud}{\var{cloud}}$
 		\EndFunction
 	\end{algorithmic}
@@ -89,10 +92,27 @@ Algorithm \ref{alg:point_cloud_based} shows the basic routine used to obtain a p
 	\label{alg:point_cloud_based}
 \end{algorithm}
 %
+Using the \textproc{UniformResolution} function, the algorithm starts off by computing an appropriate raycasting resolution \var{res} for all three axes, based on the \var{resolution} parameter passed by the user.
+This step is also done before the tri-dexel raycast, but with an increased bounding box, \cf algorithm \ref{alg:tri_dexel}.
+For the details of \textproc{UniformResolution} \cf section \ref{sec:tri_dexel_implementation}.
+Afterwards, an empty set of points, \var{cloud}, is created, which will accumulate all surface points emitted by the raycaster.
+Afterwards, the raycast is launched with the calculated resolution and the grid's bounding box.
+The closure passed to the raycasting subroutine \textproc{AxisParallelRaycast} is called at every surface hit with a list of arguments.
+From these arguments only the last two, the intersection point \var{v} and the corresponding surface normal \var{n}, are relevant.
+These two are added as tuple to the current point cloud \var{cloud}.
+After the raycast has finished, a point cloud based surface reconstruction algorithm is run, indicated by the call to \textproc{ReconstructFromPointCloud}.
+A few samples of such algorithms are given in the following:
 
-
-
-
-
-
+\begin{description}
+	\item[Ball pivoting algorithm]
+	The ball pivoting algorithm (BPA) is a region growing algorithm.
+	As the name suggests, it places a ball, \ie sphere, at the outside of the point cloud, touching three points, creating a seed triangle.
+	From this seed triangle, the ball is pivoted over each edge of the triangle until it touches another point, creating a new triangle with new edges to roll over.
+	If no point is found during pivoting, the edge is left as a boundary.
+	The front of edges is rolled over repeatedly until no more edges are available.
+	If all pivots where successful, a closed, manifold and oriented mesh has been created.
+	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
+	\item[]
+	
+\end{description}
 
