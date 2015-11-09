@@ -26,6 +26,27 @@ Firstly, a point cloud has to be created from the VML's data model.
 This step is very similar and even simpler than the creation of the dexel image discussed in the previous chapter \ref{ch:tri_dexel}.
 The same raycasting technique, with all its error correcting and robustness enhancing code, will be used to sample surface intersections on the VML's data model.
 The resolution of the raycasting grid for each of the three axis-aligned casts is again supplied by the user, again providing a good parameter for steering quality and computational demands.
+Figure \ref{fig:cylinder_head_point_cloud} shows a point cloud created from the cylinder\_head scene using a raycast with resolution 200.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/cylinder_head_point_cloud}
+		\caption{cylinder\_head}
+		\label{fig:cylinder_head_point_cloud_}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/cylinder_head_point_cloud_fins}
+		\caption{fins}
+		\label{fig:cylinder_head_point_cloud_fins}
+	\end{subfigure}
+	\caption{
+		Point cloud created by raycasting the cylinder\_head scene using three axis-aligned raycasts along the coordinate system's axes with a resolution of 200.
+	}
+	\label{fig:cylinder_head_point_cloud}
+\end{figure}
 %
 Secondly, after the point cloud has been created, a surface reconstruction algorithm is run on it.
 
@@ -104,7 +125,7 @@ After the raycast has finished, a point cloud based surface reconstruction algor
 A few samples of such algorithms are given in the following:
 
 \begin{description}
-	\item[Ball pivoting algorithm]
+	\item[Ball pivoting algorithm] \hfill \\
 	The ball pivoting algorithm (BPA) is a region growing algorithm.
 	As the name suggests, it places a ball, \ie sphere, at the outside of the point cloud, touching three points, creating a seed triangle.
 	From this seed triangle, the ball is pivoted over each edge of the triangle until it touches another point, creating a new triangle with new edges to roll over.
@@ -112,7 +133,7 @@ A few samples of such algorithms are given in the following:
 	The front of edges is rolled over repeatedly until no more edges are available.
 	If all pivots where successful, a closed, manifold and oriented mesh has been created.
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
-	\item[]
+	\item[Alpha shape]
 	
 \end{description}
 
