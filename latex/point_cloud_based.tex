@@ -133,7 +133,18 @@ A few samples of such algorithms are given in the following:
 	The front of edges is rolled over repeatedly until no more edges are available.
 	If all pivots where successful, a closed, manifold and oriented mesh has been created.
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
-	\item[Alpha shape]
+
+	\item[$\alpha$-shape] \hfill \\
+	The $\alpha$-shape was one of the first tries to define a \enquote{shape} for a set of finite points \cite{alpha_shape}.
+	The $\alpha$-shape of a 3-dimensional point cloud is a set of triangles, where each triangle has at least one empty circumsphere with radius $\alpha$.
+	It is quite similar to the BPA, but formulated statically, as no ball is rolled along the surface.
+	The $\alpha$-shape therefore also contains triangles within the point cloud, which would not be discovered by the BPA if the ball never rolls \enquote{inside} the point cloud, \ie sufficient density is given.
+	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud.
+	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
+	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
+	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
+	
+	\item[Poisson] \hfill \\
 	
 \end{description}
 
