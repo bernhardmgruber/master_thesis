@@ -167,5 +167,31 @@ A few examples of algorithms for surface reconstruction from point clouds are gi
 
 The point cloud creation and the subsequent reconstruction using the few algorithms discussed in \cite{sec:point_cloud_creation} have been benchmarked for the test scenes described in section \ref{sec:test_scenes}.
 Analogously to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 have been used for the raycaster creating the point clouds.
-Table ... contains the runtime and output size of the created point clouds.
+Table \ref{tbl:point_cloud_results} contains the runtime and output size of the created point clouds.
+%
+\begin{table}
+	\begin{tabular}{l|rr|rr|rr|rr}
+		resolution     & \multicolumn{2}{c}{50} & \multicolumn{2}{c}{100} & \multicolumn{2}{c}{200} & \multicolumn{2}{c}{400} \\
+		scene          & p\sub{out} & time & p\sub{out} & time & p\sub{out} & time & p\sub{out} & time \\
+		\midrule
+		cube2          & \SI{14}{\kilo\nothing} & \SI{  3}{\milli\second} & \SI{56}{\kilo\nothing} & \SI{ 12}{\milli\second} & \SI{226}{\kilo\nothing} & \SI{  47}{\milli\second} & \SI{907}{\kilo\nothing} & \SI{ 187}{\milli\second} \\
+		cylinders\_d   & \SI{ 7}{\kilo\nothing} & \SI{  5}{\milli\second} & \SI{27}{\kilo\nothing} & \SI{ 17}{\milli\second} & \SI{108}{\kilo\nothing} & \SI{  63}{\milli\second} & \SI{436}{\kilo\nothing} & \SI{ 247}{\milli\second} \\
+		cylinders      & \SI{ 7}{\kilo\nothing} & \SI{  3}{\milli\second} & \SI{26}{\kilo\nothing} & \SI{ 11}{\milli\second} & \SI{107}{\kilo\nothing} & \SI{  41}{\milli\second} & \SI{433}{\kilo\nothing} & \SI{ 161}{\milli\second} \\
+		cylinder\_head & \SI{15}{\kilo\nothing} & \SI{  7}{\milli\second} & \SI{60}{\kilo\nothing} & \SI{ 23}{\milli\second} & \SI{242}{\kilo\nothing} & \SI{  86}{\milli\second} & \SI{976}{\kilo\nothing} & \SI{ 335}{\milli\second} \\
+		impeller       & \SI{11}{\kilo\nothing} & \SI{ 99}{\milli\second} & \SI{46}{\kilo\nothing} & \SI{353}{\milli\second} & \SI{184}{\kilo\nothing} & \SI{1118}{\milli\second} & \SI{744}{\kilo\nothing} & \SI{3813}{\milli\second} \\
+		impeller\_2    & \SI{ 9}{\kilo\nothing} & \SI{ 54}{\milli\second} & \SI{38}{\kilo\nothing} & \SI{193}{\milli\second} & \SI{155}{\kilo\nothing} & \SI{ 600}{\milli\second} & \SI{625}{\kilo\nothing} & \SI{2037}{\milli\second} \\
+		turbine        & \SI{ 7}{\kilo\nothing} & \SI{165}{\milli\second} & \SI{31}{\kilo\nothing} & \SI{650}{\milli\second} & \SI{132}{\kilo\nothing} & \SI{2509}{\milli\second} & \SI{532}{\kilo\nothing} & \SI{9610}{\milli\second} \\
+	\end{tabular}
+	\caption{
+		Test results for the point cloud creation.
+		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
+		Runtime is averaged over 10 runs.
+	}
+	\label{tbl:point_cloud_results}
+\end{table}
+%
+
+
+
+
 
