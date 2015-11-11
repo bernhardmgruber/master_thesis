@@ -143,8 +143,22 @@ A few samples of such algorithms are given in the following:
 	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
 	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
 	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
-	
+
 	\item[Poisson] \hfill \\
-	
+	Poisson surface reconstruction is based on implicit functions \cite{poisson}.
+	The goal is to compute a so-called indicator function $\chi$, which yields 1 for positions inside the workpiece and 0 for positions outside.
+	When moving into the workpiece from outside, the values of $\chi$ change from 0 to 1 around the surface.
+	The indicator function $\chi$, specifically its gradient $\nabla\chi$, is strongly related to the normals of the input point set, a vector field $V$.
+	Therefore, the problem becomes finding a function $\chi$ whose gradient $\nabla\chi$ best approximates $V$, the normals of the point cloud, \ie $\min_\chi |\nabla\chi - V|$.
+	This problem is then transformed into a standard Poisson problem and further detailed \cite{poisson}.
+	For the computation of these functions the problem space is partitioned using an octree, whose depth provides the main variable to balance memory/computational demands and reconstruction quality.
+	The reconstruction of a surface is finally done by extracting an iso surface of $\chi$.
+	Implementations of Poisson surface reconstruction are found in \eg the CGAL \cite{cgal_poisson}, VTK \cite{vtk_poisson} and PCL \cite{pcl} library.
+	MeshLab also integrates a Poisson implementation into its GUI.
 \end{description}
+
+\section{Results}
+\label{sec:point_cloud_results}
+
+
 
