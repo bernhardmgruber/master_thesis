@@ -122,7 +122,11 @@ The closure passed to the raycasting subroutine \textproc{AxisParallelRaycast} i
 From these arguments only the last two, the intersection point \var{v} and the corresponding surface normal \var{n}, are relevant.
 These two are added as tuple to the current point cloud \var{cloud}.
 After the raycast has finished, a point cloud based surface reconstruction algorithm is run, indicated by the call to \textproc{ReconstructFromPointCloud}.
-A few samples of such algorithms are given in the following:
+
+\subsection{Surface reconstruction}
+\label{sec:point_cloud_reconstruction}
+
+A few examples of algorithms for surface reconstruction from point clouds are given in the following:
 
 \begin{description}
 	\item[Ball pivoting algorithm] \hfill \\
@@ -157,8 +161,11 @@ A few samples of such algorithms are given in the following:
 	MeshLab also integrates a Poisson implementation into its GUI.
 \end{description}
 
+
 \section{Results}
 \label{sec:point_cloud_results}
 
-
+The point cloud creation and the subsequent reconstruction using the few algorithms discussed in \cite{sec:point_cloud_creation} have been benchmarked for the test scenes described in section \ref{sec:test_scenes}.
+Analogously to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 have been used for the raycaster creating the point clouds.
+Table ... contains the runtime and output size of the created point clouds.
 
