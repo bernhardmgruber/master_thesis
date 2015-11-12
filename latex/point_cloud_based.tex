@@ -17,6 +17,11 @@ This raycast may just as well be used to sample other data structures as well.
 In its simplest form, by only collecting the surface hits, a point cloud is obtained.
 This point cloud may then be used as input to probably all point cloud based surface reconstruction algorithms, including the ones mentioned above.
 
+Compared with the other two implementation chapters \ref{ch:direct_intersection} and \ref{ch:tri_dexel}, this chapter resembles more an additional idea than a serious implementation.
+The reason for this is that reconstructing a surface, especially with features, turned out to be much harder from a point cloud than from semantically richer data structures such as a tri-dexel image.
+Currently, the tri-dexel approach is the preferred reconstruction approach inside the VML.
+However, giving the ability to export a point cloud opens up another huge world of research work and algorithms, and is therefore shortly discussed in this chapter.
+
 
 \section{Concept}
 \label{sec:point_cloud_concept}
@@ -136,7 +141,10 @@ A few examples of algorithms for surface reconstruction from point clouds are gi
 	If no point is found during pivoting, the edge is left as a boundary.
 	The front of edges is rolled over repeatedly until no more edges are available.
 	If all pivots where successful, a closed, manifold and oriented mesh has been created.
+	The BPA requires a user supplied ball size, which steers the capability of rolling into finer features and the danger of creating holes or falling into the point cloud.
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
+	An implementation of the BPA is available in CGAL \cite{cgal_bpa}.
+	MeshLab also offers a BPA version, parameterizable via its GUI.
 
 	\item[$\alpha$-shape] \hfill \\
 	The $\alpha$-shape was one of the first tries to define a \enquote{shape} for a set of finite points \cite{alpha_shape}.
@@ -190,8 +198,72 @@ Table \ref{tbl:point_cloud_results} contains the runtime and output size of the 
 	\label{tbl:point_cloud_results}
 \end{table}
 %
+Three trends, similarly to the results of the tri-dexel reconstruction in table \ref{tbl:tri_dexel_results}, are also observable here.
+Firstly, the number of created points p\sub{out} for a given resolution is again similar for all scenes.
+Secondly, p\sub{out} increases quadratically with the resolution.
+Thirdly, also the runtime increases quadratically with the resolution.
+The reasons is the asymptotic complexity of $\mathcal{O}(n^2)$ of the raycaster, which is discussed in more detail in section \ref{sec:tri_dexel_results}.
+Furthermore, the dependency of the runtime on the scene's complexity as well as parallelization, CPU and memory consumption is also discussed there.
 
+Concerning subsequent surface reconstruction algorithms, table \ref{tbl:bpa_results} contains the mesh sizes and timings for the VML's BPA implementation.
+The ball's radius is derived from the raycasting resolution and set to 1.5 times the diameter of a cell of the sampling grid created by 3 axis aligned raycasts.
+%
+\begin{table}
+	\begin{tabular}{l|rrr|rrr}
+		resolution     & \multicolumn{3}{c}{50} & \multicolumn{3}{c}{100} \\
+		scene          & p\sub{in} & t\sub{out} & time & p\sub{in} & t\sub{out} & time \\
+		\midrule
+		cube2          & \SI{14}{\kilo\nothing}& \SI{27}{\kilo\nothing} & \SI{53}{\milli\second} & \SI{56}{\kilo\nothing} & \SI{111}{\kilo\nothing} & \SI{222}{\milli\second} \\
+		cylinders\_d   & \SI{ 7}{\kilo\nothing}& \SI{13}{\kilo\nothing} & \SI{22}{\milli\second} & \SI{27}{\kilo\nothing} & \SI{ 53}{\kilo\nothing} & \SI{ 95}{\milli\second} \\
+		cylinders      & \SI{ 7}{\kilo\nothing}& \SI{13}{\kilo\nothing} & \SI{22}{\milli\second} & \SI{26}{\kilo\nothing} & \SI{ 53}{\kilo\nothing} & \SI{ 94}{\milli\second} \\
+		cylinder\_head & \SI{15}{\kilo\nothing}& \SI{27}{\kilo\nothing} & \SI{60}{\milli\second} & \SI{60}{\kilo\nothing} & \SI{110}{\kilo\nothing} & \SI{223}{\milli\second} \\
+		impeller       & \SI{11}{\kilo\nothing}& \SI{20}{\kilo\nothing} & \SI{48}{\milli\second} & \SI{46}{\kilo\nothing} & \SI{ 91}{\kilo\nothing} & \SI{200}{\milli\second} \\
+		impeller\_2    & \SI{ 9}{\kilo\nothing}& \SI{17}{\kilo\nothing} & \SI{36}{\milli\second} & \SI{38}{\kilo\nothing} & \SI{ 76}{\kilo\nothing} & \SI{161}{\milli\second} \\
+		turbine        & \SI{ 7}{\kilo\nothing}& \SI{ 9}{\kilo\nothing} & \SI{20}{\milli\second} & \SI{31}{\kilo\nothing} & \SI{ 53}{\kilo\nothing} & \SI{142}{\milli\second} \\
+	\end{tabular}
+	\bigskip\\
+	\begin{tabular}{l|rrr|rrr}
+		resolution     & \multicolumn{3}{c}{200} & \multicolumn{3}{c}{400} \\
+		scene          & p\sub{in} & t\sub{out} & time & p\sub{in} & t\sub{out} & time \\
+		\midrule
+		cube2          & \SI{226}{\kilo\nothing}& \SI{449}{\kilo\nothing} & \SI{1022}{\milli\second} & \SI{907}{\kilo\nothing}& \SI{1807}{\kilo\nothing} & \SI{5106}{\milli\second} \\
+		cylinders\_d   & \SI{108}{\kilo\nothing}& \SI{217}{\kilo\nothing} & \SI{ 442}{\milli\second} & \SI{436}{\kilo\nothing}& \SI{ 871}{\kilo\nothing} & \SI{1999}{\milli\second} \\
+		cylinders      & \SI{107}{\kilo\nothing}& \SI{215}{\kilo\nothing} & \SI{ 421}{\milli\second} & \SI{433}{\kilo\nothing}& \SI{ 865}{\kilo\nothing} & \SI{1902}{\milli\second} \\
+		cylinder\_head & \SI{242}{\kilo\nothing}& \SI{454}{\kilo\nothing} & \SI{ 946}{\milli\second} & \SI{976}{\kilo\nothing}& \SI{1850}{\kilo\nothing} & \SI{4263}{\milli\second} \\
+		impeller       & \SI{184}{\kilo\nothing}& \SI{368}{\kilo\nothing} & \SI{ 859}{\milli\second} & \SI{744}{\kilo\nothing}& \SI{1485}{\kilo\nothing} & \SI{3710}{\milli\second} \\
+		impeller\_2    & \SI{155}{\kilo\nothing}& \SI{309}{\kilo\nothing} & \SI{ 695}{\milli\second} & \SI{625}{\kilo\nothing}& \SI{1248}{\kilo\nothing} & \SI{3135}{\milli\second} \\
+		turbine        & \SI{132}{\kilo\nothing}& \SI{246}{\kilo\nothing} & \SI{ 613}{\milli\second} & \SI{532}{\kilo\nothing}& \SI{1049}{\kilo\nothing} & \SI{2222}{\milli\second} \\
+	\end{tabular}
+	\caption{
+		Test results surface reconstruction using the VML's internal BPA implementation excluding the time required to generate the point cloud, \cf table \ref{tbl:point_cloud_results}.
+		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
+		Runtime is averaged over 10 runs.
+	}
+	\label{tbl:bpa_results}
+\end{table}
+%
+Compared with the tri-dexel results in table \ref{tbl:tri_dexel_results}, the BPA outputs less than a half as much triangles.
+This is due to the additional feature reconstruction and triangle fans created inside each cell by the tri-dexel approach.
+As the BPA only operates on the vertices of the point cloud, it cannot create any further vertices.
 
+Another consequence of this behavior is a correlation of the number of input points, \cf table \ref{tbl:point_cloud_results}, and the number of outputted triangles, \cf table \ref{tbl:bpa_results}.
+For each point of the input roughly two triangles are created.
+This ratio is smaller at lower resolutions as more features/points are skipped by the ball's size, but, with increasing density, almost all points are used by the BPA and this ratio approaches two.
+An explanation for this ratio is given in figure \ref{fig:bpa_point_triangle_ratio}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=0.6\textwidth]{images/bpa_point_triangle_ratio}
+	\caption{
+		Explanation for the ratio between mesh size and point cloud size approaching 2.
+		If the surface of an object and the corresponding points and triangles are completely unwrapped into a plane, each surface point may be associated with exactly two triangle.
+	}
+	\label{fig:bpa_point_triangle_ratio}
+\end{figure}
+%
+This correlation now allows to calculate an approximation for the input raycasting resolution given a number of output triangles, which becomes handy if a triangle budget is specified for the output mesh.
 
-
+The BPA timings in table \ref{tbl:bpa_results}, especially at higher resolutions, further show that the algorithm's runtime is strongly related to the number of points of the cloud.
+For each \SI{1}{\kilo\nothing} points, the BPA requires roughly \SI{4}{\milli\second} runtime, emitting \SI{2}{\kilo\nothing} triangles.
+At lower resolutions, the parallelization overhead becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding paper \cite{bpa_vml}.
 
