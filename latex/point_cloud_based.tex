@@ -134,35 +134,151 @@ After the raycast has finished, a point cloud based surface reconstruction algor
 A few examples of algorithms for surface reconstruction from point clouds are given in the following:
 
 \begin{description}
+	\begin{figure}
+		\centering
+		\begin{subfigure}[b]{0.30\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{bpa_principle_1}
+			\caption{
+				Pivoting
+			}
+			\label{fig:bpa_principle_1}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.30\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{bpa_principle_2}
+			\caption{
+				Hole creation
+			}
+			\label{fig:bpa_principle_2}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.30\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{bpa_principle_3}
+			\caption{
+				Lost features
+			}
+			\label{fig:bpa_principle_3}
+		\end{subfigure}
+		\caption{
+			Principle of the BPA surface reconstruction approach \cite{bpa}.
+		}
+		\label{fig:bpa_principle}
+	\end{figure}
+	
 	\item[Ball pivoting algorithm] \hfill \\
-	The ball pivoting algorithm (BPA) is a region growing algorithm.
+	The ball pivoting algorithm (BPA) is a region growing algorithm, \cf figure \ref{fig:bpa_principle}.
 	As the name suggests, it places a ball, \ie sphere, at the outside of the point cloud, touching three points, creating a seed triangle.
 	From this seed triangle, the ball is pivoted over each edge of the triangle until it touches another point, creating a new triangle with new edges to roll over.
 	If no point is found during pivoting, the edge is left as a boundary.
 	The front of edges is rolled over repeatedly until no more edges are available.
 	If all pivots where successful, a closed, manifold and oriented mesh has been created.
 	The BPA requires a user supplied ball size, which steers the capability of rolling into finer features and the danger of creating holes or falling into the point cloud.
+	If the point density is too low or the ball is too small, holes are created, \cf figure \ref{fig:bpa_principle_2}.
+	If concave features are to small or the ball is too large, features may be lost, \cf figure \ref{fig:bpa_principle_3}.
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
 	An implementation of the BPA is available in CGAL \cite{cgal_bpa}.
 	MeshLab also offers a BPA version, parameterizable via its GUI.
 
+	\begin{figure}
+		\centering
+		\begin{subfigure}[b]{0.30\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{alpha_shapes_convex_hull}
+			\caption{
+				$\alpha = \infty$
+			}
+			\label{fig:alpha_shapes_convex_hull}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.30\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{alpha_shapes_big_alpha}
+			\caption{
+				Big $\alpha$
+			}
+			\label{fig:alpha_shapes_big_alpha}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.30\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{alpha_shapes_small_alpha}
+			\caption{
+				Small $\alpha$
+			}
+			\label{fig:alpha_shapes_small_alpha}
+		\end{subfigure}
+		\caption{
+			Principle of the alpha shapes surface reconstruction approach.
+			Based on \cite{alpha_shapes_images}.
+		}
+		\label{fig:alpha_shapes_principle}
+	\end{figure}
+
 	\item[$\alpha$-shape] \hfill \\
 	The $\alpha$-shape was one of the first tries to define a \enquote{shape} for a set of finite points \cite{alpha_shape}.
-	The $\alpha$-shape of a 3-dimensional point cloud is a set of triangles, where each triangle has at least one empty circumsphere with radius $\alpha$.
+	The $\alpha$-shape of a 3-dimensional point cloud is a set of triangles, where each triangle has at least one empty circumsphere with radius $\alpha$, \cf figure \ref{fig:alpha_shapes_principle}
 	It is quite similar to the BPA, but formulated statically, as no ball is rolled along the surface.
 	The $\alpha$-shape therefore also contains triangles within the point cloud, which would not be discovered by the BPA if the ball never rolls \enquote{inside} the point cloud, \ie sufficient density is given.
-	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud.
+	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud, \cf figure \ref{fig:alpha_shapes_convex_hull}.
+	The magnitude of $\alpha$ determines 
 	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
 	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
 	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
 
+	\begin{figure}
+		\centering
+		\begin{subfigure}[b]{0.24\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{poisson_oriented_points}
+			\captionsetup{justification=centering}
+			\caption{
+				oriented points\\
+				$V$
+			}
+			\label{fig:poisson_oriented_points}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.24\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{poisson_gradient_function}
+			\captionsetup{justification=centering}
+			\caption{
+				indicator gradient\\
+				$\nabla\chi$
+			}
+			\label{fig:poisson_gradient_function}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.24\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{poisson_indicator_function}
+			\captionsetup{justification=centering}
+			\caption{
+				indicator\\
+				$\chi$
+			}
+			\label{fig:poisson_indicator_function}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.24\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{poisson_surface}
+			\captionsetup{justification=centering}
+			\caption{
+				surface\\
+				~
+			}
+			\label{fig:poisson_surface}
+		\end{subfigure}
+		\caption{
+			Principle of the Poisson surface reconstruction approach \cite{poisson}.
+		}
+		\label{fig:poisson_principle}
+	\end{figure}
+	
 	\item[Poisson] \hfill \\
-	Poisson surface reconstruction is based on implicit functions \cite{poisson}.
-	The goal is to compute a so-called indicator function $\chi$, which yields 1 for positions inside the workpiece and 0 for positions outside.
+	Poisson surface reconstruction is based on implicit functions \cite{poisson}, \cf figure \ref{fig:poisson_principle}.
+	The goal is to compute a so-called indicator function $\chi$, which yields 1 for positions inside the workpiece and 0 for positions outside, \cf figure \ref{fig:poisson_indicator}
 	When moving into the workpiece from outside, the values of $\chi$ change from 0 to 1 around the surface.
-	The indicator function $\chi$, specifically its gradient $\nabla\chi$, is strongly related to the normals of the input point set, a vector field $V$.
+	The indicator function $\chi$, specifically its gradient $\nabla\chi$, \cf figure \ref{fig:poisson_gradient_function}, is strongly related to the normals of the input point set, a vector field $V$, \cf figure \ref{fig:poisson_oriented_points}.
 	Therefore, the problem becomes finding a function $\chi$ whose gradient $\nabla\chi$ best approximates $V$, the normals of the point cloud, \ie $\min_\chi |\nabla\chi - V|$.
-	This problem is then transformed into a standard Poisson problem and further detailed \cite{poisson}.
+	This problem is then transformed into a standard Poisson problem, further details are given in the corresponding paper \cite{poisson}.
 	For the computation of these functions the problem space is partitioned using an octree, whose depth provides the main variable to balance memory/computational demands and reconstruction quality.
 	The reconstruction of a surface is finally done by extracting an iso surface of $\chi$.
 	Implementations of Poisson surface reconstruction are found in \eg the CGAL \cite{cgal_poisson}, VTK \cite{vtk_poisson} and PCL \cite{pcl} library.
@@ -267,3 +383,58 @@ The BPA timings in table \ref{tbl:bpa_results}, especially at higher resolutions
 For each \SI{1}{\kilo\nothing} points, the BPA requires roughly \SI{4}{\milli\second} runtime, emitting \SI{2}{\kilo\nothing} triangles.
 At lower resolutions, the parallelization overhead becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding paper \cite{bpa_vml}.
 
+Figure \ref{fig:bpa_results} shows renderings of the result meshes after running the VML's BPA on point clouds created with a resolution of 400.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cube2}
+		\caption{cube2}
+		\label{fig:bpa_cube2}
+	\end{subfigure}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinder_head}
+		\caption{cylinder\_head}
+		\label{fig:bpa_cylinder_head}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinders}
+		\caption{cylinders}
+		\label{fig:bpa_cylinders}
+	\end{subfigure}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinders_d}
+		\caption{cylinders\_d}
+		\label{fig:bpa_cylinders_d}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_hq_impeller}
+		\caption{impeller}
+		\label{fig:bpa_hq_impeller}
+	\end{subfigure}
+	\hspace{1cm}
+	\begin{subfigure}[b]{0.34\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_hq_impeller_2}
+		\caption{impeller\_2}
+		\label{fig:bpa_hq_impeller_2}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_turbine}
+		\caption{turbine}
+		\label{fig:bpa_turbine}
+	\end{subfigure}
+	\caption{
+		Renderings of the result meshes using MeshLab after applying the BPA reconstruction approach on a point cloud created with a resolution of 400 on the selected test scenes in table \ref{tbl:test_scenes}.
+	}
+	\label{fig:bpa_results}
+\end{figure}
+%
