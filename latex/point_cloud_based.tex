@@ -439,20 +439,33 @@ Figure \ref{fig:bpa_results} shows renderings of the result meshes after running
 	\label{fig:bpa_results}
 \end{figure}
 %
+All scenes except the turbine have been extracted flawlessly.
+The BPA did a good job in creating a mesh for each point cloud, although the reconstructions are not perfect.
+Especially sharp edges and corners are missing in all reconstructions.
+Furthermore, similar to the tri-dexel, the BPA also produces a high number of triangles in flat regions, where far less triangles would be necessary to express the same surface.
+Again, this may be solved by running a post processing step which recombines adjacent triangles with equal normals.
 
+Similar to the tri-dexel, the BPA also reproduces the original triangulation of the volumes in the cylinders\_d scene, clearly seen at the drilling and the lateral surface of the stock in figure \ref{fig:bpa_cylinders_d}.
+Also the small rills between the blades of the impeller become visible again.
+Although the tri-dexel does a slightly better job with these nuances, as it may calculate feature and apex points from the normals of its dexel nodes.
+The BPA does not use point normals for reconstructing features, although a post processing pass might \eg further bend/tessellate created triangles based on their vertex normals.
+
+Consequently, the only difficulty of the BPA is reconstructing small features, both convex and concave.
+Figure \ref{fig:bpa_cylinder_head_edges} shows several concave and convex edges of the cylinder\_head scene which where not correctly reconstructed.
+%
 \begin{figure}
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{bpa_cylinder_head_thin_fin}
-		\caption{cylinder\_head drilling at fin}
-		\label{fig:bpa_cylinder_head_thin_fin}
-	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{bpa_cylinder_head_edges}
 		\caption{cylinder\_head edges}
 		\label{fig:bpa_cylinder_head_edges}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinder_head_thin_fin}
+		\caption{cylinder\_head drilling at fin}
+		\label{fig:bpa_cylinder_head_thin_fin}
 	\end{subfigure}
 	\caption{
 		Details of the cylinder\_head scene rendered using MeshLab.
@@ -460,7 +473,18 @@ Figure \ref{fig:bpa_results} shows renderings of the result meshes after running
 	}
 	\label{fig:bpa_cylinder_head_details}
 \end{figure}
+%
+Concerning concave edges/features, the ball size is the BPA's limiting component as it does not allow the created surface to \enquote{crawl} into the sharp corners.
+These features are simply rolled over.
+Fine convex and concave features are only reconstructible from the normals of the point cloud and therefore ignored by the BPA.
+Only geometry for which points are present in the point cloud is reconstructed by the BPA.
+Surprisingly, due to the BPA's sole concentration on points, thin convex features such as the drilling at a fin of the cylinder\_head, \cf figure \ref{fig:bpa_cylinder_head_thin_fin}, are reconstructed quite robustly.
+This part of the scene challenges the tri-dexel approach much more, as the cells almost collapse along one axis during slicing.
 
+The turbine scene looks reasonable from a distance, \cf figure \ref{fig:bpa_turbine}.
+However, the BPA has a hard time reconstructing the concave grooves, failing horribly at lower resolutions.
+Figure \ref{fig:bpa_grooves} shows the turbine's grooves reconstructed from point clouds with various resolutions.
+%
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.24\textwidth}
@@ -493,8 +517,17 @@ Figure \ref{fig:bpa_results} shows renderings of the result meshes after running
 	}
 	\label{fig:bpa_grooves}
 \end{figure}
+%
+At a resolution of 50, the grooves are simply to small for the ball to roll inside.
+Compared with the tri-dexel approach using the same resolution, which succeeds in recreating the groove, the BPA's result is terrible.
+Increasing the resolution to 100 allows the ball to slip inside the groove, although still a lot of geometry is created spanning it.
+At a resolution of 200, the groove becomes clearly visible.
+However, the concave indentations at the groove's sides are still captured badly, especially the indentation at the bottom.
+Finally, at a resolution of 400 the groove is reconstructed almost correctly, which only a few artifacts at the bottom.
+Compared again with the tri-dexel results for the turbine's grooves, \cf figure \ref{fig:td_grooves}, the BPA requires approximately twice the resolution for a similar visual quality.
 
-Although the BPA 
+A further problem of the BPA is its instability inside concave features which are slightly larger than the ball as well as the possibility of the ball to roll inside the point cloud.
+Figure \ref{fig:bpa_issues} shows cases for these two problems.%
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -510,16 +543,21 @@ Although the BPA
 		\label{fig:bpa_turbine_inside}
 	\end{subfigure}
 	\caption{
-		Details of the cylinder\_head and turbine scene after BPA reconstruction rendered using MeshLab.
+		Error in the cylinder\_head and turbine scene after BPA reconstruction, rendered using MeshLab.
 		Boundary edges are marked in green.
-		The left rendering shows the creation of holes and non-manifold triangles between two fins of the cylinder\_head, which may happen if the ball is roughly as big as a concave feature.
-		The right rendering shows a cog of the turbine where the ball has fell inside the point cloud.
-		Between the differently oriented meshes, lots of boundary edges and overlapping triangles are created.
 	}
 	\label{fig:bpa_issues}
 \end{figure}
 
-table with holes created by BPA
+The left rendering, figure \ref{fig:bpa_cylinder_head_non_manif}, shows the creation of holes and non-manifold triangles between two fins of the cylinder\_head.
+Such problems occur if the ball suddenly switches sides inside a concave feature, creating a triangle spanning the indentation.
+Usually, the edges of these triangles cannot be pivoted further and remain boundaries.
+
+The right rendering shows a cog of the turbine where the ball has fell inside the point cloud.
+Between the differently oriented meshes, one created from outside, one from inside, lots of boundary edges and overlapping triangles are created.
+If sufficient density of the point cloud is guaranteed, this case should, theoretically, never occur.
+However, since all pivotings are subject to numeric calculations, there are indeed cases where the ball may still roll inside the point cloud.
+Increasing the ball's size may help to minimize the likelihood of such an error, but comes at the cost of worse feature reconstruction.
 
 Concerning the created boundary edges and holes, \cf table \ref{tbl:bpa_boundary edges}, the BPA is quite robust if the point cloud does not contain concave features which are slightly larger then the size of the ball.
 %
@@ -543,6 +581,13 @@ Concerning the created boundary edges and holes, \cf table \ref{tbl:bpa_boundary
 	\label{tbl:bpa_boundary edges}
 \end{table}
 %
-The only point clouds where boundary edges have been generated are the cylinder\_head at a resolution of 50 and all turbine clouds higher than 50.
-In all of these cases, the ball rolls inside a concave feature/hole and creates triangles spanning the sides of the feature, \cf figure \ref{fig:bpa_cylinder_head_non_manif}.
+The only point clouds where boundary edges have been generated are the cylinder\_head, at a resolution of 50, and all turbine clouds higher than 50.
+
+In all of these cases, the ball rolls inside a concave feature/hole and creates triangles spanning the sides of the feature, \cf figure \ref{fig:bpa_cylinder_head_non_manif} and \ref{fig:bpa_turbine_groove_100}.
 These cases could be resolved by analyzing the created mesh, finding non-manifold vertices/edges, removing affected triangles and rerunning the BPA on the remaining holes, maybe with different ball sizes.
+If sufficient memory is available, the point cloud resolution may also be increased which allows the ball to be smaller and have more space to pivot in such small features.
+
+In the turbine cases, the ball also frequently rolls inside the point cloud, even if it is only for smaller regions.
+At the border of these regions, the mesh orientation changes and usually causes boundary edges to be left, as the BPA is not allowed to attach new triangles to existing triangles if they are differently orientated.
+This kind of problem occurs primarily numerically and may only be mitigated by implementing further checks into the pivoting code.
+
