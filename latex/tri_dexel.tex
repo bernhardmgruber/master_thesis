@@ -1782,6 +1782,7 @@ Figure \ref{fig:td_cylinder_head_issues} shows these issues by the example of th
 	\end{subfigure}
 	\caption{
 		Details of the cylinder\_head scene rendered using MeshLab.
+		Boundary edges are marked in green.
 		The renderings show the creation of T-vertices and holes at the border of normal and sliced cells.
 		The hole is created at the border of a cell and a sliced cell, which is discussed in figure \ref{fig:tri_dexel_hole_creation}.
 		The meshes have been extracted using the tri-dexel approach with cell slicing at a resolution of 100.
@@ -1795,24 +1796,24 @@ If all T-vertices are also fixed, \eg by splitting triangles at the edge spannin
 Table \ref{tbl:tri_dexel_boundary edges} contains the number of boundary edges for the tested scenes and resolutions and the tri-dexel variant using cell slicing.
 %
 \begin{table}
-\centering
-		\begin{tabular}{l|r|r|r|r}
-			resolution     &   50 &  100 &  200 &   400 \\
-			\midrule
-			cube2          &    0 &    0 &    0 &     0 \\
-			cylinders\_d   &    0 &  128 &  238 &   846 \\
-			cylinders      &    0 &    0 &    0 &     0 \\
-			cylinder\_head &  871 & 1880 & 4136 &  4966 \\
-			impeller       & 1129 & 2380 & 4654 & 11940 \\
-			impeller\_2    &  574 & 1191 & 3033 &  6050 \\
-			turbine        & 2006 & 3703 & 7181 & 13803 \\
-		\end{tabular}
-		\caption{
-			Created boundary edges by the tri-dexel surface extraction using cell-slicing and the test scenes described in \ref{tbl:test_scenes}.
-			All values were measured using MeshLab.
-			The meshes created without cell-slicing do not contain boundary edges.
-		}
-		\label{tbl:tri_dexel_boundary edges}
+	\centering
+	\begin{tabular}{l|r|r|r|r}
+		resolution     &   50 &  100 &  200 &   400 \\
+		\midrule
+		cube2          &    0 &    0 &    0 &     0 \\
+		cylinders\_d   &    0 &  128 &  238 &   846 \\
+		cylinders      &    0 &    0 &    0 &     0 \\
+		cylinder\_head &  871 & 1880 & 4136 &  4966 \\
+		impeller       & 1129 & 2380 & 4654 & 11940 \\
+		impeller\_2    &  574 & 1191 & 3033 &  6050 \\
+		turbine        & 2006 & 3703 & 7181 & 13803 \\
+	\end{tabular}
+	\caption{
+		Created boundary edges by the tri-dexel surface extraction using cell-slicing and the test scenes described in \ref{tbl:test_scenes}.
+		All values were measured using MeshLab.
+		The meshes created without cell-slicing do not contain boundary edges.
+	}
+	\label{tbl:tri_dexel_boundary edges}
 \end{table}
 %
 These numbers are fairly smaller than the ones produced by the direct intersection approach discussed in chapter \ref{ch:direct_intersection}, \cf figure \ref{tbl:direct_intersection_results}.
