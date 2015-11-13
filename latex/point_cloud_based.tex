@@ -131,7 +131,7 @@ After the raycast has finished, a point cloud based surface reconstruction algor
 \subsection{Surface reconstruction}
 \label{sec:point_cloud_reconstruction}
 
-A few examples of algorithms for surface reconstruction from point clouds are given in the following:
+Three examples of algorithms for surface reconstruction from point clouds are given in the following:
 
 \begin{description}
 	\begin{figure}
@@ -177,8 +177,9 @@ A few examples of algorithms for surface reconstruction from point clouds are gi
 	If the point density is too low or the ball is too small, holes are created, \cf figure \ref{fig:bpa_principle_2}.
 	If concave features are to small or the ball is too large, features may be lost, \cf figure \ref{fig:bpa_principle_3}.
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
-	An implementation of the BPA is available in CGAL \cite{cgal_bpa}.
+	A further implementation of the BPA is available in CGAL \cite{cgal_bpa}.
 	MeshLab also offers a BPA version, parameterizable via its GUI.
+	The BPA will be the main example for a point cloud surface reconstruction algorithm throughout this chapter, especially the results section \ref{sec:point_cloud_results}.
 
 	\begin{figure}
 		\centering
@@ -438,3 +439,110 @@ Figure \ref{fig:bpa_results} shows renderings of the result meshes after running
 	\label{fig:bpa_results}
 \end{figure}
 %
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinder_head_thin_fin}
+		\caption{cylinder\_head drilling at fin}
+		\label{fig:bpa_cylinder_head_thin_fin}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinder_head_edges}
+		\caption{cylinder\_head edges}
+		\label{fig:bpa_cylinder_head_edges}
+	\end{subfigure}
+	\caption{
+		Details of the cylinder\_head scene rendered using MeshLab.
+		The meshes have been extracted using the BPA approach with a resolution of 400.
+	}
+	\label{fig:bpa_cylinder_head_details}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_turbine_groove_50}
+		\caption{50}
+		\label{fig:bpa_turbine_groove_50}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_turbine_groove_100}
+		\caption{100}
+		\label{fig:bpa_turbine_groove_100}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_turbine_groove_200}
+		\caption{200}
+		\label{fig:bpa_turbine_groove_200}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_turbine_groove_400}
+		\caption{400}
+		\label{fig:bpa_turbine_groove_400}
+	\end{subfigure}
+	\caption{
+		Detailed renderings with the same perspective of a groove of the turbine scene using MeshLab.
+		The meshes were created using the BPA reconstruction algorithm run on a point cloud with the resolutions 50, 100, 200 and 400.
+	}
+	\label{fig:bpa_grooves}
+\end{figure}
+
+Although the BPA 
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_cylinder_head_non_manif}
+		\caption{cylinder\_head 50}
+		\label{fig:bpa_cylinder_head_non_manif}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{bpa_turbine_inside}
+		\caption{turbine 200}
+		\label{fig:bpa_turbine_inside}
+	\end{subfigure}
+	\caption{
+		Details of the cylinder\_head and turbine scene after BPA reconstruction rendered using MeshLab.
+		Boundary edges are marked in green.
+		The left rendering shows the creation of holes and non-manifold triangles between two fins of the cylinder\_head, which may happen if the ball is roughly as big as a concave feature.
+		The right rendering shows a cog of the turbine where the ball has fell inside the point cloud.
+		Between the differently oriented meshes, lots of boundary edges and overlapping triangles are created.
+	}
+	\label{fig:bpa_issues}
+\end{figure}
+
+table with holes created by BPA
+
+Concerning the created boundary edges and holes, \cf table \ref{tbl:bpa_boundary edges}, the BPA is quite robust if the point cloud does not contain concave features which are slightly larger then the size of the ball.
+%
+\begin{table}
+	\centering
+	\begin{tabular}{l|r|r|r|r}
+		resolution     &  50 &  100 &  200 &  400 \\
+		\midrule
+		cube2          &   0 &    0 &    0 &    0 \\
+		cylinders\_d   &   0 &    0 &    0 &    0 \\
+		cylinders      &   0 &    0 &    0 &    0 \\
+		cylinder\_head & 110 &    0 &    0 &    0 \\
+		impeller       &   0 &    0 &    0 &    0 \\
+		impeller\_2    &   0 &    0 &    0 &    0 \\
+		turbine        &   0 & 3055 & 1721 & 3293 \\
+	\end{tabular}
+	\caption{
+		Created boundary edges by the BPA surface extraction.
+		All values were measured using MeshLab.
+	}
+	\label{tbl:bpa_boundary edges}
+\end{table}
+%
+The only point clouds where boundary edges have been generated are the cylinder\_head at a resolution of 50 and all turbine clouds higher than 50.
+In all of these cases, the ball rolls inside a concave feature/hole and creates triangles spanning the sides of the feature, \cf figure \ref{fig:bpa_cylinder_head_non_manif}.
+These cases could be resolved by analyzing the created mesh, finding non-manifold vertices/edges, removing affected triangles and rerunning the BPA on the remaining holes, maybe with different ball sizes.
