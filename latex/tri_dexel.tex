@@ -1572,7 +1572,7 @@ However, as fully occupied and non-occupied cells do not need any processing, on
 In the last second, triangulation has been finished for almost all cells.
 Most of the work left is freeing allocated resources, which takes quite a while and is again serialized by the operating system, causing the utilization to drop drastically for the last second.
 
-Regarding the allocated memory, in addition to the VML's regular grid holding the impeller scene in \SI{600}{\mebi\byte}, the tri-dexel algorithm requires approximately \SI{425}{\mebi\byte} additional memory, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
+Regarding the allocated memory, in addition to the VML's regular grid holding the impeller scene in \SI{600}{\mebi\byte}, the tri-dexel algorithm requires approximately \SI{425}{\mebi\byte} additional memory at a resolution of 400, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
 On third of the memory is allocated before the raycast, another third during the raycast and the last third when building the tri-dexel grid.
 While cells are processed, cell data is aggregated, regularized, triangulated and immediately freed again.
 Therefore, the memory consumption remains almost constant during the further execution after the grid construction.

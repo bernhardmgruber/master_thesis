@@ -131,7 +131,7 @@ After the raycast has finished, a point cloud based surface reconstruction algor
 \subsection{Surface reconstruction}
 \label{sec:point_cloud_reconstruction}
 
-Three examples of algorithms for surface reconstruction from point clouds are given in the following:
+Two examples of algorithms for surface reconstruction from point clouds are given in the following:
 
 \begin{description}
 	\begin{figure}
@@ -181,49 +181,49 @@ Three examples of algorithms for surface reconstruction from point clouds are gi
 	MeshLab also offers a BPA version, parameterizable via its GUI.
 	The BPA will be the main example for a point cloud surface reconstruction algorithm throughout this chapter, especially the results section \ref{sec:point_cloud_results}.
 
-	\begin{figure}
-		\centering
-		\begin{subfigure}[b]{0.30\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{alpha_shapes_convex_hull}
-			\caption{
-				$\alpha = \infty$
-			}
-			\label{fig:alpha_shapes_convex_hull}
-		\end{subfigure}
-		\begin{subfigure}[b]{0.30\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{alpha_shapes_big_alpha}
-			\caption{
-				Big $\alpha$
-			}
-			\label{fig:alpha_shapes_big_alpha}
-		\end{subfigure}
-		\begin{subfigure}[b]{0.30\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{alpha_shapes_small_alpha}
-			\caption{
-				Small $\alpha$
-			}
-			\label{fig:alpha_shapes_small_alpha}
-		\end{subfigure}
-		\caption{
-			Principle of the alpha shapes surface reconstruction approach.
-			Based on \cite{alpha_shapes_images}.
-		}
-		\label{fig:alpha_shapes_principle}
-	\end{figure}
-
-	\item[$\alpha$-shape] \hfill \\
-	The $\alpha$-shape was one of the first tries to define a \enquote{shape} for a set of finite points \cite{alpha_shape}.
-	The $\alpha$-shape of a 3-dimensional point cloud is a set of triangles, where each triangle has at least one empty circumsphere with radius $\alpha$, \cf figure \ref{fig:alpha_shapes_principle}
-	It is quite similar to the BPA, but formulated statically, as no ball is rolled along the surface.
-	The $\alpha$-shape therefore also contains triangles within the point cloud, which would not be discovered by the BPA if the ball never rolls \enquote{inside} the point cloud, \ie sufficient density is given.
-	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud, \cf figure \ref{fig:alpha_shapes_convex_hull}.
-	The magnitude of $\alpha$ determines 
-	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
-	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
-	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
+%	\begin{figure}
+%		\centering
+%		\begin{subfigure}[b]{0.30\textwidth}
+%			\centering
+%			\includegraphics[width=\textwidth]{alpha_shapes_convex_hull}
+%			\caption{
+%				$\alpha = \infty$
+%			}
+%			\label{fig:alpha_shapes_convex_hull}
+%		\end{subfigure}
+%		\begin{subfigure}[b]{0.30\textwidth}
+%			\centering
+%			\includegraphics[width=\textwidth]{alpha_shapes_big_alpha}
+%			\caption{
+%				Big $\alpha$
+%			}
+%			\label{fig:alpha_shapes_big_alpha}
+%		\end{subfigure}
+%		\begin{subfigure}[b]{0.30\textwidth}
+%			\centering
+%			\includegraphics[width=\textwidth]{alpha_shapes_small_alpha}
+%			\caption{
+%				Small $\alpha$
+%			}
+%			\label{fig:alpha_shapes_small_alpha}
+%		\end{subfigure}
+%		\caption{
+%			Principle of the alpha shapes surface reconstruction approach.
+%			Based on \cite{alpha_shapes_images}.
+%		}
+%		\label{fig:alpha_shapes_principle}
+%	\end{figure}
+%
+%	\item[$\alpha$-shape] \hfill \\
+%	The $\alpha$-shape was one of the first tries to define a \enquote{shape} for a set of finite points \cite{alpha_shape}.
+%	The $\alpha$-shape of a 3-dimensional point cloud is a set of triangles, where each triangle has at least one empty circumsphere with radius $\alpha$, \cf figure \ref{fig:alpha_shapes_principle}
+%	It is quite similar to the BPA, but formulated statically, as no ball is rolled along the surface.
+%	The $\alpha$-shape therefore also contains triangles within the point cloud, which would not be discovered by the BPA if the ball never rolls \enquote{inside} the point cloud, \ie sufficient density is given.
+%	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud, \cf figure \ref{fig:alpha_shapes_convex_hull}.
+%	The magnitude of $\alpha$ determines 
+%	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
+%	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
+%	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
 
 	\begin{figure}
 		\centering
@@ -383,6 +383,12 @@ This correlation now allows to calculate an approximation for the input raycasti
 The BPA timings in table \ref{tbl:bpa_results}, especially at higher resolutions, further show that the algorithm's runtime is strongly related to the number of points of the cloud.
 For each \SI{1}{\kilo\nothing} points, the BPA requires roughly \SI{4}{\milli\second} runtime, emitting \SI{2}{\kilo\nothing} triangles.
 At lower resolutions, the parallelization overhead becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding paper \cite{bpa_vml}.
+
+Concerning memory demands, the BPA requires quite a bit of space for its acceleration structure, a regular grid partitioning the point cloud.
+This grid greatly speeds up the search for nearby points during pivoting.
+Furthermore, this grid is also the basis for a parallelization, \cf the corresponding paper for details \cite{bpa_vml}.
+In addition to the grid, the currently built mesh is stored in a rich data structure, storing not only triangles but also a lot of connectivity information between vertices, edges and faces.
+These data structures sum up to roughly \SI{1.2}{\gibi\byte} memory during a reconstruct of the impeller at a resolution of 400.
 
 Figure \ref{fig:bpa_results} shows renderings of the result meshes after running the VML's BPA on point clouds created with a resolution of 400.
 %
@@ -591,3 +597,101 @@ In the turbine cases, the ball also frequently rolls inside the point cloud, eve
 At the border of these regions, the mesh orientation changes and usually causes boundary edges to be left, as the BPA is not allowed to attach new triangles to existing triangles if they are differently orientated.
 This kind of problem occurs primarily numerically and may only be mitigated by implementing further checks into the pivoting code.
 
+
+Finally, to show the suitability of the point cloud for other algorithms outside the VML, a few renderings of the more complex scenes from meshes reconstructed with the Poisson reconstruction approach are discussed.
+Figure \ref{fig:poisson_results} shows renderings of the cylinder\_head and impeller scene after applying the Poisson surface reconstruction filter available in MeshLab.
+%
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_cylinder_head}
+		\caption{cylinder\_head}
+		\label{fig:poi_cylinder_head}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_cylinder_head_detail}
+		\caption{cylinder\_head details}
+		\label{fig:poi_cylinder_head_detail}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_hq_impeller}
+		\caption{impeller}
+		\label{fig:poi_hq_impeller}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_hq_impeller_points}
+		\caption{impeller edges}
+		\label{fig:poi_hq_impeller_points}
+	\end{subfigure}
+	\caption{
+		Renderings of the cylinder\_head and impeller scenes of reconstructions using the Poisson surface reconstruction filter from MeshLab.
+		The point cloud was created with a resolution of 400.
+		The Poisson filter was parameterized with an octree depth of 10, solver divide at 8, 1 sample per node and a surface offsetting of 1, \cf corresponding dialog in MeshLab.
+	}
+	\label{fig:poisson_results}
+\end{figure}
+%
+As the Poisson surface reconstruction tries to be robust against inhomogeneous and noisy inputs, sharp features are considered outliers and lost during the function fitting process.
+This gives the reconstructed meshes a smooth and roundish appearance, as visible in the general renderings in figures \ref{fig:poi_cylinder_head} and \ref{fig:poi_hq_impeller}.
+The detailed rendering of a drilling of the cylinder\_head in figure \ref{fig:poi_cylinder_head_detail} further demonstrates the loss of sharp edges.
+Additionally, the structure in the upper right, the drilling at the fin, is almost completely lost as the structure is too thin to allow the creation of a surface.
+Figure \ref{fig:poi_hq_impeller_points} shows a reconstructed blade of the impeller together with the sampled point cloud.
+The amount of lost volume, especially at the blade's tip and edge at the left, is clearly visible, as the surface only bends towards the points in flatter regions.
+Nevertheless, the resulting triangulation is appealing with even a bit of adaptivity, containing larger triangles in flatter regions.
+All runs of the algorithm generated manifold and closed meshes for all tested point clouds.
+
+Figure \ref{fig:poi_grooves} shows a groove of the turbine reconstructed from point clouds with various resolutions.
+%
+\begin{figure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_turbine_groove_50}
+		\caption{50}
+		\label{fig:poi_turbine_groove_50}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_turbine_groove_100}
+		\caption{100}
+		\label{fig:poi_turbine_groove_100}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_turbine_groove_200}
+		\caption{200}
+		\label{fig:poi_turbine_groove_200}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.24\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{poi_turbine_groove_400}
+		\caption{400}
+		\label{fig:poi_turbine_groove_400}
+	\end{subfigure}
+	\caption{
+		Detailed renderings with the same perspective of a groove of the turbine scene using MeshLab.
+		The meshes were created using the Poisson surface reconstruction filter of MeshLab run on a point cloud with the resolutions 50, 100, 200 and 400.
+	}
+	\label{fig:poi_grooves}
+\end{figure}
+%
+At a resolution of 50, the groove is simply sampled too poor for the Poisson reconstruction to create the indentation.
+This result is comparable to the BPA's performance at the same resolution in figure \ref{fig:bpa_turbine_groove_50}, where the ball was to big to roll inside the groove.
+At a resolution of 100, the groove becomes visible as the indentation is created.
+Still, the concave rills inside the notch as well as the indentation at the bottom of the groove are not visible yet.
+The former is acceptably reconstructed at a resolution of 200 while the latter requires a resolution of 400 to appear.
+Compared with the tri-dexel approach and similarly to the BPA, the Poisson surface reconstruction also requires roughly twice the resolution of the tri-dexel for a visually comparable output regarding the captured features.
+However, as detailed in the section \ref{sec:point_cloud_concept}, the main reason for this issue is the richer semantic carried by the tri-dexel image when compared with a point cloud.
+
+Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10 - 20 times slower than the BPA implementation of the VML, \cf table \ref{tbl:bpa_results}.
+\Eg, the runtimes for the turbine scene at the resolutions 50, 100, 200 and 400 are, averaged over 5 runs, \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
+However, the algorithm employed by MeshLab runs single threaded.
+Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude 
+During the reconstruction at resolution 400, roughly \SI{400}{\mebi\byte} were allocated, making the Poisson algorithm significantly more light-weight than the BPA.
+
+Similar to the external Poisson surface reconstruction algorithm of MeshLab, any other external algorithm may be run on the point clouds created from the raycaster in section \ref{sec:point_cloud_implementation}.
+MeshLab for example further offers an implementation of alpha shapes \cite{alpha_shape}, an own BPA, two marching cubes variants based on MLS \cite{meshlab_mc_mls_1, meshlab_mc_mls_2} as well as an algorithm based on distance fields from the VCG library \cite{vcg}.
+Further libraries for point cloud surface reconstruction include the Computational Geometry Algorithms Library (CGAL) \cite{cgal}, the Visualization Toolkit (VTK) \cite{vtk}, QHull \cite{qhull} or the Point Cloud Library (PCL) \cite{pcl}.
