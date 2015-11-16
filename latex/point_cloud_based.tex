@@ -176,7 +176,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 	If all pivots where successful, a closed, manifold and oriented mesh has been created.
 	The BPA requires a user supplied ball size, which steers the capability of rolling into finer features and the danger of creating holes or falling into the point cloud.
 	If the point density is too low or the ball is too small, holes are created, \cf figure \ref{fig:bpa_principle_2}.
-	If concave features are to small or the ball is too large, features may be lost, \cf figure \ref{fig:bpa_principle_3}.
+	If concave features are too small or the ball is too large, features may be lost, \cf figure \ref{fig:bpa_principle_3}.
 
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
 	A further implementation of the BPA is available in CGAL \cite{cgal_bpa}.
@@ -283,7 +283,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 	Therefore, the problem becomes finding a function $\chi$ whose gradient $\nabla\chi$ best approximates $V$, the normals of the point cloud, \ie $\min_\chi |\nabla\chi - V|$.
 	This problem is then transformed into a standard Poisson problem, further details are given in the corresponding paper \cite{poisson}.
 	For the computation of these functions, the problem space is partitioned using an octree, whose depth provides the main variable to balance memory/computational demands and reconstruction quality.
-	The reconstruction of a surface is finally done by extracting an iso surface of $\chi$.
+	The reconstruction of a surface is finally done by extracting an isosurface of $\chi$.
 
 	Implementations of Poisson surface reconstruction are found in \eg the CGAL \cite{cgal_poisson}, VTK \cite{vtk_poisson} and PCL \cite{pcl} library.
 	MeshLab also integrates a Poisson implementation into its GUI.
@@ -461,7 +461,7 @@ Although the tri-dexel does a slightly better job with these nuances, as it may 
 The BPA does not use point normals for reconstructing features, although a post processing pass might \eg further bend/tessellate created triangles based on their vertex normals.
 
 Consequently, the only difficulty of the BPA is reconstructing small features, both convex and concave.
-Figure \ref{fig:bpa_cylinder_head_edges} shows several concave and convex edges of the cylinder\_head scene which where not correctly reconstructed.
+Figure \ref{fig:bpa_cylinder_head_edges} shows several concave and convex edges of the cylinder\_head scene which were not correctly reconstructed.
 %
 \begin{figure}
 	\centering
@@ -528,7 +528,7 @@ Figure \ref{fig:bpa_grooves} shows the turbine's grooves reconstructed from poin
 	\label{fig:bpa_grooves}
 \end{figure}
 %
-At a resolution of 50, the grooves are simply to small for the ball to roll inside.
+At a resolution of 50, the grooves are simply too small for the ball to roll inside.
 Compared with the tri-dexel approach using the same resolution, which succeeds in recreating the groove, the BPA's result is terrible.
 Increasing the resolution to 100 allows the ball to slip inside the groove, although still a lot of geometry is created spanning it.
 At a resolution of 200, the groove becomes clearly visible.
@@ -569,7 +569,7 @@ If sufficient density of the point cloud is guaranteed, this case should, theore
 However, since all pivotings are subject to numeric calculations, there are indeed cases where the ball may still roll inside the point cloud.
 Increasing the ball's size may help to minimize the likelihood of such an error, but comes at the cost of worse feature reconstruction.
 
-Concerning the created boundary edges and holes, \cf table \ref{tbl:bpa_boundary edges}, the BPA is quite robust if the point cloud does not contain concave features which are slightly larger then the size of the ball.
+Concerning the created boundary edges and holes, \cf table \ref{tbl:bpa_boundary edges}, the BPA is quite robust if the point cloud does not contain concave features which are slightly larger than the size of the ball.
 %
 \begin{table}
 	\centering
@@ -684,7 +684,7 @@ Figure \ref{fig:poi_grooves} shows a groove of the turbine reconstructed from po
 \end{figure}
 %
 At a resolution of 50, the groove is simply sampled too poor for the Poisson reconstruction to create the indentation.
-This result is comparable to the BPA's performance at the same resolution in figure \ref{fig:bpa_turbine_groove_50}, where the ball was to big to roll inside the groove.
+This result is comparable to the BPA's performance at the same resolution in figure \ref{fig:bpa_turbine_groove_50}, where the ball was too big to roll inside the groove.
 At a resolution of 100, the groove becomes visible as the indentation is created.
 Still, the concave rills inside the notch as well as the indentation at the bottom of the groove are not visible yet.
 The rills are acceptably reconstructed at a resolution of 200 while the bottom notch requires a resolution of 400 to appear.
