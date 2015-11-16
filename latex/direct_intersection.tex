@@ -222,7 +222,7 @@ After all vertices have been processed, the result list is return, representing 
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0,-1, 0), \var{aabb}.\var{upper}.\var{y}}$
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0, 1), \var{aabb}.\var{lower}.\var{z}}$
 			\State $\var{vertices} \gets \Call{ClipPolygonPlane}{\var{vertices}, \var{Vertex}( 0, 0,-1), \var{aabb}.\var{upper}.\var{z}}$
-			
+
 			\State \Return $\Call{Trianglulate}{\Call{Unique}{\var{vertices}}}$
 		\EndFunction
 		\\
@@ -374,7 +374,7 @@ This is a problem as constraints may touch the boundary of the original triangle
 The Triangle library is used for splitting triangles at various constrained edges in another paper \cite{mesh_intersection}.
 Nevertheless, it has a very difficult C interface which tries to mimic a command line with text arguments even on its API level.
 Furthermore, passing in and returning geometric data structures requires extensive care regarding memory management.
-The library did work for most of the cases but crashed several times, \eg on every 1000\textsuperscript{th} triangle.  
+The library did work for most of the cases but crashed several times, \eg on every 1000\textsuperscript{th} triangle.
 %
 The Geometric Tools Engine (GTE) is a rather modern library with an excellent C++ interface.
 The algorithms' precision may be configured via templates.
@@ -395,7 +395,7 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 				\State $\var{points} \gets \var{points} \cup \{\var{p}_1, \var{p}_2\}$
 			\EndFor
 			\State $\var{axis}_0 \gets \Call{LargestAxis}{\var{t}.\var{normal}}$
-			\State $\var{axis}_1 \gets (\var{axis}_0 + 1) \bmod 3$ 
+			\State $\var{axis}_1 \gets (\var{axis}_0 + 1) \bmod 3$
 			\State $\var{axis}_2 \gets (\var{axis}_0 + 2) \bmod 3$
 			\State $\var{points2} \gets \varnothing$ \Comment{Project 3D to 2D points, order must remain}
 			\ForAll{$\var{p} \in points$}
@@ -429,7 +429,7 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 				\Else
 					\State \Return $2$
 				\EndIf
-			\Else 
+			\Else
 				\If{$\var{v}.\var{y} > \var{v}.\var{z}$}
 					\State \Return $1$
 				\Else
@@ -487,7 +487,7 @@ However, as classification might eliminate triangles, the ray could potentially 
 The regular grid only guarantees closed meshes within a cell.
 To circumvent this issue, the inside test for a triangle must be conducted within a cell.
 
-An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algorithm \ref{alg:triangle_inside_test}. 
+An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algorithm \ref{alg:triangle_inside_test}.
 %
 \begin{algorithm}
 	\centering
@@ -602,36 +602,36 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 
 \begin{description}
 	% TODO: add drawings
-	
+
 	\item[Collapse near points in structures] \hfill \\
 	At the beginning of the \textproc{UnionStructure} algorithm almost no guarantees are given on the two input structures.
 	As very thin or degenerated triangles are numerically problematic during the following algorithmic steps, \eg intersection, inside test, \etc, filtering them may avoid some of those problems.
 	Therefore, all vertices which are closer than a defined small epsilon distance are collapsed to their mean.
 	Thus, no holes are created in the structure, only degenerated triangles.
 	These are easy to filter in a post-processing step by removing all triangles where two or more vertices are equal.
-	
+
 
 	\item[Flush tiny values to zero] \hfill \\
 	Floating point values with tiny exponents, \eg $10^{-15}$ and below, tend to make some calculations unstable, especially when collapsing vertices with such coordinates.
 	Collapsed vertices with such values might still not compare equal afterwards which breaks subsequent calls to the CDT algorithm.
 	The reason therefore is unfortunately not clear.
 	However, flushing such small values to zero eliminates the problem.
-	
-	
+
+
 	\item[Verify intersection line] \hfill \\
 	In situations where two triangles are quite thin, the Möller-Trumbore intersection test may report an intersection and calculate an intersection line which lies outside one or both of the triangles.
 	Subsequent CDTs will then generate additional triangles outside the triangle which should be split as CDT routines usually triangulate the convex hull of the input point set.
 	This issue is avoided by an additional test run after the call to \textproc{IntersectTriangles}.
 	If a triangle intersection is recorded, test each point of the line if it lies on each of the triangles using a raycast with the point as origin and each triangle normal as ray direction.
 	Only if the resulting $u$ and $v$ coordinates for both points are within their bounds including a small epsilon, \ie $-\epsilon \leq u \leq 1+\epsilon \wedge -\epsilon \leq v \leq 1+\epsilon \wedge u + v \leq 1 + \epsilon$, the intersection is accepted.
-	
-	
+
+
 	\item[Collapse constraint vertices with structure vertices] \hfill \\
 	Some of the intersection lines on a triangle might be very close to the triangle's vertices.
 	To avoid creating degenerated triangles during CDT, all constraints' vertices are checked against the triangle's vertices to ensure a minimum distance.
 	If a distance is less than a specified minimum, the affected vertex is set to the corresponding vertex of the triangle.
-	
-	
+
+
 	\item[Collapse near points in constraints per triangle] \hfill \\
 	This correction is the most important one.
 	After all intersection lines have been recorded, collapse all constraint vertices which are closer than a defined epsilon distance.
@@ -639,13 +639,13 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 	In other words, constrained edges which are not connected to each other because of numerical issues in the intersection routine are rejoined again to form closed polylines.
 	Furthermore, tiny constraints collapse to points and are removed.
 	This matter is important for correct splits after running the CDT.
-	
-	
+
+
 	\item[Ensure unique constraints] \hfill \\
 	Constraint uniqueness is a small and simple check.
 	The test is required as duplicated constraints impose a problem for some CDT libraries.
-	
-	
+
+
 	\item[Specify hull constraints] \hfill \\
 	Most CDT libraries triangulate a given point cloud within the convex hull of the cloud.
 	Identifying the edges belonging to the convex hull is usually deterministic if the points are in what is called general position, \ie no coincident or collinear points.
@@ -657,8 +657,8 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 	Together with the triangle's vertices, the hull vertices are ordered cyclical around their center of mass.
 	The hull constraints are then formed from each adjacent pair of the ordered hull vertices including the constraint from the last to the first hull vertex.
 	These hull constraints are appended to the constraints created by the intersection lines as input to the CDT.
-	
-	
+
+
 	\item[Remove degenerate triangles after CDT] \hfill \\
 	Despite good preparation of the input, it might still be the case that tiny or degenerated triangles are generated by the CDT routine, especially along the hull.
 	The vertices of such triangles are apart far enough to pass vertex collapse in a following iteration.

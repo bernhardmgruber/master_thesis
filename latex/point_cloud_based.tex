@@ -165,7 +165,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 		}
 		\label{fig:bpa_principle}
 	\end{figure}
-	
+
 	\item[Ball pivoting algorithm] \hfill \\
 	The ball pivoting algorithm (BPA) is a region growing algorithm, \cf figure \ref{fig:bpa_principle}.
 	As the name suggests, it places a ball, \ie sphere, at the outside of the point cloud, touching three points, creating a seed triangle.
@@ -220,7 +220,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 %	It is quite similar to the BPA, but formulated statically, as no ball is rolled along the surface.
 %	The $\alpha$-shape therefore also contains triangles within the point cloud, which would not be discovered by the BPA if the ball never rolls \enquote{inside} the point cloud, \ie sufficient density is given.
 %	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud, \cf figure \ref{fig:alpha_shapes_convex_hull}.
-%	The magnitude of $\alpha$ determines 
+%	The magnitude of $\alpha$ determines
 %	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
 %	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
 %	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
@@ -272,7 +272,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 		}
 		\label{fig:poisson_principle}
 	\end{figure}
-	
+
 	\item[Poisson] \hfill \\
 	Poisson surface reconstruction is based on implicit functions \cite{poisson}, \cf figure \ref{fig:poisson_principle}.
 	The goal is to compute a so-called indicator function $\chi$, which yields 1 for positions inside the workpiece and 0 for positions outside, \cf figure \ref{fig:poisson_indicator}
@@ -689,7 +689,7 @@ However, as detailed in the section \ref{sec:point_cloud_concept}, the main reas
 Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10 - 20 times slower than the BPA implementation of the VML, \cf table \ref{tbl:bpa_results}.
 \Eg, the runtimes for the turbine scene at the resolutions 50, 100, 200 and 400 are, averaged over 5 runs, \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
 However, the algorithm employed by MeshLab runs single threaded.
-Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude 
+Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude
 During the reconstruction at resolution 400, roughly \SI{400}{\mebi\byte} were allocated, making the Poisson algorithm significantly more light-weight than the BPA.
 
 Similar to the external Poisson surface reconstruction algorithm of MeshLab, any other external algorithm may be run on the point clouds created from the raycaster in section \ref{sec:point_cloud_implementation}.
