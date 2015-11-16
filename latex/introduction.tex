@@ -124,4 +124,15 @@ Chapter \ref{ch:direct_intersection} discusses the first implemented approach to
 It relies on directly intersecting the triangles of the swept volumes stored within the VML.
 This method is the most naive, but, in theory, most exact.
 
+Chapter \ref{ch:tri_dexel} describes the second implementation which is based on a tri-dexel representation.
+Utilizing an axis-aligned raycast to sample the VML's data model, a tri-dexel image is created.
+This sampled data model is regularized to fight numeric issues and sampling errors.
+A subsequent feature reconstruction pass greatly enhances the visual quality of the output.
+At the end, a novel extension for adaptive resampling is introduced.
+
+Chapter \ref{ch:point_cloud_based} builds on the idea of the axis-aligned raycast to sample a point cloud of the VML's data model.
+As surface reconstruction algorithms for point clouds are greatly available in literature, the potential of these kinds of algorithms is discussed.
+The main example is a variant of the Ball Pivoting Algorithm used by the VML for swept volume computation.
+Furthermore, a Poisson surface reconstruction algorithm is also shortly presented.
+
 %\dummytext{2}
