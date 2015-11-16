@@ -485,7 +485,7 @@ Figure \ref{fig:bpa_cylinder_head_edges} shows several concave and convex edges 
 	\label{fig:bpa_cylinder_head_details}
 \end{figure}
 %
-Concerning concave edges/features, the ball size is the BPA's limiting component as it does not allow the created surface to \enquote{crawl} into the sharp corners.
+Concerning concave features, the ball size is the BPA's limiting component as it does not allow the created surface to \enquote{crawl} into the sharp corners.
 These features are simply rolled over.
 Fine convex and concave features are only reconstructible from the normals of the point cloud and therefore ignored by the BPA.
 Only geometry for which points are present in the point cloud is reconstructed by the BPA.
@@ -538,7 +538,8 @@ Finally, at a resolution of 400 the groove is reconstructed almost correctly, wh
 Compared again with the tri-dexel results for the turbine's grooves, \cf figure \ref{fig:td_grooves}, the BPA requires approximately twice the resolution for a similar visual quality.
 
 A further problem of the BPA is its instability inside concave features which are slightly larger than the ball as well as the possibility of the ball to roll inside the point cloud.
-Figure \ref{fig:bpa_issues} shows cases for these two problems.%
+Figure \ref{fig:bpa_issues} shows cases for these two problems.
+%
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
