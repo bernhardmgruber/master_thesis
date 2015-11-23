@@ -7,7 +7,7 @@ This approach is the most naive, computationally intensive, but, in theory, most
 It is conceptually equivalent to directly intersecting the mesh of the stock with each swept volume mesh.
 Boolean operations on triangle meshes are already available in most CAD kernels.
 However, these kernels usually require the meshes to be closed.
-Due to the triangle elimination strategy using cell classification, \cf section \ref{sec:classification}, the meshes stored in the regular grid are no longer closed.
+Due to the triangle elimination strategy using cell classification, \cf \cref{sec:classification}, the meshes stored in the regular grid are no longer closed.
 Thus, regular CAD kernels cannot be used to intersect the meshes maintained by the VML and a custom mesh intersection algorithm has been developed.
 The idea of this approach is based on a paper about finding and deforming the intersection between two meshes as well as applying textures to those regions to increase the realism in computer graphics, \ie computer games \cite{mesh_intersection}.
 
@@ -28,7 +28,7 @@ As all triangles, which initially intersected the opposite structure, have been 
 By removing all triangles of a structure which are inside the opposite structure, the remaining triangles of both structures form a new surface which corresponds to the union of both structures.
 This new structure is then again pairwise united with other structures until only one structure is left, \ie all structures are reduced to one.
 This final structure is the reconstructed surface of the VML's data model.
-Figure \ref{fig:cube2} demonstrates this workflow by the example of intersecting a cube with a cuboid.
+\Cref{fig:cube2} demonstrates this workflow by the example of intersecting a cube with a cuboid.
 
 \begin{figure}
 	\centering
@@ -94,9 +94,9 @@ Intersecting the structures at the level of each cell greatly reduces the value 
 Unfortunately, many triangles usually span the bounding boxes of several cells and are duplicated in each encompassed one.
 To avoid duplicates or overlapping triangles when combining results from neighboring cells, all triangles of a cell have to be clipped against the cell's bounding box.
 This step can be done before or after intersecting the structures of a cell, but always before starting to eliminate triangles against the opposite structure.
-There is also a second reason why this direct intersection approach must be run on a cell level which is discussed in section \ref{sec:triangle_inside_test}.
+There is also a second reason why this direct intersection approach must be run on a cell level which is discussed in \cref{sec:triangle_inside_test}.
 
-An abstracted algorithm of this reconstruction approach is shown in algorithm \ref{alg:direct_intersection}.
+An abstracted algorithm of this reconstruction approach is shown in \cref{alg:direct_intersection}.
 The following sections discuss details of this algorithms and follow the order of subroutines/functions used within.
 The only exception is the \textproc{SeparateStructures} routine, which only groups the incoming triangles by their structure id.
 It returns a list of structures, where each structure is a set of triangles.
@@ -177,7 +177,7 @@ In particular, it clips any polygon against any convex clip polygon by iterative
 Despite being initially designed for 2 dimensions, the algorithm easily extends to higher dimensions.
 
 For clipping triangles against the bounding box of a cell, a 3-dimensional version of the Sutherland-Hodgeman algorithm is needed.
-Algorithm \ref{alg:clip} shows a pseudocode implementation of the \textproc{ClipStructure} routine which is based on the Sutherland-Hodgeman algorithm to clip all structure triangles against the bounding box of a cell.
+\Cref{alg:clip} shows a pseudocode implementation of the \textproc{ClipStructure} routine which is based on the Sutherland-Hodgeman algorithm to clip all structure triangles against the bounding box of a cell.
 %
 When clipping a structure against a bounding box, each individual triangle of the structure is clipped separately.
 The result of clipping a single triangle may be the same triangle, a set of new triangles or even no triangle at all.
@@ -186,7 +186,7 @@ The resulting triangles after clipping, if any, are collected to form the new, c
 The Sutherland-Hodgeman algorithm clips against a convex polygon, or its equivalent in higher dimensions, \ie a polytope, by iteratively clipping against each side.
 In case of a bounding box, the input polygon has to be clipped against each of the six sides of the cell.
 These sides are extended and described as planes by specifying a normal vector and the plane's distance to the origin.
-The six planes built from a cell's bounding box are given in the \textproc{ClipPolygonAABB} function of algorithm \ref{alg:clip}.
+The six planes built from a cell's bounding box are given in the \textproc{ClipPolygonAABB} function of \cref{alg:clip}.
 The input polygon itself is represented as an ordered list of vertices, where each pair of adjacent vertices form an edge of the polygon, including the last and the first vertex as a pair.
 The order of the vertices remains the same during the clipping process, but vertices may be removed or additional ones added.
 The final vertex list, after clipping against all planes, needs to be triangulated again.
@@ -200,7 +200,7 @@ Initially, an empty list of result vertices is created.
 For each of the polygon's vertices, the signed distance to the clipping plane is calculated.
 The distance of each vertex is compared with the distance of its preceding vertex.
 If the signs of the distances are different, the edge represented by the current vertex and its predecessor intersects the clipping plane.
-In this case, the intersection point with the clipping plane is calculated, \cf algorithm \ref{alg:clip} for details, and the point is added to the result list.
+In this case, the intersection point with the clipping plane is calculated, \cf \cref{alg:clip} for details, and the point is added to the result list.
 If the distance of the current vertex is positive, the vertex itself is inside the clipping volume and is also added to the result list.
 After all vertices have been processed, the result list is return, representing the clipped polygon again as an ordered list of its vertices.
 
@@ -274,7 +274,7 @@ Triangle-triangle intersection is a common problem in collision detection and ha
 The intersection test of Möller \cite{tri_tri_intersection_moller}, despite being older and marginally slower than more recent developments \cite{tri_tri_intersection_2}, is also available as public domain C code on the authors website \cite{tri_tri_intersection_moller_code}.
 As only a few adaptations were necessary, Möller's code was taken and thoroughly refactored to fit a modern C++ style without changing its behavior.
 Since the code is quite long and freely available on Möller's website, an implementation/algorithm is not included here.
-The \textproc{IntersectTriangle} routine referenced in algorithm \ref{alg:direct_intersection} is thus merely a small adapter calling into Möller's code and is given in algorithm \ref{alg:triangle_intersection}.
+The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersection} is thus merely a small adapter calling into Möller's code and is given in \cref{alg:triangle_intersection}.
 
 \begin{algorithm}
 	\centering
@@ -302,13 +302,13 @@ Then, the signed plane distance of each vertex of one triangle to the plane of t
 If the signs of these three values is the same for one triangle, it completely lies on one side of the plane and therefore does not intersect the other triangle.
 This test is run for both triangles.
 Afterwards, the intersection line between the two planes is calculated by crossing the planes' normal vectors.
-Figure \ref{fig:tri_intersect} shows the intersection line of the two triangle planes in green and is used to discuss the remaining part of the algorithm.
+\Cref{fig:tri_intersect} shows the intersection line of the two triangle planes in green and is used to discuss the remaining part of the algorithm.
 Now, the intervals of the line which lie inside the triangle have to be calculated.
 For each pair of vertices of a triangle, \ie each triangle's edges, the two signed distances of the vertices to the plane of the other triangle are compared.
 If they have a different sign, this edge intersects the other triangle's plane and therefore crosses the intersection line of both planes.
 The intersection point splits the edge with the same ratio as the signed distances of both vertices.
-For each triangle, two intersecting edges are found, thus yielding an interval for each triangle, \cf blue segments of the line in figure \ref{fig:tri_intersect}.
-If these two intervals overlap, the triangles intersect and their intersection line is the overlapping segment of the planes' intersection line, \cf red segment in figure \ref{fig:tri_intersect}.
+For each triangle, two intersecting edges are found, thus yielding an interval for each triangle, \cf blue segments of the line in \cref{fig:tri_intersect}.
+If these two intervals overlap, the triangles intersect and their intersection line is the overlapping segment of the planes' intersection line, \cf red segment in \cref{fig:tri_intersect}.
 Otherwise, there is no intersection.
 
 \begin{figure}
@@ -342,7 +342,7 @@ Initially, a manually written CT was used.
 Even though it was capable of triangulating simple cases, it suffered severely from numerical instability and poor output quality.
 A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the paper giving the initial idea to the direct intersection reconstruction approach \cite{mesh_intersection}.
 However, as CDT algorithms are quite hard to implement regarding speed and robustness, using an established and tested library is highly recommended.
-A list of C/C++ libraries offering constrained Delaunay triangulations is given in table \ref{tbl:delaunay_libs}.
+A list of C/C++ libraries offering constrained Delaunay triangulations is given in \cref{tbl:delaunay_libs}.
 Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
 Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
 As output they generate a Delaunay mesh, with the convex hull of the point cloud as boundary.
@@ -379,12 +379,12 @@ The library did work for most of the cases but crashed several times, \eg on eve
 The Geometric Tools Engine (GTE) is a rather modern library with an excellent C++ interface.
 The algorithms' precision may be configured via templates.
 The library runs outstandingly stable with only a few troubles in cases where the input was numerically problematic, \eg contained points with differences only at the last few digits representable with double precision.
-However, these issues can be fixed with appropriate preprocessing of the input, \cf section \ref{sec:numeric_improvements}.
+However, these issues can be fixed with appropriate preprocessing of the input, \cf \cref{sec:numeric_improvements}.
 Furthermore, the GTE library is licensed under the Boost License and therefore perfectly usable in commercial products like the VML.
 %
 The remaining libraries have not been further tested, mainly for the reason that the VML is a commercial product and the use of these libraries would require to drop the code again later.
 
-The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which is given in algorithm \ref{alg:triangle_splitting}.
+The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which is given in \cref{alg:triangle_splitting}.
 %
 \begin{algorithm}
 	\centering
@@ -465,9 +465,9 @@ These triangles are finally returned.
 \label{sec:triangle_inside_test}
 
 After all triangles of two intersecting structures have been split on their intersection lines, all triangles which do not contribute to the union surface, \ie are inside the other structure, have to be removed.
-Due to the regular grid's classification, \cf section \ref{sec:classification}, triangles might have been removed and, consequently, structures put together from multiple cells of the regular grid may no longer be closed meshes.
+Due to the regular grid's classification, \cf \cref{sec:classification}, triangles might have been removed and, consequently, structures put together from multiple cells of the regular grid may no longer be closed meshes.
 As it turns out, the test whether a triangle is inside another structure may fail if the tested structure is not a closed mesh, a common case.
-An example of such an issue is shown in figure \ref{fig:inside_test_error}.
+An example of such an issue is shown in \cref{fig:inside_test_error}.
 %
 \begin{figure}[!]
 	\centering
@@ -483,11 +483,11 @@ An example of such an issue is shown in figure \ref{fig:inside_test_error}.
 A triangle is tested against a structure by using a ray.
 This ray is shot from an arbitrary point on the triangle, which does not lie on an edge, \eg the triangle's centroid, to an arbitrary point on a triangle of the other structure.
 If the ray does not intersect the other structure on its way, a comparison of the ray's direction with the normal of the targeted triangle determines whether the ray's origin, \ie the centroid of the tested triangle, is inside the other structure or not.
-However, as classification might eliminate triangles, the ray could potentially intersect triangles of the structure which have been removed, \cf left ray in figure \ref{fig:inside_test_error}.
+However, as classification might eliminate triangles, the ray could potentially intersect triangles of the structure which have been removed, \cf left ray in \cref{fig:inside_test_error}.
 The regular grid only guarantees closed meshes within a cell.
 To circumvent this issue, the inside test for a triangle must be conducted within a cell.
 
-An algorithm for this \textproc{IsTriangleInsideStructure} test is given in algorithm \ref{alg:triangle_inside_test}.
+An algorithm for this \textproc{IsTriangleInsideStructure} test is given in \cref{alg:triangle_inside_test}.
 %
 \begin{algorithm}
 	\centering
@@ -547,9 +547,9 @@ For ray-triangle intersection the famous Möller-Trumbore intersection test is u
 An implementation of their algorithm in C is already given in the corresponding paper.
 The original version has a few early exit tests on \var{u} and \var{v}, which might save some work in case the ray misses the triangle.
 However, branching is becoming increasingly expensive on modern hardware architectures, especially in vectorized code paths or GPU code.
-A branch-free version of Möller-Trumbore's code, which is currently used and performs slightly better, is shown in algorithm \ref{alg:triangle_inside_test}.
+A branch-free version of Möller-Trumbore's code, which is currently used and performs slightly better, is shown in \cref{alg:triangle_inside_test}.
 
-The idea of the algorithm is shown in figure \ref{fig:ray_triangle_intersect}.
+The idea of the algorithm is shown in \cref{fig:ray_triangle_intersect}.
 %
 \begin{figure}
 	\centering
@@ -573,7 +573,7 @@ The first is a translation of $O$ by $-V_0$ to move the coordinate system's orig
 The second step is a change of basis with $\left[-D, V_1 - V_0, V_2 - V_0 \right]$ as base matrix.
 This is done by multiplying with the inverse base matrix.
 The result vector $\left[ t,  u,  v \right]$ then contains the desired values.
-By moving the multiplication with the inversed base matrix to the other side, the equation in figure \ref{fig:ray_triangle_intersect} is obtained.
+By moving the multiplication with the inversed base matrix to the other side, the equation in \cref{fig:ray_triangle_intersect} is obtained.
 Möller and Trumbore solve this system of equations in matrix form using Cramer's rule and by calculating the determinant of a matrix using a cross and a dot product, \aka scalar triple product.
 This allows to calculate the values of the solution vector incrementally to allow early exits.
 
@@ -670,7 +670,7 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 \subsection{Parallelization}
 \label{sec:parallelization}
 
-By choosing to solve the intersections of all structures per cell, the main routine in algorithm \ref{alg:direct_intersection} became embarrassingly parallel.
+By choosing to solve the intersections of all structures per cell, the main routine in \cref{alg:direct_intersection} became embarrassingly parallel.
 As the regular grid usually consists of a larger number of cells, \eg $100 \times 100 \times 100$ is quite common, scheduling each cell in parallel is probably the best option for parallelization.
 However, a good scheduling strategy is needed, as the workload per cell is highly diverse.
 Most of the cells are empty because they are either inside or outside cells and require no processing.
@@ -704,7 +704,7 @@ the uneven workloads in all loops, \eg number of structures per cell, number of 
 \label{sec:test_scenes}
 
 For testing the direct intersection approach and the further surface reconstruction algorithms shown in succeeding chapters, a few test scenes have been created.
-The test scenes and their configurations are shown in table \ref{tbl:test_scenes}.
+The test scenes and their configurations are shown in \cref{tbl:test_scenes}.
 %
 \begin{table}[h]
 	\centering
@@ -727,7 +727,7 @@ The test scenes and their configurations are shown in table \ref{tbl:test_scenes
 \end{table}
 
 The cube2 scene is a simple intersection between a cubic stock and a cuboid swept volume.
-It has already been used as an example when discussing the concept of the direct intersection approach at the beginning of this chapter in figure \ref{fig:cube2}.
+It has already been used as an example when discussing the concept of the direct intersection approach at the beginning of this chapter in \cref{fig:cube2}.
 But instead of no grid, a small one with a resolution of $10\times10\times10$ cells is used.
 This scene is used as a proof of concept for each surface reconstruction algorithm in this thesis.
 %
@@ -738,7 +738,7 @@ The cylinders\_d scene requires more triangles to approximate the cylinders.
 Both scenes also use the same small grid resolution as the cube2 scene.
 These two scenes should have an almost identical visual outcome but quite different stress on the numeric robustness of the extraction.
 %
-The cylinder\_head scene was the initial test scene when the ray casting subsystem was developed, \cf chapter \ref{ch:previous_work}.
+The cylinder\_head scene was the initial test scene when the ray casting subsystem was developed, \cf \cref{ch:previous_work}.
 It is the smallest and easiest of the practical scenes used for benchmarking.
 The cylinder\_head uses a medium sized grid of $50\times50\times30$ cells with a moderate, but still little, number of triangles and swept volumes.
 %
@@ -755,7 +755,7 @@ The amount of triangles in each grid cell varies greatly between the test scenes
 This property is interesting as it has the largest impact on algorithms which have to iterate on the triangles of a cell.
 Furthermore, largely divergent triangle counts inside cells challenge schedulers in parallel processing of cells and increase branch divergence on GPU architectures.
 An optimal distribution would be an almost empty histogram with a peak at a certain location, meaning all surface cell contain roughly the same number of triangles.
-Figure \ref{fig:histograms} shows histograms of the triangles per cell distribution for the test scenes of table \ref{tbl:test_scenes}.
+\Cref{fig:histograms} shows histograms of the triangles per cell distribution for the test scenes of \cref{tbl:test_scenes}.
 %
 \begin{figure}[!]
 	\centering
@@ -802,7 +802,7 @@ Figure \ref{fig:histograms} shows histograms of the triangles per cell distribut
 		\label{fig:turbine_histogram}
 	\end{subfigure}
 	\caption{
-		Histograms showing the distribution of triangle counts per cell for the selected test scenes in table \ref{tbl:test_scenes}.
+		Histograms showing the distribution of triangle counts per cell for the selected test scenes in \cref{tbl:test_scenes}.
 		The horizontal axis shows the number of triangles per cell.
 		The vertical axis is logarithmic and shows the number of cells with a specific triangle count.
 	}
@@ -830,7 +830,7 @@ Despite its uniformity, such distributions are unfortunately rather disadvantage
 Furthermore, the triangle counts per cell are quite high with amounts of up to 2000 triangles per cell occurring quite often.
 Cells with even more triangles exist only marginally.
 
-For visual reference, figure \ref{fig:raycasted_scenes} shows images of the selected test scenes raycasted using the VML.
+For visual reference, \cref{fig:raycasted_scenes} shows images of the selected test scenes raycasted using the VML.
 %
 \begin{figure}[!]
 	\centering
@@ -877,7 +877,7 @@ For visual reference, figure \ref{fig:raycasted_scenes} shows images of the sele
 		\label{fig:turbine_raycasted}
 	\end{subfigure}
 	\caption{
-		Raycasted images of the test scenes given in table \ref{tbl:test_scenes}.
+		Raycasted images of the test scenes given in \cref{tbl:test_scenes}.
 	}
 	\label{fig:raycasted_scenes}
 \end{figure}
@@ -885,8 +885,8 @@ For visual reference, figure \ref{fig:raycasted_scenes} shows images of the sele
 \section{Results}
 \label{sec:direct_intersection_results}
 
-Finally, the direct intersection approach described in this chapter has been tested on the scenes described in section \ref{sec:test_scenes}.
-Table \ref{tbl:direct_intersection_results} contains the runtime and output size of the test runs.
+Finally, the direct intersection approach described in this chapter has been tested on the scenes described in \cref{sec:test_scenes}.
+\Cref{tbl:direct_intersection_results} contains the runtime and output size of the test runs.
 %
 \begin{table}[!]
 	\centering
@@ -913,7 +913,7 @@ Table \ref{tbl:direct_intersection_results} contains the runtime and output size
 The timings vary a lot from \SI{1}{\milli\second} for the simple cube2 scene up to \SI{280}{\second} for the turbine scene.
 The runtime depends on multiple characteristics of the input.
 The number of swept volumes increase the runtime linearly, as seen when comparing the timings of the impeller and impeller\_2 scene.
-This consequence can also be derived from algorithm \ref{alg:direct_intersection} where the \textproc{DirectIntersection} function performs a pairwise reduction of all structures of a single cell, a linear operation.
+This consequence can also be derived from \cref{alg:direct_intersection} where the \textproc{DirectIntersection} function performs a pairwise reduction of all structures of a single cell, a linear operation.
 All other parameters influence the runtime in less easily comprehensible ways.
 The turbine scene for example has a little more than 3 times the triangles to process than the impeller scene and a lot less swept volumes, but requires more than 10 times the computation time.
 What causes the big difference in this case is mostly the triangle density per structure.
@@ -921,20 +921,20 @@ When dividing the number of totally stored triangles by the number of swept volu
 This number is roughly 2500 for the impeller scenes and 33000 for the turbine scene.
 As the grid resolution is almost identical in these scenes, the parts of a swept volumes assigned to each cell, \ie the structures, are substantially larger.
 An increase in the number of triangles per structure, raises the runtime quadratically in several sub-algorithms.
-Having a look on the basic structure of the direct intersection approach in algorithm \ref{alg:direct_intersection}, the \textproc{ClipStructure} and the \textproc{SplitTriangle} functions run linearly with the number of triangles per structure, whereas the \textproc{IntersectTriangle} and \textproc{IsTriangleInsideStructure} form nested loops on all triangles of the structure, \ie require quadratic time.
-Considering the additional code required to increase numeric stability discussed in section \ref{sec:numeric_improvements}, the collapsing of near points of a structure is also a quadratic operation.
+Having a look on the basic structure of the direct intersection approach in \cref{alg:direct_intersection}, the \textproc{ClipStructure} and the \textproc{SplitTriangle} functions run linearly with the number of triangles per structure, whereas the \textproc{IntersectTriangle} and \textproc{IsTriangleInsideStructure} form nested loops on all triangles of the structure, \ie require quadratic time.
+Considering the additional code required to increase numeric stability discussed in \cref{sec:numeric_improvements}, the collapsing of near points of a structure is also a quadratic operation.
 The algorithms with quadratic runtime also light up in profiling sessions with \textproc{IntersectTriangle} consuming \SI{38}{\percent}, near points collapsing \SI{26}{\percent} and \textproc{IsTriangleInsideStructure} \SI{18}{\percent} of the total runtime.
 The grid resolution affects the runtime by partitioning the whole problem into smaller parts.
 A finer grid causes structures to be smaller and the output to contain fewer errors as cells contain fewer structures and triangles.
 Especially the quadratic functions benefit from smaller structures.
 However, as a consequence of a finer grid, more cells have to be processed in total.
-As processing cells is a linear operation, \cf algorithm \ref{alg:direct_intersection}, increasing the grid resolution is usually beneficial.
+As processing cells is a linear operation, \cf \cref{alg:direct_intersection}, increasing the grid resolution is usually beneficial.
 Nevertheless, maintaining the grid and related data structures requires time and especially memory, thus restricting its granularity.
 Resolutions between 100 and 150 cells in one dimensions usually proofed to be good choices for real world scenarios.
 
-The amount of exploitable parallelism has already been discussed in section \ref{sec:parallelization}.
+The amount of exploitable parallelism has already been discussed in \cref{sec:parallelization}.
 The topmost loop of the \textproc{DirectIntersection} function has been parallelized in the implementation using Microsoft's Parallel Patterns Library (PPL) and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
-The CPU utilization during an single run of the direct intersection approach on the impeller scene is shown in figure \ref{fig:di_cpu}.
+The CPU utilization during an single run of the direct intersection approach on the impeller scene is shown in \cref{fig:di_cpu}.
 %
 \begin{figure}[!]
 	\centering
@@ -955,7 +955,7 @@ However, more complex scheduling usually also increases the parallelization over
 Concerning memory, the regular grid holding the impeller requires approximately \SI{600}{\mebi\byte} memory.
 During the algorithm, \SI{300}{\mebi\byte} additional memory has been allocated, mostly for the temporary union structures and the buffer holding the resulting surface.
 
-Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes.
+\Cref{fig:di_results} contains renderings of the resulting triangle meshes.
 %
 \begin{figure}[!]
 	\centering
@@ -1005,15 +1005,15 @@ Figure \ref{fig:di_results} contains renderings of the resulting triangle meshes
 		\label{fig:di_turbine}
 	\end{subfigure}
 	\caption{
-		Renderings of the result meshes using MeshLab after applying the direct intersection reconstruction approach on the selected test scenes in table \ref{tbl:test_scenes}.
+		Renderings of the result meshes using MeshLab after applying the direct intersection reconstruction approach on the selected test scenes in \cref{tbl:test_scenes}.
 	}
 	\label{fig:di_results}
 \end{figure}
 %
 The cube2 scene has been extracted almost correctly.
 All intersecting triangles have been properly split and retriangulated.
-There is one small hole at one of the edges and a few falsely remaining ones at the bottom left of the cutting surface, \cf figure \ref{fig:di_cube2}.
-These errors are due to a wrong outcome of the inside test, \cf \textproc{IsTriangleInsideStructure} in algorithm \ref{alg:triangle_inside_test}.
+There is one small hole at one of the edges and a few falsely remaining ones at the bottom left of the cutting surface, \cf \cref{fig:di_cube2}.
+These errors are due to a wrong outcome of the inside test, \cf \textproc{IsTriangleInsideStructure} in \cref{alg:triangle_inside_test}.
 Nevertheless, the errors in the reconstructed surface are small and may be corrected manually using an appropriate 3D modeling tool, creating a closed mesh.
 
 Both cylinder scenes delivered good results.
@@ -1024,13 +1024,13 @@ In early stages, before the GTE library had been used for its excellent CDT, the
 With the use of GTE, the numeric problems shifted from the CDT to the \textproc{IsTriangleInsideStructure} test.
 The reason why smaller and more regular triangles entail a higher error rate in this test is not entirely clear.
 The test is quite sensitive to the chosen target point of the structure used for casting the test ray.
-Furthermore, a lot if ray-triangle intersections are performed where triangle normals are compared with the ray's direction, \cf details of algorithm \ref{alg:triangle_inside_test}.
+Furthermore, a lot if ray-triangle intersections are performed where triangle normals are compared with the ray's direction, \cf details of \cref{alg:triangle_inside_test}.
 All these tests become numerically unstable, if the ray becomes parallel to the tested triangles.
 In theory, the tested triangle should always lie clearly inside or outside the structure it is tested against, otherwise there must have been an intersection and the triangle would have been split.
 In practice, if an intersection has been missed and the triangle spans the structure or the tested triangle is almost degenerated and very close to the structure, errors may occur.
 
 Concerning the more complex scenes, the impeller and turbine surfaces look quite good from a distance, but fail horribly reviewing the details.
-Figure \ref{fig:di_scenes_artifacts} shows two detailed views, one centered on a smaller blade of the impeller and one centered on a milling groove of the turbine.
+\Cref{fig:di_scenes_artifacts} shows two detailed views, one centered on a smaller blade of the impeller and one centered on a milling groove of the turbine.
 %
 \begin{figure}[h]
 	\centering
@@ -1058,7 +1058,7 @@ These errors may then cause consequential errors in \eg the triangle inside test
 As the impeller's grid contains cells with up to 64 structures, small mistakes add up iteratively and may cause huge defects on the final surface.
 Especially the cells which contain triangles from many swept volumes, \ie cells at the blade edges, suffer from this effect.
 The triangle inside test still does an acceptable job and the final surface does somehow resemble the surface of the machining result.
-Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles, \cf table \ref{tbl:direct_intersection_results}.
+Nonetheless, the reconstructed surface contains a huge number of holes and boundaries as well as lots of intersecting triangles, \cf \cref{tbl:direct_intersection_results}.
 Regarding the quality of the produced mesh, the result is probably worthless for subsequent tasks, like using it for simulations.
 
 The turbine scene seems to have a similar problem.
@@ -1068,10 +1068,10 @@ By deleting self-intersecting triangles from the outcome, an intelligent hole cl
 
 All extracted meshes in general have issues with neighboring triangles not having identical shared vertices.
 The difference however is neglectable and can easily be corrected in a post processing step which merges close vertices, \eg using the Merge Close Vertices filter of MeshLab.
-Furthermore, the result contains many T-vertices around intersected triangles which result from clipping a cell's triangles after the triangle-triangle intersections and retriangulations instead of before, \cf section \ref{sec:clipping}.
+Furthermore, the result contains many T-vertices around intersected triangles which result from clipping a cell's triangles after the triangle-triangle intersections and retriangulations instead of before, \cf \cref{sec:clipping}.
 
-In addition to timings and triangle counts, the results table \ref{tbl:direct_intersection_results} also lists the number of created boundary edges.
+In addition to timings and triangle counts, the results \cref{tbl:direct_intersection_results} also lists the number of created boundary edges.
 These numbers are fairly high, especially at the real-world and complicated scenes.
 However, these numbers specify the number of edges at a boundary, not the number of holes, which is considerably smaller.
 In fact, most of the boundary edges in simpler scenes, \eg cylinders and cylinder\_head, are attributed to T-vertices.
-Nevertheless, more complex scenes like the impeller or turbine truly contain an extensive amount of holes, as sceen in their detailed renderings, \cf figure \ref{fig:di_scenes_artifacts}.
+Nevertheless, more complex scenes like the impeller or turbine truly contain an extensive amount of holes, as sceen in their detailed renderings, \cf \cref{fig:di_scenes_artifacts}.

@@ -17,7 +17,7 @@ draft,
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage[binary-units=true,group-digits=false]{siunitx}
-\usepackage[final]{graphicx}
+\usepackage[draft]{graphicx}
 \usepackage{subcaption}
 \usepackage[style=numeric,backend=biber,urldate=iso8601]{biblatex}
 \usepackage{xspace}
@@ -34,6 +34,7 @@ draft,
 \usepackage[hidelinks]{hyperref}
 \usepackage[plain]{algorithm}
 \usepackage[noend]{algpseudocode}
+\usepackage[capitalize,noabbrev]{cleveref}
 
 
 % ====================================================================================================
@@ -87,6 +88,11 @@ draft,
 % siunitx
 %
 \DeclareSIUnit{\nothing}{\relax}
+
+%
+% cleveref
+%
+\crefname{line}{line}{lines}
 
 %
 % misc

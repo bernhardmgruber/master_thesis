@@ -16,7 +16,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 
 
 	\item[Triangulation/Tessellation] \hfill \\
-	Although several representations exist to describe solids, \cf section \ref{sec:surface_representations}, triangle meshes are often preferred when exporting or distributing a solid.
+	Although several representations exist to describe solids, \cf \cref{sec:surface_representations}, triangle meshes are often preferred when exporting or distributing a solid.
 	The process of converting an alternative representation to a triangle mesh is called triangulation or tessellation.
 	\Eg, a common scenario in CAD is to export a model described using a CSG tree or dexel image as a triangle mesh.
 
@@ -35,7 +35,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	As a further aspect, the intersection between any pair of faces must be either a shared edge, a shared vertex or nothing \cite{mesh_lecture10}.
 	In other words, faces can only connect to and not insect each other.
 	%
-	If a mesh is closed, it is a boundary representation, \cf section \ref{sec:surface_representations}, and therefore represents a solid.
+	If a mesh is closed, it is a boundary representation, \cf \cref{sec:surface_representations}, and therefore represents a solid.
 
 	Another type of meshes are volumetric meshes, which also represent the contained volume in addition to the surface.
 	Volumetric meshes are used, \eg, in finite element methods for physics simulations.
@@ -51,7 +51,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	%
 	Speaking strictly of triangle meshes, this restriction becomes concrete:
 	A triangle mesh is a manifold if each edge is incident to only one or two faces and the faces incident to a vertex form an open or closed fan \cite{mesh_basics}.
-	Figure \ref{fig:manifold} shows examples following and violating this requirements.
+	\Cref{fig:manifold} shows examples following and violating this requirements.
 
 	\begin{figure}[H]
 		\centering
@@ -118,7 +118,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	This order is also called winding order and determines the direction of the surface normal.
 	The orientation of two adjacent faces is said to be compatible, if the two shared vertices on the shared edge are in opposite order.
 	A mesh is orientable if it is a manifold and any pair of adjacent faces are compatible.
-	Figure \ref{fig:orientable_mesh} shows examples of orientable and not orientable meshes.
+	\Cref{fig:orientable_mesh} shows examples of orientable and not orientable meshes.
 
 	\begin{figure}[H]
 		\centering
@@ -172,7 +172,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	The concept of 2-dimensional Delaunay triangulations can be extended to 3 dimensions, where each triangle of a manifold mesh has an empty circumscribing sphere.
 	Such a triangle is sometimes also referred to as Gabriel 2-Simplex (G2S) \cite{g2s}.
 	Delaunay triangulations produce very regular and visually appealing triangle meshes, as triangles with larger interior angles are preferred.
-	Figure \ref{fig:delaunay_triangulation} shows a set of points with three different triangulations, with the first being Delaunay.
+	\Cref{fig:delaunay_triangulation} shows a set of points with three different triangulations, with the first being Delaunay.
 
 	\begin{figure}[H]
 		\centering
@@ -192,7 +192,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	The resulting triangulation is called a constrained Delaunay triangulation (CDT).
 	Each triangle of the mesh satisfies the Delaunay condition, \ie an empty circumcircle, except for triangles containing a constrained edge.
 	A CDT is therefore as Delaunay as possible.
-	Figure \ref{fig:delaunay_triangulation} shows a constrained Delaunay triangulation on the middle and the corresponding Delaunay triangulation on the left image.
+	\Cref{fig:delaunay_triangulation} shows a constrained Delaunay triangulation on the middle and the corresponding Delaunay triangulation on the left image.
 	Constraints are colored red.
 	By splitting the constrained edges using additional vertices, \ie Steiner points, a CDT can be further refined into a fully conforming constrained Delaunay triangulation.
 
@@ -232,7 +232,7 @@ The following section is based on a comprehensive overview with sketches and des
 	It was first described by Chappel \cite{vector_clipping} in 1983.
 	The method requires the surface of the final workpiece as well as the stock.
 	Initially, points on the final workpiece are calculated together with surface normals, \ie a point cloud, where the normals are not of unit length but long enough to reach the surface of the stock.
-	To simulate the manufacturing process, the cutter is moved over this point cloud and the vectors attached to the points are clipped by the moving cutter, \cf figure \ref{fig:vector_clipping}.
+	To simulate the manufacturing process, the cutter is moved over this point cloud and the vectors attached to the points are clipped by the moving cutter, \cf \cref{fig:vector_clipping}.
 	This method can be compared to a lawn mower, which cuts the grass, \ie the normal vectors, towards the ground, \ie the final workpiece.
 	After cutting has completed, the lengths of the remaining vectors indicate the local error of the NC program.
 	Vectors with positive lengths mark areas where too less material was removed and vice versa.
@@ -254,8 +254,8 @@ The following section is based on a comprehensive overview with sketches and des
 	Z-maps approximate a solid by sampling its height at each crossing of a regular 2-dimensional grid.
 	This grid is usually placed perpendicular to the cutting direction at one side of the stock, \eg the bottom.
 	The volume of the z-mapped solid can be seen as the union of right square prisms where a prism is placed on each crossing of the grid with the height sampled at the crossing.
-	Figure \ref{fig:zmap} shows such a prism approximation of a cuboid stock with a ball-end cutter removing material.
-	As a z-map is a 2-dimensional scalar field with values at discrete regular positions, it can therefore be seen as an image, commonly referred to as depth image, \cf figure \ref{fig:depth_image}.
+	\Cref{fig:zmap} shows such a prism approximation of a cuboid stock with a ball-end cutter removing material.
+	As a z-map is a 2-dimensional scalar field with values at discrete regular positions, it can therefore be seen as an image, commonly referred to as depth image, \cf \cref{fig:depth_image}.
 
 	Material is removed by creating a depth image for each cutter movement, \aka sweep, with the same position and orientation as the depth image of the workpiece.
 	The sweep's depth image describes the removed material during the sweep.
@@ -296,7 +296,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Each dexel stores a sorted list of these intersections, where an intersection is also called a dexel node.
 	A node basically contains the depth value of the intersection and can contain further information such as a surface normal or a color value.
 	Pairs of dexel nodes where the first node has been an entry and the second an exit are called segments and always lie inside the workpiece.
-	Figure \ref{fig:dexel_image} shows a dexel representation of a half sphere with a smaller, concentric half sphere drilled out.
+	\Cref{fig:dexel_image} shows a dexel representation of a half sphere with a smaller, concentric half sphere drilled out.
 
 	Material removal is done in a similar fashion as with z-maps.
 	A dexel image is created for a sweep and then combined with the dexel image of the current workpiece.
@@ -323,7 +323,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Although multiple dexel images can be created from any orientations, it is common to create three dexel images along the three axes of a Cartesian coordinate system.
 	Therefore, the 2-dimensional dexel grids lie in the three planes defined by pairs of the coordinate system's axes, \ie xy-, yz-, zx-plane.
 	This case of multi-dexel image is also referred to as triple- or tri-dexel image.
-	Figure \ref{fig:tri_dexel_image} shows a triple-dexel representation of an octant of a centered unit sphere.
+	\Cref{fig:tri_dexel_image} shows a triple-dexel representation of an octant of a centered unit sphere.
 
 	\begin{figure}[H]
 		\centering
@@ -343,7 +343,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Although primitives are typically basic shapes such as cubes, spheres or cylinders, they can, in theory, be any kind of complex shape.
 	Pairs of primitives can be combined using Boolean set operations such as union, intersection or difference.
 	The result of such an operation is a new solid, which can be again combined with other models or further primitives.
-	A good visualization of these combinations is as a tree as shown in figure \ref{fig:csg_tree}.
+	A good visualization of these combinations is as a tree as shown in \cref{fig:csg_tree}.
 
 	In virtual machining, material removal can be described as iteratively subtracting a new solid corresponding to the swept volume of the cutter during a single movement.
 	Additive manufacturing, e.g. 3-dimensional printing, is also easily representable by adding a new solid.
@@ -370,7 +370,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Uniform spatial decomposition (USD) divides space into equally sized cells.
 	An example would be a regular grid with cubic cells.
 	This special case is known as voxel model, where a voxel, abbreviated from volume element, is a single cell of the regular grid.
-	Figure \ref{fig:spatial_decomposition_usd} shows a voxel model of a simple solid.
+	\Cref{fig:spatial_decomposition_usd} shows a voxel model of a simple solid.
 
 	USDs are simple to create and implement as they only require a three dimensional grid which stores for each cell whether it is occupied or not.
 	Boolean operations are also easily solved, as two uniform grids can be combined on a per cell basis similar to z-maps.
@@ -380,7 +380,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Hierarchical spatial decomposition (HSD) overcomes the shortcomings of USDs.
 	HSDs partition space in an adaptive way and increase their resolution only where detail is necessary.
 	Therefore, HSDs usually require less memory at the cost of increased complexity.
-	Figure \ref{fig:spatial_decomposition_hsd} shows an example of a solid represented by a hierarchically decomposed space.
+	\Cref{fig:spatial_decomposition_hsd} shows an example of a solid represented by a hierarchically decomposed space.
 
 	A common representative of HSDs are octrees.
 	An octree on its highest level is a cube which is then recursively subdivided into eight half-sized cubes, \aka octants.
@@ -420,7 +420,7 @@ The following section is based on a comprehensive overview with sketches and des
 	This surface typically consists of faces, \ie bounded surfaces, edges between those faces, \ie bounded curves, vertices, \ie 3-dimensional points, as well as their topology.
 	B-reps are therefore closed meshes.
 	Faces can be specified using a variety of mathematical models from complex splines such as B-splines and NURBs to simple polygons like triangles.
-	Figure \ref{fig:brep} shows an example of a B-rep which represents a machining part using triangles as faces.
+	\Cref{fig:brep} shows an example of a B-rep which represents a machining part using triangles as faces.
 	%
 	In the field of virtual machining, the faces of B-reps are typically polygons which are connected by straight edges, \ie polyhedrons.
 	The most common case are triangle meshes, although quadrilateral meshes are also popular in CAD.
