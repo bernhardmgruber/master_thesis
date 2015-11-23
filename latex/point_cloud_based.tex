@@ -223,7 +223,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 %	The $\alpha$-shape therefore also contains triangles within the point cloud, which would not be discovered by the BPA if the ball never rolls \enquote{inside} the point cloud, \ie sufficient density is given.
 %	If $\alpha$ becomes $\infty$, the $\alpha$-shape becomes the convex hull of the point cloud, \cf \cref{fig:alpha_shapes_convex_hull}.
 %	The magnitude of $\alpha$ determines
-%	The empty circumsphere criterion further guarantees the triangulation to be Delaunay, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
+%	The empty circumsphere criterion further guarantees the triangulation to be a Delaunay triangulation, \ie the $\alpha$-shape is a subset of the 3-dimensional Delaunay triangulation.
 %	An implementation of an $\alpha$-shape constructing algorithm is found in \eg the CGAL \cite{cgal_3d_alpha_shapes}, VTK \cite{vtk}, QHull \cite{qhull} or PCL \cite{pcl} library.
 %	MeshLab provides user-friendly access the QHull version of the algorithm via a GUI.
 
@@ -694,7 +694,7 @@ Compared with the tri-dexel approach and similarly to the BPA, the Poisson surfa
 However, as detailed in \cref{sec:point_cloud_concept}, the main reason for this issue is the richer semantic carried by the tri-dexel image when compared with a point cloud.
 
 Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10 - 20 times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
-\Eg, the runtimes for the turbine scene at the resolutions 50, 100, 200 and 400, averaged over 5 runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
+The runtimes for the turbine scene, for example, at the resolutions 50, 100, 200 and 400, averaged over 5 runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
 However, the algorithm employed by MeshLab runs single threaded.
 Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude
 During the reconstruction at resolution 400, roughly \SI{400}{\mebi\byte} were allocated, making the Poisson algorithm significantly more light-weight than the BPA.

@@ -18,7 +18,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	\item[Triangulation/Tessellation] \hfill \\
 	Although several representations exist to describe solids, \cf \cref{sec:surface_representations}, triangle meshes are often preferred when exporting or distributing a solid.
 	The process of converting an alternative representation to a triangle mesh is called triangulation or tessellation.
-	\Eg, a common scenario in CAD is to export a model described using a CSG tree or dexel image as a triangle mesh.
+	A common scenario in CAD, for example, is to export a model described using a CSG tree or dexel image as a triangle mesh.
 
 
 	%\item[Chord error] \hfill \\
@@ -47,7 +47,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	This mapping must be bijective and is called homeomorphism or topological isomorphism.
 	Each point of the region has a corresponding point in the mapped space and vice versa.
 	In case of 3-dimensional meshes, a mesh is a 2-manifold if it can locally be mapped into 2-dimensional Euclidean space.
-	\Eg the Earth is a 2-manifold as each local region can be mapped into a 2-dimensional plane, like the maps of an atlas.
+	The Earth, for example, is a 2-manifold as each local region can be mapped into a 2-dimensional plane, like the maps of an atlas.
 	%
 	Speaking strictly of triangle meshes, this restriction becomes concrete:
 	A triangle mesh is a manifold if each edge is incident to only one or two faces and the faces incident to a vertex form an open or closed fan \cite{mesh_basics}.
@@ -166,13 +166,12 @@ The following is a list of definitions of common terms used in 3-dimensional com
 
 
 	\item[Delaunay triangulation] \hfill \\
-	Named after the Russian mathematician Boris Delaunay, a 2-dimensional triangulation is called Delaunay when the circumcircle of each triangle does not contain a vertex of another triangle.
-	The Delaunay triangulation is unique for each set of points as long as not more than three vertices lie on a circle.
-	\Eg a quad can be triangulated along any of the diagonals to be Delaunay.
+	Named after the Russian mathematician Boris Delaunay, a 2-dimensional triangulation is called a Delaunay triangulation, when the circumcircle of each triangle does not contain a vertex of another triangle.
+	The Delaunay triangulation is unique for each set of points, as long as not more than three vertices lie on a circle, \eg a square can be triangulated along any of the diagonals.
 	The concept of 2-dimensional Delaunay triangulations can be extended to 3 dimensions, where each triangle of a manifold mesh has an empty circumscribing sphere.
 	Such a triangle is sometimes also referred to as Gabriel 2-Simplex (G2S) \cite{g2s}.
 	Delaunay triangulations produce very regular and visually appealing triangle meshes, as triangles with larger interior angles are preferred.
-	\Cref{fig:delaunay_triangulation} shows a set of points with three different triangulations, with the first being Delaunay.
+	\Cref{fig:delaunay_triangulation} shows a set of points with three different triangulations, with the first one being a Delaunay triangulation.
 
 	\begin{figure}[H]
 		\centering
@@ -191,7 +190,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	Sometimes, predefined edges, \ie constraints or constrained edges, have to be respected when triangulating a point cloud into a Delaunay triangulation.
 	The resulting triangulation is called a constrained Delaunay triangulation (CDT).
 	Each triangle of the mesh satisfies the Delaunay condition, \ie an empty circumcircle, except for triangles containing a constrained edge.
-	A CDT is therefore as Delaunay as possible.
+	A CDT is therefore as close to a Delaunay triangulation as possible.
 	\Cref{fig:delaunay_triangulation} shows a constrained Delaunay triangulation on the middle and the corresponding Delaunay triangulation on the left image.
 	Constraints are colored red.
 	By splitting the constrained edges using additional vertices, \ie Steiner points, a CDT can be further refined into a fully conforming constrained Delaunay triangulation.
@@ -205,7 +204,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 
 
 	\item[Swept volume] \hfill \\
-	In the context virtual machining, a single move of a cutting tool along a path is called a sweep.
+	In the context of virtual machining, a single move of a cutting tool along a path is called a sweep.
 	A swept volume is the volume which is covered by the cutting tool's solid during a sweep.
 	The fast and efficient computation of such swept volumes for all kinds of paths, including self-intersection, is still subject to research and discussed in the field of envelope theory.
 
@@ -257,7 +256,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\Cref{fig:zmap} shows such a prism approximation of a cuboid stock with a ball-end cutter removing material.
 	As a z-map is a 2-dimensional scalar field with values at discrete regular positions, it can therefore be seen as an image, commonly referred to as depth image, \cf \cref{fig:depth_image}.
 
-	Material is removed by creating a depth image for each cutter movement, \aka sweep, with the same position and orientation as the depth image of the workpiece.
+	Material is removed by creating a depth image for each cutter movement, \ie a sweep, with the same position and orientation as the depth image of the workpiece.
 	The sweep's depth image describes the removed material during the sweep.
 	It is combined with the depth image of the workpiece by updating all depth values to be the minimum value of the workpiece's and sweep's depth image.
 
@@ -304,7 +303,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 	In comparison with image-based representations like z-maps and depth images, dexel-based approaches are able to represent overlapping surfaces and workpieces with a front- and a back-face.
 	Nevertheless, the sampling resolution from the surface's perspective is dependent on the orientation of the surface towards the dexel grid.
-	The more parallel the surface is to the grid, the smaller becomes the distance between two neighboring entry/exit points on the surface.
+	The more parallel the surface lies to to the grid, the smaller becomes the distance between two neighboring entry/exit points on the surface.
 	In case the surface is perpendicular to the grid, the dexels lie parallel to the surface and do not capture any intersections.
 
 	\begin{figure}[H]
@@ -383,7 +382,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\Cref{fig:spatial_decomposition_hsd} shows an example of a solid represented by a hierarchically decomposed space.
 
 	A common representative of HSDs are octrees.
-	An octree on its highest level is a cube which is then recursively subdivided into eight half-sized cubes, \aka octants.
+	An octree on its highest level is a cube which is then recursively subdivided into eight half-sized cubes, called octants.
 	This subdivision is only done, where a finer decomposition of space is necessary.
 	Further examples of hierarchical decompositions are Binary Space Partitioning (BSP) and Bounding Volume Hierarchies (BVH).
 
@@ -426,7 +425,7 @@ The following section is based on a comprehensive overview with sketches and des
 	The most common case are triangle meshes, although quadrilateral meshes are also popular in CAD.
 	%
 	Boolean operations like subtraction are hard to perform on arbitrary B-reps.
-	When considering only triangulated surfaces, the undertaking becomes doable, but still remains calculatively expensive and usually suffers from numerics.
+	When considering only triangulated surfaces, boolean operations become manageable, but still remain calculatively expensive and usually suffer from numeric instabilities.
 	Boolean operations on triangulated B-reps are typically available in modern CAD kernels.
 
 	\begin{figure}[H]
@@ -441,17 +440,17 @@ The following section is based on a comprehensive overview with sketches and des
 	\item[Functional representation (F-rep)] \hfill \\
 	From a more mathematical point of view, surfaces can also be represented using real-valued functions.
 	Pasko \etal give a good overview on this subject in the context of modeling and computer graphics \cite{frep}.
-	\Eg a sphere is defined analytically as the infinite set of points with the same distance, \ie radius, to a distinct center point.
-	By defining a function $d$ for the distance of a point $p$ to the center $c$ of a sphere $S$,
+	A sphere, for example, is defined analytically as the infinite set of points with the same distance, \ie radius, to a distinct center point $c$.
+	By defining a function $d$ for the distance of a point $p$ to the center $c$,
 	\begin{align}
 		d(p) &= \lvert c - p \rvert,
-	\intertext{subtracting the radius $r$ and equating it with zero, a predicate}
-		\mathit{on\_sphere}(p) &\Leftrightarrow d(p) - r = 0
-	\intertext{is constructed that holds true for all points on the sphere's surface.}
-	\intertext{More formally, $S$ is called a locus with regard to $\mathit{on\_sphere}$ and defined as}
-		S &= \{\, p \in \mathbb{R}^3 \mid \mathit{on\_sphere}(p) \,\}.
+		\intertext{a sphere $S$ with radius $r$ is defined as a set of points}
+		S &= \{\, p \in \mathbb{R}^3 \mid d(p) - r = 0 \,\}.
 	\end{align}
-	Generalized, an object can be specified by classifying all spatial points using a continuous, real-valued function $f$. For each point $p \in \mathbb{R}^3$
+	Formally, $S$ is called a locus with regard to the condition $d(p) - r = 0$.
+	
+	Generalized, an object can be specified by classifying all spatial points using a continuous, real-valued function $f$.
+	For each point $p \in \mathbb{R}^3$
 	\begin{align}
 		f(p) &> 0 \quad \text{if $p$ is inside the object,}               \notag \\
 		f(p) &= 0 \quad \text{if $p$ is on the surface of the object and} \notag \\

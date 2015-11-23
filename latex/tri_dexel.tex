@@ -422,7 +422,7 @@ This poses no problem in a single threaded context, but would lead to data races
 \label{sec:tri_dexel_regularization}
 
 During the conversion of the VML's data model into a tri-dexel representation errors may occur.
-Dexel segments for example might not be of accurate length because of numerics in the triangle intersection routine or corrections applied by the raycaster when sorting and counting through the intersected structures to identify surface hits.
+Dexel segments, for example, might not be of accurate length because of numeric instabilities in the triangle intersection routine or corrections applied by the raycaster when sorting and counting through the intersected structures to identify surface hits.
 Such defects are especially critical at the intersection points of dexels from multiple dexel images, the grid points.
 Furthermore, the number of different configurations a single tri-dexel cell may have is huge, as each edge may contain an arbitrary number of dexel segments, rendering the creation of an appropriate triangulation algorithm almost impossible.
 It is thus beneficial to reduce the number of cases by dropping some information in favor of regularity.

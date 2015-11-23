@@ -345,7 +345,7 @@ However, as CDT algorithms are quite hard to implement regarding speed and robus
 A list of C/C++ libraries offering constrained Delaunay triangulations is given in \cref{tbl:delaunay_libs}.
 Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
 Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
-As output they generate a Delaunay mesh, with the convex hull of the point cloud as boundary.
+As output they generate a Delaunay triangulation, with the convex hull of the point cloud as boundary.
 
 \renewcommand{\arraystretch}{1.5} % row spacing
 \begin{table}[h]
@@ -574,7 +574,8 @@ The second step is a change of basis with $\left[-D, V_1 - V_0, V_2 - V_0 \right
 This is done by multiplying with the inverse base matrix.
 The result vector $\left[ t,  u,  v \right]$ then contains the desired values.
 By moving the multiplication with the inversed base matrix to the other side, the equation in \cref{fig:ray_triangle_intersect} is obtained.
-Möller and Trumbore solve this system of equations in matrix form using Cramer's rule and by calculating the determinant of a matrix using a cross and a dot product, \aka scalar triple product.
+Möller and Trumbore solve this system of equations in matrix form using Cramer's rule.
+The determinant of a matrix is calculated using a combination of a cross and a dot product, called the scalar triple product.
 This allows to calculate the values of the solution vector incrementally to allow early exits.
 
 
@@ -593,8 +594,8 @@ The triangle splitting algorithm for example can only hold its guarantees if the
 Otherwise, degenerated triangles may be created between intersecting edges or at the triangle edges.
 %
 Another problem are algorithms which create very small numbers in intermediary calculations.
-If a triangle is really thin, the dot product between the edges at the smallest corner is almost zero and might suffer severely from numerics.
-The cross product and therefore the normal vector also becomes instable.
+If a triangle is really thin, the dot product between the edges at the smallest corner is almost zero and suffers from numeric instability.
+The cross product and therefore the normal vector also becomes unstable.
 Calculations depending on these values might then critically misjudge a situation and \eg create intersection lines outside a triangle or falsely report a triangle as inside-a-structure based on a degenerated normal.
 The problem with errors on such hard decisions is that they escalate with the number of iterations, which might be several hundreds or thousands.
 If two structures are united but a wrongly discarded triangle left a hole, all following inside tests are affected and may fail.
