@@ -70,16 +70,16 @@ This final structure is the reconstructed surface of the VML's data model.
 	\end{subfigure}
 	\caption{
 		Surface reconstruction from the VML's data model by the example of intersecting a cube and a cuboid.
-		Figure \subref{fig:cube2_stock_sv} shows the cubic stock, in the lower left, and a tilted cuboid as swept volume, in the upper right.
-		Figure \subref{fig:cube2_classified} shows the classification result when these two solids are mapped into the VML's regular grid.
+		The cubic stock, in the lower left, and a tilted cuboid as swept volume, in the upper right, is shown in \subref{fig:cube2_stock_sv}.
+		The classification result when these two solids are mapped into the VML's regular grid is shown in \subref{fig:cube2_classified}.
 		Most of the swept volume's triangles have been removed.
 		When intersecting both structures, \ie swept volume and stock triangles, all intersection lines per triangle are recorded.
-		Figure \subref{fig:cube2_constraints} shows these lines for the swept volume's triangles.
-		The triangles are then retriangulated with respect to those intersections as shown in figure \subref{fig:cube2_retriangulated}.
+		For the swept volume's triangles, \subref{fig:cube2_constraints} shows these lines.
+		The triangles are then retriangulated with respect to those intersections as shown in \subref{fig:cube2_retriangulated}.
 		Afterwards, each triangle is tested against the other structure, whether they are inside and can be removed.
-		The result of testing the retriangulated swept volume's triangles against the stock is shown in figure \subref{fig:cube2_eliminated}.
+		The result of testing the retriangulated swept volume's triangles against the stock is shown in \subref{fig:cube2_eliminated}.
 		The retriangulation and inside test is analogously done for the stock structure.
-		Finally, the reconstructed surface is the union of the remaining triangles, figure \subref{fig:cube2_result}.
+		Finally, the reconstructed surface is the union of the remaining triangles, \cf \subref{fig:cube2_result}.
 	}
 	\label{fig:cube2}
 \end{figure}

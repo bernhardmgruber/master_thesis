@@ -65,9 +65,9 @@ With the beginning of 2015, the prototype developed during Enlight and Engrave w
 		\end{subfigure}
 	\caption{
 		Demonstration of the VML's capabilities.
-		Cutter meshes, \cf figure \subref{fig:hq_impeller_tool} and \subref{fig:turbine_tool}, are loaded and then transformed using a list of transformation matrices to calculate swept volumes, \cf figure \subref{fig:hq_impeller_swept} and \subref{fig:turbine_swept}.
+		Cutter meshes, \cf \subref{fig:hq_impeller_tool} and~\subref{fig:turbine_tool}, are loaded and then transformed using a list of transformation matrices to calculate swept volumes, \cf \subref{fig:hq_impeller_swept} and~\subref{fig:turbine_swept}.
 		By applying a series of these swept volumes to a stock, the machining of a workpiece is simulated.
-		The result can be visualized using raycasting, \cf figure \subref{fig:hq_impeller_complete} and \subref{fig:turbine_complete} \cite{engrave_report}.
+		The result can be visualized using raycasting, \cf \subref{fig:hq_impeller_complete} and~\subref{fig:turbine_complete} \cite{engrave_report}.
 	}
 	\label{fig:vml_demo}
 \end{figure}
@@ -147,10 +147,10 @@ The sketches in \cref{fig:classification_before,fig:classification_sv} illustrat
 	\includegraphics[width=0.1\textwidth]{images/classification_legend}
 	\caption{
 		Principle of classifying cells according to the added mesh.
-		Figure \subref{fig:classification_before} shows the classification of the regular grid with a stock mesh before a swept volume has been added.
-		Figure \subref{fig:classification_sv} shows the classification of the regular grid with regard to the swept volume about to add.
-		When the swept volume is added, both classifications are combined as shown in figure \subref{fig:classification_after}.
-		Finally, triangles in outside cells can be removed as shown in figure \subref{fig:classification_after_removal}, cutting down the total number of stored triangles.
+		The classification of the regular grid with a stock mesh before a swept volume has been added is shown in \subref{fig:classification_before}.
+		The classification of the regular grid with regard to the swept volume about to add is shown in \subref{fig:classification_sv}.
+		When the swept volume is added, both classifications are combined as shown in \subref{fig:classification_after}.
+		Finally, triangles in outside cells can be removed as shown in \subref{fig:classification_after_removal}, cutting down the total number of stored triangles.
 		For raycasting, only surface cells are relevant.
 	}
 	\label{fig:classification}

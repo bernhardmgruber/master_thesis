@@ -1,3 +1,4 @@
+\RequirePackage{fixltx2e}
 \documentclass[
 10pt,
 a4paper,
@@ -18,7 +19,7 @@ draft,
 \usepackage{mathtools}
 \usepackage[binary-units=true,group-digits=false]{siunitx}
 \usepackage[draft]{graphicx}
-\usepackage{subcaption}
+\usepackage[subrefformat=parens]{subcaption}
 \usepackage[style=numeric,backend=biber,urldate=iso8601]{biblatex}
 \usepackage{xspace}
 \usepackage[iso]{datetime}
@@ -26,10 +27,7 @@ draft,
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage[final]{pdfpages}
-\usepackage{lipsum}
-\usepackage{color}
 \usepackage{chngcntr}
-\usepackage{fixltx2e}
 \usepackage{float}
 \usepackage[hidelinks]{hyperref}
 \usepackage[plain]{algorithm}
@@ -93,6 +91,13 @@ draft,
 % cleveref
 %
 \crefname{line}{line}{lines}
+
+%
+% subcaption
+%
+\makeatletter
+\renewcommand\p@subfigure{\thefigure~}
+\makeatother
 
 %
 % misc
