@@ -516,7 +516,7 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 				\State $\var{n}_{\var{axis}} = 1$
 				\If{$\var{srcOcc} \wedge \neg \var{dstOcc}$}
 					\If{$|\var{segs}| = 0 \vee \var{segs}_0.\var{start}.\var{depth} - \rho > \var{srcDepth}$}
-						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{srcDepth}, -\var{n}), \var{Node}(\var{srcDepth} + \rho, \var{n})))$ % TODO: check if add_front is necessary
+						\State $\var{segs}.\var{add}(\var{Segment}(\var{Node}(\var{srcDepth}, -\var{n}), \var{Node}(\var{srcDepth} + \rho, \var{n})))$
 					\ElsIf{$|\var{segs}| > 0 \wedge \var{segs}_0.\var{start}.\var{depth} > \var{srcDepth} \wedge {}$\hfill\break
 						\hspace*{\dimexpr\algorithmicindent*4}$\var{segs}_0.\var{start}.\var{depth} - \rho \leq \var{srcDepth}$}
 						\State $\var{segs}_0.\var{start}.\var{depth} \gets \var{srcDepth}$
@@ -1230,7 +1230,7 @@ Thus, a different surface is created at the border, resulting in a typically thi
 
 The cells resulting from slicing are resampled, regularized and triangulated by reusing all existing classes and algorithms.
 For each cell a new tri-dexel image is created with a resolution of 2 in each dimension with exactly the same bounding box as the cell.
-The reconstruction proceeds analogously to the one of the main tri-dexel image, \cf \cref{alg:tri_dexel} \cref{line:tri_dexel_begin}ff. %TODO
+The reconstruction proceeds analogously to the one of the main tri-dexel image, \cf \cref{alg:tri_dexel} \cref{line:tri_dexel_begin}ff.
 
 This new cell slicing algorithm is integrated into the existing code by adapting the base tri-dexel reconstruction algorithm, \cref{alg:tri_dexel}, as shown in \cref{alg:tri_dexel_2}.
 %
