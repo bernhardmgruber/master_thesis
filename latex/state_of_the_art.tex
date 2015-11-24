@@ -10,7 +10,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 \begin{description}
 	\item[Direct intersection] \hfill \\
 	Directly intersecting each volume with each other, triangle by triangle, is the most direct and theoretically exact approach of calculating the result of a series of Boolean subtractions.
-	A good description of triangle mesh intersections is given by Rosen who tried to smooth the sharp intersection line between two meshes for aesthetics in video games \cite{mesh_intersection}.
+	A good description of triangle mesh intersections is given by Rosen who tried to smooth the sharp intersection line between two meshes to improve the visual impression in video games \cite{mesh_intersection}.
 	Triangle-triangle intersection is described by Möller \cite{tri_tri_intersection_moller} as well as Tropp \etal \cite{tri_tri_intersection_2}.
 
 	To build a new surface mesh from two intersecting ones, each intersected triangle can be split into polygons based on the cut segments from other triangles and retriangulated using the cutting segments as constraints.
@@ -21,7 +21,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 
 	\item[Point cloud based] \hfill \\
 	Point clouds are data structures where an object is approximated by a set of points with optional normal vectors.
-	These points can be obtained \eg by sampling a solid's surface, either virtually by \eg using a raycast or in reality by scanning an objects surface, \eg laser scans of buildings, sculptures \etc.
+	These points can be obtained \eg by sampling a solid's surface, either virtually using a raycast or in reality by scanning an objects surface, \eg laser scans of buildings, sculptures \etc.
 	The VML already uses surface sampling of its data model via its raycast based visualization.
 	%
 	Point clouds can be triangulated using different algorithms:
