@@ -3,18 +3,17 @@
 \label{ch:tri_dexel}
 
 The second discussed method to extract a triangulated surface from the VML's data model is based on a tri-dexel representation, \cf \cref{sec:surface_representations}.
-As observed with the previously shown method in \cref{ch:direct_intersection}, reconstructing a surface directly form the many intersecting triangles stored in the VML's grid is computationally expensive, highly numerically unstable and prone to errors.
+As observed with the previously shown method in \cref{ch:direct_intersection}, reconstructing a surface form the many triangles stored in the VML's grid, by directly intersecting them, is computationally expensive, highly numerically unstable and prone to errors.
 A more robust approach is desirable, which is able to always successfully reconstruct a surface with good quality.
 This reconstruction should succeed independently of the complexity of the maintained geometry.
-As a trade-off for this robustness, the approach may sacrifice surface exactness and filigree features.
-Dexel-based representations fit this purpose nicely.
+As a trade-off for robustness, the approach may offer up surface exactness and fine features.
+Dexel-based representations comply well with these requirements.
 They provide a good abstraction of a machined workpiece with rich semantics.
-The used grid resolution supplies an easy to configure level of detail and steering parameter between representation quality and memory/CPU demands.
+The resolution of the dexel grid supplies an easy to configure level of detail and steering parameter between representation quality and memory/CPU demands.
 Creating dexel-based representations from the VML's data model is achieved using an adaption of the already implemented, well-working and robust raycasting subsystem used for visualization, \cf \cref{sec:raycasting}.
-To achieve a good portrayal, independently of the workpiece's orientation, three axis-aligned dexel images will be generated, thus creating a tri-dexel representation.
-For converting such a tri-dexel model into a final triangle mesh, various algorithms are found in literature.
-An excellent example is Ren \etal's "Feature Conservation and Conversion of Tri-dexel Volumetric Models to Polyhedral Surface Models for Product Prototyping" \cite{tridexel_reconstruction}.
-Their approach form the idea and foundation of the implementation presented in this chapter.
+To achieve good portrayal, independently of the workpiece's orientation, three axis-aligned dexel images are generated, thus creating a tri-dexel representation.
+For converting such a tri-dexel model into a final triangle mesh, various algorithms are presented in literature.
+A well-written example by Ren \etal forms the idea and foundation of the implementation presented in this chapter \cite{tridexel_reconstruction}.
 
 
 \section{Concept}
@@ -82,8 +81,7 @@ Combining these dexel images creates a uniform regular grid, the tri-dexel grid.
 	\label{fig:cylinder_head_dexel}
 \end{figure}
 
-Secondly, the tri-dexel representation is converted into a triangle mesh.
-This procedure is mostly based on the paper mentioned in the introduction \cite{tridexel_reconstruction}.
+Secondly, the tri-dexel representation is converted into a triangle mesh \cite{tridexel_reconstruction}.
 Each intersection point of three orthogonal dexels from the tri-dexel grid forms a grid point.
 If a grid point lies within a dexel segment on any of these dexels, it is said to be occupied, \ie lies within the workpiece's volume.
 8 grid points and their 12 connecting edges along with their dexel segments are grouped into cells of the grid.
@@ -103,12 +101,13 @@ Each grid cell is then processed independently.
 %
 Before a cell is triangulated, a few consistency checks and corrections are applied to the cell.
 This process is called regularization and ensures a successful triangulation into a water-tight mesh.
-Afterwards, the cell is triangulated.
+Then, the cell is triangulated.
 For this purpose, a depth-first search process is iteratively started at non-occupied grid points of the cell to discover boundary loops.
-Basically, the found loops may be triangulated right away to obtain a water tight mesh.
-However, the quality of the triangulation may be further enhanced by taking normal information at the dexel nodes into account.
+Basically, the detected loops may be triangulated right away to obtain a water tight mesh.
+However, the quality of the triangulation is further enhanced by taking normal information at the dexel nodes into account.
 This is especially necessary to reconstruct features of the model.
 This optional feature reconstruction pass is run on the loops found in the previous step and may create additional vertices.
+Taking these vertices into account allows the creation of better loop triangulations.
 
 \section{Implementation}
 \label{sec:tri_dexel_implementation}
@@ -215,7 +214,7 @@ The subsequent sections discuss the functions and procedures of the algorithm in
 
 The raycast is the prime algorithm for converting the VML's data model into a tri-dexel representation.
 The raycast is performed with parallel, axis-aligned and equidistant rays.
-All rays start at the intersection points of a uniform, 2-dimensional grid placed on one side of the data model's slightly enlarged bounding box and end at the opposite side, \cf \cref{fig:dexel_image}.
+All rays start at the intersection points of a uniform, 2-dimensional grid placed on one side of the data model's slightly enlarged bounding box, and end at the opposite side, \cf \cref{fig:dexel_image}.
 Three of these raycasts along the three axes of the coordinate system result in three dexel images.
 As the raycasting code is kept separated from the tri-dexel data structures, a function is passed to the raycasting code which is invoked each time a ray has found a surface intersection.
 Therefore, the same code is capable of creating other data structures as well, \cf \cref{ch:point_cloud_based}.
@@ -272,7 +271,7 @@ The index of each axis is stored in the variable \var{axis0}, where 0 denotes th
 \var{axis0} is also called primary axis and is accompanied by \var{axis1} and \var{axis2} which hold the other two, secondary axes, in cyclic order.
 Depending on the choice of primary and secondary axes, the resolution of the 2-dimensional grid spawning the rays is determined and assigned to \var{xCount} and \var{yCount}, for the horizontal and vertical resolution.
 The coordinate x and y inside the raycasting code refer to the axes of the raycasted \enquote{image} and not the axes of the 3-dimensional coordinate system of the scene.
-Afterwards, the distance between two incident rays along both secondary axes is computed.
+Then, the distance between two incident rays along both secondary axes is computed.
 Therefore, the size of the bounding box is computed and divided by the resolution minus one.
 The result is assigned to the variables \var{\Delta x} and \var{\Delta y}.
 Now, the algorithm starts creating and casting all rays along their primary axis.
@@ -284,7 +283,7 @@ The \textproc{CreateRay} function's objective is to create an instance of \var{R
 The origin is calculated by starting from the bounding box's \var{lower} corner.
 Along the primary axis, this value is already correct.
 On the secondary axes, the origin, currently at the origin for ray $0, 0$, must be moved according to the ray's \var{x} and \var{y} coordinate.
-In order to do so, \var{x} and \var{y} are multiplied by the distances between incident rays, \var{\Delta x} and \var{\Delta y}, and added to the origin's secondary axes.
+Thus, \var{x} and \var{y} are multiplied by the distances between incident rays, \var{\Delta x} and \var{\Delta y}, and added to the origin's secondary axes.
 %
 Computing the ray's direction is simpler, as it is axis aligned.
 Therefore, the direction is a unit vector along the primary axis, created by setting the corresponding component of a zeroed vector to one.
@@ -314,12 +313,12 @@ Before the raycast is launched, an instance of \var{TriDexelImage} is created, p
 When calling \textproc{AxisParallelRaycast}, an anonymous function is passed, which is invoked on every surface hit detected during raycasting.
 This function receives the primary axis \var{axis}, \ie the axis along which the rays where traversed, \var{x} and \var{y} coordinate on the 2-dimensional dexel grid as well as the intersection point \var{v} with the normal of the hit triangle \var{n}.
 With this information, the tri-dexel image stored in \var{img} is populated.
-Once raycasting has completed, the tri-dexel grid is generated from the tri-dexel image.
+When raycasting is complete, the tri-dexel grid is generated from the tri-dexel image.
 This conversion is more a reinterpretation and preparation of the information contained within the tri-dexel image.
 Whereas the image contains the raw raycasting result, the tri-dexel grid already stores grid point occupancy information and cuts all dexels at cell borders.
 This preparation eases the follow-up processing of individual cells.
 
-Converting the tri-dexel image into a tri-dexel grid is done by the \textproc{CreateTriDexelGrid} function, which is shown in \cref{alg:tri_dexel_grid_generation}.
+Converting the tri-dexel image into a tri-dexel grid is achieved by the \textproc{CreateTriDexelGrid} function, which is shown in \cref{alg:tri_dexel_grid_generation}.
 %
 \begin{algorithm}
 	\centering
@@ -393,7 +392,7 @@ For each dexel image further loops are necessary to iterate over all dexels of t
 
 For each segment the affected range of grid points is computed.
 Two coordinates of these points are already known, which are the same as the coordinates of the dexel in its image.
-The third, missing coordinates are the ones spanned by the dexel segment.
+The third, missing coordinates are spanned by the dexel segment.
 To compute these coordinates, the dexel segment's start and end depth are mapped to grid point coordinates.
 Each call to \textproc{DepthToGrid} yields the lower grid point coordinate along the specified axis for a given depth on this axis.
 This value is also equivalent to the index of the edge along \var{axis} on which a dexel node with the given depth would lie.
@@ -1536,7 +1535,7 @@ The triangle count of the resulting mesh is usually a bit higher when reconstruc
 By contrast, the runtime changes significantly when cell slicing is enabled.
 The answer to this vast increase, especially in feature rich scenes like impeller and turbine, is given by profiling.
 The functions doing most individual work\footnote{
-	Functions having the most exclusive samples, \ie samples where the execution was inside the body of a function when the sample was taken, without samples of further functions called from the body.}
+	Functions having the most exclusive samples, \ie samples where the execution was inside the body of a function when the sample was taken, without samples of functions called from the body.}
 are all found within the raycasting component.
 They are \textproc{IntersectCell} with \SI{24}{\percent}, \textproc{IntersectTriangle} with \SI{17}{\percent} and a operating system function handling heap allocations with \SI{9}{\percent}.
 Of further interest is also the stage of the algorithm at which these functions are heavily used.
