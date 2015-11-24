@@ -945,7 +945,21 @@ The CPU utilization during an single run of the direct intersection approach on 
 %
 \begin{figure}[!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{di_hq_impeller_cpu}
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.95\textwidth,
+			height=0.5\textwidth,
+			xlabel={Wall clock time in \si{\second}},
+			ylabel={CPU utilization in \si{\percent}},
+			ymin=0,
+			ymax=100,
+			ytick={0,20,...,100},
+			xtick={6,9,...,33}
+		]
+			\addplot table [x=time, y=utilization, col sep=comma]{spreadsheets/di_hq_impeller_cpu.csv};
+		\end{axis}
+	\end{tikzpicture}
+	%\includegraphics[width=0.8\textwidth]{di_hq_impeller_cpu}
 	\caption{
 		CPU utilization during a run of the direct intersection algorithm to reconstruct the surface of the impeller scene.
 		Measured using the profiler of Visual Studio 2013.

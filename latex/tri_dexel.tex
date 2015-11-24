@@ -1551,7 +1551,21 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 %
 \begin{figure}
 	\centering
-	\includegraphics[width=0.9\textwidth]{images/td_hq_impeller_cpu}
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.95\textwidth,
+			height=0.5\textwidth,
+			xlabel={Wall clock time in \si{\second}},
+			ylabel={CPU utilization in \si{\percent}},
+			ymin=0,
+			ymax=100,
+			ytick={0,20,...,100},
+			xtick={7,8,...,16}
+		]
+			\addplot table [x=time, y=utilization, col sep=comma]{spreadsheets/td_hq_impeller_cpu.csv};
+		\end{axis}
+	\end{tikzpicture}
+	%\includegraphics[width=0.9\textwidth]{images/td_hq_impeller_cpu}
 	\caption{
 		CPU utilization during a run of the tri-dexel algorithm with a grid resolution of 200 along the longest axis, all features enabled, reconstructing the surface of the impeller scene.
 		Measured using the profiler of Visual Studio 2013.
