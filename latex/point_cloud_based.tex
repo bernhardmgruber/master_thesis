@@ -281,7 +281,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 	When moving into the workpiece from outside, the values of $\chi$ change from zero to one around the surface.
 	The indicator function $\chi$, specifically its gradient $\nabla\chi$, \cf \cref{fig:poisson_gradient_function}, is strongly related to the normals of the input point set, a vector field $V$, \cf \cref{fig:poisson_oriented_points}.
 	Therefore, the problem becomes finding a function $\chi$ whose gradient $\nabla\chi$ best approximates $V$, the normals of the point cloud, \ie $\min_\chi |\nabla\chi - V|$.
-	This problem is then transformed into a standard Poisson problem, further details are given in the corresponding paper \cite{poisson}.
+	This problem is then transformed into a standard Poisson problem, further details are given in the corresponding work \cite{poisson}.
 	For the computation of these functions, the problem space is partitioned using an octree, whose depth provides the main variable to balance memory/computational demands and reconstruction quality.
 	The reconstruction of a surface is finally done by extracting an isosurface of $\chi$.
 
@@ -387,11 +387,11 @@ This correlation now allows to calculate an approximation for the input raycasti
 
 The BPA timings in \cref{tbl:bpa_results}, especially at higher resolutions, further show that the algorithm's runtime is strongly related to the number of points of the cloud.
 For each \SI{1}{\kilo\nothing} points, the BPA requires roughly \SI{4}{\milli\second} runtime, emitting \SI{2}{\kilo\nothing} triangles.
-At lower resolutions, the overhead of the parallelization becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding paper \cite{bpa_vml}.
+At lower resolutions, the overhead of the parallelization becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding work \cite{bpa_vml}.
 
 Concerning memory demands, the BPA requires quite a bit of space for its acceleration structure, a regular grid partitioning the point cloud.
 This grid greatly speeds up the search for nearby points during pivoting.
-Furthermore, this grid is also the basis for a parallelization, \cf the corresponding paper for details \cite{bpa_vml}.
+Furthermore, this grid is also the basis for a parallelization, \cf the corresponding work for details \cite{bpa_vml}.
 In addition to the grid, the currently built mesh is stored in a rich data structure, maintaining not only triangles but also a lot of connectivity information between vertices, edges and faces.
 These data structures sum up to roughly \SI{1.2}{\gibi\byte} memory during a reconstruct of the impeller at a resolution of 400.
 

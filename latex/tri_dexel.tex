@@ -427,7 +427,7 @@ Furthermore, the number of different configurations a single tri-dexel cell may 
 Thus, it is beneficial to reduce the number of cases by dropping some information in favor of regularity.
 
 The process of repairing defects and reducing complexity of a tri-dexel cell is called regularization.
-This method is documented well in the tri-dexel paper foundational to this chapter \cite{tridexel_reconstruction}.
+This method is documented well in the tri-dexel work foundational to this chapter \cite{tridexel_reconstruction}.
 Regularizing a tri-dexel cell is done by iterating over all edges and applying a set of rules.
 These rules are illustrated in \cref{fig:tri_dexel_regularization} and described below:
 
@@ -724,7 +724,7 @@ Therefore, the boundary loop configuration and also the triangulation could be p
 This strategy is typically found in the original and many derived marching cubes implementations \cite{marching_cubes}.
 As a matter of fact, the tables used by these marching cubes implementations, actually any table, could be used to triangulate tri-dexel cells.
 
-Unfortunately, the depth-first search approach, as explained in the corresponding paper \cite{tridexel_reconstruction}, does have an issue with four of the 256 configurations.
+Unfortunately, the depth-first search approach, as explained in the corresponding work \cite{tridexel_reconstruction}, does have an issue with four of the 256 configurations.
 If only two grid points are occupied and lie on diagonally opposing corners of the cell, they form two boundary loops which are both discoverable by a single depth-first search.
 This causes a problem, as the search discovers six vertices, which do not make up a single but two loops.
 Therefore, these cases have to be handled differently.
