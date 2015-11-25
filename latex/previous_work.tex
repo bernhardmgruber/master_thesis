@@ -100,7 +100,7 @@ For visualization, the data model is sampled using a raycast which calculates a 
 
 The central data structure inside the VML, which holds the current state of the simulation, \ie the workpiece, is a regular 3-dimensional grid.
 This data structure was originally chosen because it was directly used as acceleration structure for the raycasting subsystem.
-Although there is a wide variety of acceleration structures available, \eg kd-trees, octrees, binary space partitioning (BSP), bounding volume hierarchies (BVH), \etc, regular grids offer greater simplicity in organization and construction than the others.
+Although there is a wide variety of acceleration structures available, \eg kd-trees, octrees, binary space partitioning (BSP) or bounding volume hierarchies (BVH), regular grids offer greater simplicity in organization and construction than the others.
 This is especially beneficial in cases where those data structures have to be updated regularly.
 Particularly animated scenes in computer-animated films or changing geometries as in virtual machining require frequent rebuilds or updates of those data structures.
 Due to their simplicity and regularity, regular grids provide viable candidates for these scenarios.
@@ -225,7 +225,7 @@ The VML's regular grid with its open geometries resulting from classification ar
 For this purpose a virtual camera is placed relative to the regular grid.
 The camera's position and orientation describe an image plane, \ie a rectangle, in front of the camera which will correspond to the final image.
 Originating from the camera's position, a ray is sent through each pixel of the image plane into the scene.
-If an intersection occurs, the pixel associated with the ray is colored according to properties of the intersected surface, \eg color, normal, material, \etc.
+If an intersection occurs, the pixel associated with the ray is colored according to properties of the intersected surface, \eg color, normal and material.
 \Cref{fig:raycasting_principle} shows the basic principle of raycasting inside the VML.
 
 \begin{figure}
@@ -234,7 +234,7 @@ If an intersection occurs, the pixel associated with the ray is colored accordin
 	\caption{
 		Principle of ray casting.
 		A ray is sent from an eye point, \ie camera position, through each pixel of an image plane and is traversed through the scene containing the workpiece.
-		If an intersection occurs, the pixel is colored according to the intersected surface, \protect\eg color of the surface, lighting using surface normal, \protect\etc.
+		If an intersection occurs, the pixel is colored according to the intersected surface, \protect\eg color of the surface, lighting using the normal of the surface or material parameters.
 		\cite{enlight_demo_workshop}.
 	}
 	\label{fig:raycasting_principle}

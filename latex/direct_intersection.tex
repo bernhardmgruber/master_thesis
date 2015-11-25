@@ -608,7 +608,7 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 
 	\item[Collapse near points in structures] \hfill \\
 	At the beginning of the \textproc{UnionStructure} algorithm almost no guarantees are given on the two input structures.
-	As very thin or degenerated triangles are numerically problematic during the following algorithmic steps, \eg intersection, inside test, \etc, filtering them may avoid some of those problems.
+	As very thin or degenerated triangles are numerically problematic during the following algorithmic steps, \eg intersection or inside test, filtering them may avoid some of those problems.
 	Therefore, all vertices which are closer than a defined small epsilon distance are collapsed to their mean values.
 	Thus, no holes are created in the structure, only degenerated triangles.
 	These are easy to filter in a post-processing step by removing all triangles where two or more vertices are equal.
@@ -702,7 +702,7 @@ Furthermore, most GPU architectures rely on either vectorization or execution of
 	This behavior is also called lockstep execution and the paradigm single instruction, multiple threads (SIMT).
 	If some threads branch differently than others, \eg if, while or for statements, all threads execute both branches, but some of them are masked out to avoid changes by the executed instructions.
 	Intel's on-chip GPUs rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.} to achieve a high throughput.
-Thus, the uneven workloads in all loops, \eg number of structures per cell, number of triangles per structure, number of intersections, \etc, hardly saturate these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
+Thus, the uneven workloads in all loops, \eg number of structures per cell, number of triangles per structure or number of intersections, hardly saturate these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
 
 
 \section{Test scenes}
