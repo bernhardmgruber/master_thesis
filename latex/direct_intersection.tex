@@ -261,7 +261,7 @@ After all vertices have been processed, the result list is return, representing 
 		\EndFunction
 	\end{algorithmic}
 	\caption{
-		A Sutherland-Hodgeman algorithm variant for clipping polygons against a bounding box in 3 dimensions.
+		A Sutherland-Hodgeman algorithm variant for clipping polygons against a bounding box in three dimensions.
 	}
 	\label{alg:clip}
 \end{algorithm}
@@ -451,14 +451,14 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 A few preparations are necessary before the CDT subroutine can be called.
 All points used by constrained edges must be part of the input point cloud and are therefore added to the point cloud formed by the input triangle's vertices.
 
-Furthermore, as the CDT only runs in 2 dimensions, all vertices are projected onto the plane spanned by the two coordinate system axes with the smaller magnitude in the triangle's normal vector.
+Furthermore, as the CDT only runs in two dimensions, all vertices are projected onto the plane spanned by the two coordinate system axes with the smaller magnitude in the triangle's normal vector.
 This operation is simple as it only requires the selection of two components of each point and no calculation.
 As all constraints as well as the resulting triangulation are specified using indexes into the point cloud, the list containing the 2-dimensional, projected vertices must have the same order as the original point list.
 Before starting the triangulation, the constrained edges have to be specified.
 Each constraint is inserted by supplying a pair of indexes into the point cloud.
 Afterwards, the CDT can be calculated.
 The resulting triangulation is specified using a list of indexes.
-The length of this list is a multiple of 3 and each consecutive 3 indexes form a triangle of the result.
+The length of this list is a multiple of three and each consecutive three indexes form a triangle of the result.
 When these indexes are resolved by indexing into the original point cloud, the vertices for the final triangles are obtained.
 These triangles are finally returned.
 
@@ -815,8 +815,8 @@ An optimal distribution would be an almost empty histogram with a peak at a cert
 \end{figure}
 
 The cube2 scene contains few triangles in general.
-Most cells contain only 1 or 2 triangles and probably not more than 1 structure.
-Larger cells contain 4 or 5 triangles occur infrequent.
+Most cells contain only one or two triangles and probably not more than one structure.
+Larger cells contain four or five triangles occur infrequent.
 In general, the distribution is quite compact.
 
 The cylinder\_head is characterized by a quite divergent distribution, although the range is still modest from many cells with a small triangle count to only a few cells with 40 to 70 triangles.
@@ -911,7 +911,7 @@ Finally, the direct intersection approach described in this chapter has been tes
 	\caption{
 		Test results for the direct intersection surface extraction approach.
 		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
-		Runtime is averaged over 10 runs.
+		Runtime is averaged over ten runs.
 		The number of boundary edges were measured using MeshLab \cite{meshlab}.
 	}
 	\label{tbl:direct_intersection_results}
@@ -922,7 +922,7 @@ The runtime depends on multiple characteristics of the input.
 The number of swept volumes increase the runtime linearly, as seen when comparing the timings of the impeller and impeller\_2 scene.
 This consequence can also be derived from \cref{alg:direct_intersection} where the \textproc{DirectIntersection} function performs a pairwise reduction of all structures of a single cell, a linear operation.
 All other parameters influence the runtime in less easily comprehensible ways.
-The turbine scene for example has a little more than 3 times the triangles to process than the impeller scene and a lot less swept volumes, but requires more than 10 times the computation time.
+The turbine scene for example has a little more than three times the triangles to process than the impeller scene and a lot less swept volumes, but requires more than ten times the computation time.
 What causes the big difference in this case is mostly the triangle density per structure.
 When dividing the number of totally stored triangles by the number of swept volumes, we can get a rough idea of the complexity of a single swept volume.
 This number is roughly 2500 for the impeller scenes and 33000 for the turbine scene.
@@ -968,7 +968,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 \end{figure}
 %
 The CPU cores are almost perfectly utilized for the first 20 seconds.
-Afterwards, the workload drops down to zero within the last 3 seconds of the run.
+Afterwards, the workload drops down to zero within the last three seconds of the run.
 The PPL's default scheduler already works well, keeping all cores utilized for \SI{85}{\percent} of the runtime.
 This slow drop at the end of the test run might be improved by employing a better scheduling strategy.
 However, more complex scheduling usually also increases the parallelization overhead.
@@ -1039,7 +1039,7 @@ Nevertheless, the errors in the reconstructed surface are small and may be corre
 
 Both cylinder scenes delivered good results.
 The variant with the small and thin triangles even resulted in an almost perfect surface with no holes and no leftover triangles.
-Surprisingly, the other variant with the quality triangulation contained 9 holes and 1 un-eliminated triangle.
+Surprisingly, the other variant with the quality triangulation contained nine holes and one un-eliminated triangle.
 This outcome is quite the opposite of what had been observed during the development of the algorithm.
 In early stages, before the GTE library had been used for its excellent CDT, the core problem was the correct splitting of intersected triangles, which was much more stable on smaller and more regular triangles.
 With the use of GTE, the numeric problems shifted from the CDT to the \textproc{IsTriangleInsideStructure} test.

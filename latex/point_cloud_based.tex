@@ -277,8 +277,8 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 
 	\item[Poisson] \hfill \\
 	Poisson surface reconstruction is based on implicit functions \cite{poisson}, \cf \cref{fig:poisson_principle}.
-	The goal is to compute a so-called indicator function $\chi$, which yields 1 for positions inside the workpiece and 0 for positions outside, \cf \cref{fig:poisson_indicator_function}
-	When moving into the workpiece from outside, the values of $\chi$ change from 0 to 1 around the surface.
+	The goal is to compute a so-called indicator function $\chi$, which yields one for positions inside the workpiece and zero for positions outside, \cf \cref{fig:poisson_indicator_function}
+	When moving into the workpiece from outside, the values of $\chi$ change from zero to one around the surface.
 	The indicator function $\chi$, specifically its gradient $\nabla\chi$, \cf \cref{fig:poisson_gradient_function}, is strongly related to the normals of the input point set, a vector field $V$, \cf \cref{fig:poisson_oriented_points}.
 	Therefore, the problem becomes finding a function $\chi$ whose gradient $\nabla\chi$ best approximates $V$, the normals of the point cloud, \ie $\min_\chi |\nabla\chi - V|$.
 	This problem is then transformed into a standard Poisson problem, further details are given in the corresponding paper \cite{poisson}.
@@ -314,7 +314,7 @@ Analogously to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 ha
 	\caption{
 		Test results for the point cloud creation.
 		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
-		Runtime is averaged over 10 runs.
+		Runtime is averaged over ten runs.
 	}
 	\label{tbl:point_cloud_results}
 \end{table}
@@ -327,7 +327,7 @@ The reasons is the asymptotic complexity of $\mathcal{O}(n^2)$ of the raycaster,
 Furthermore, the dependency of the runtime on the scene's complexity as well as parallelization, CPU and memory consumption is also discussed there.
 
 Concerning subsequent surface reconstruction algorithms, \cref{tbl:bpa_results} contains the mesh sizes and timings for the VML's BPA implementation.
-The ball's radius is derived from the raycasting resolution and set to 1.5 times the diameter of a cell of the sampling grid created by 3 axis aligned raycasts.
+The ball's radius is derived from the raycasting resolution and set to 1.5 times the diameter of a cell of the sampling grid created by three axis aligned raycasts.
 %
 \begin{table}
 	\centering
@@ -359,7 +359,7 @@ The ball's radius is derived from the raycasting resolution and set to 1.5 times
 	\caption{
 		Test results surface reconstruction using the VML's internal BPA implementation excluding the time required to generate the point cloud, \cf \cref{tbl:point_cloud_results}.
 		Benchmarks were run on a machine utilizing an Intel Core i7-3770 at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
-		Runtime is averaged over 10 runs.
+		Runtime is averaged over ten runs.
 	}
 	\label{tbl:bpa_results}
 \end{table}
@@ -377,7 +377,7 @@ An explanation for this ratio is given in \cref{fig:bpa_point_triangle_ratio}.
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/bpa_point_triangle_ratio}
 	\caption{
-		Explanation for the ratio between mesh size and point cloud size approaching 2.
+		Explanation for the ratio between mesh size and point cloud size approaching two.
 		If the surface of an object and the corresponding points and triangles are completely unwrapped into a plane, each surface point may be associated with exactly two triangle.
 	}
 	\label{fig:bpa_point_triangle_ratio}
@@ -636,7 +636,7 @@ Finally, to show the suitability of the point cloud for other algorithms outside
 	\caption{
 		Renderings of the cylinder\_head and impeller scenes of reconstructions using the Poisson surface reconstruction filter from MeshLab.
 		The point cloud was created with a resolution of 400.
-		The Poisson filter was parameterized with an octree depth of 10, solver divide at 8, 1 sample per node and a surface offsetting of 1, \cf corresponding dialog in MeshLab.
+		The Poisson filter was parameterized with an octree depth of ten, solver divide at eight, one sample per node and a surface offsetting of one, \cf corresponding dialog in MeshLab.
 	}
 	\label{fig:poisson_results}
 \end{figure}
@@ -694,7 +694,7 @@ Compared with the tri-dexel approach and similarly to the BPA, the Poisson surfa
 However, as detailed in \cref{sec:point_cloud_concept}, the main reason for this issue is the richer semantic carried by the tri-dexel image when compared with a point cloud.
 
 Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10 - 20 times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
-The runtimes for the turbine scene, for example, at the resolutions 50, 100, 200 and 400, averaged over 5 runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
+The runtimes for the turbine scene, for example, at the resolutions 50, 100, 200 and 400, averaged over five runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
 However, the algorithm employed by MeshLab runs single threaded.
 Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude
 During the reconstruction at resolution 400, roughly \SI{400}{\mebi\byte} were allocated, making the Poisson algorithm significantly more light-weight than the BPA.

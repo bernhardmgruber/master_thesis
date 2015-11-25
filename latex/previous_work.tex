@@ -276,7 +276,7 @@ This number is called the inside counter.
 The stock volume is handled specially during the raycast, as it is inverted and turned into a swept volume itself to allow uniform handling.
 After the inside counter has been determined, all intersections of the ray with structures inside the cell are iterated from the nearest to the farthest.
 During this iterating the inside counter is modified on each structure entry or exit to constantly reflect the number of structures the ray is currently inside.
-If the counter becomes 0, the surface has been reached and a hit is reported with data from the hit triangle which is later used to color the final image of the scene.
+If the counter becomes zero, the surface has been reached and a hit is reported with data from the hit triangle which is later used to color the final image of the scene.
 \Cref{fig:raycast} shows a detailed example of such an intersection procedure and explains the algorithmic steps to retrieve the surface hit.
 
 \begin{figure}
