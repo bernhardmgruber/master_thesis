@@ -31,14 +31,14 @@ Firstly, a point cloud has to be created from the VML's data model.
 This step is very similar and even simpler than the creation of the dexel image discussed in the previous \cref{ch:tri_dexel}.
 The same raycasting technique, with all its error correcting and robustness enhancing code, will be used to sample surface intersections on the VML's data model.
 The resolution of the raycasting grid for each of the three axis-aligned casts is again supplied by the user, again providing a good parameter for steering quality and computational demands.
-\Cref{fig:cylinder_head_point_cloud} shows a point cloud created from the cylinder\_head scene using a raycast with resolution 200.
+\Cref{fig:cylinder_head_point_cloud} shows a point cloud created from the \cylinderhead scene using a raycast with resolution 200.
 %
 \begin{figure}
 	\centering
 	\begin{subfigure}[t]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_point_cloud}
-		\caption{cylinder\_head}
+		\caption{\cylinderhead}
 		\label{fig:cylinder_head_point_cloud_}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.49\textwidth}
@@ -48,7 +48,7 @@ The resolution of the raycasting grid for each of the three axis-aligned casts i
 		\label{fig:cylinder_head_point_cloud_fins}
 	\end{subfigure}
 	\caption{
-		Point cloud created by raycasting the cylinder\_head scene using three axis-aligned raycasts along the coordinate system's axes with a resolution of 200.
+		Point cloud created by raycasting the \cylinderhead scene using three axis-aligned raycasts along the coordinate system's axes with a resolution of 200.
 	}
 	\label{fig:cylinder_head_point_cloud}
 \end{figure}

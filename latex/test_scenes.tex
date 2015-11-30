@@ -10,13 +10,13 @@ The test scenes and their configurations are shown in \cref{tbl:test_scenes}.
 	\begin{tabular}{lrrrrrrrr}
 		Scene          & SVs  & cells & surf. & tri.  & s\textsubscript{max} & s\textsubscript{avg} \\
 		\midrule
-		cube2          &    1 & \SI{  1}{\kilo\nothing} & \SI{47}{\percent} & \SI{  0.8}{\kilo\nothing} &  2 & 1.1 \\
-		cylinders\_d   &    1 & \SI{  1}{\kilo\nothing} & \SI{22}{\percent} & \SI{    7}{\kilo\nothing} &  2 & 1.1 \\
-		cylinders      &    1 & \SI{  1}{\kilo\nothing} & \SI{22}{\percent} & \SI{    4}{\kilo\nothing} &  2 & 1.1 \\
-		cylinder\_head &   20 & \SI{ 75}{\kilo\nothing} & \SI{21}{\percent} & \SI{   80}{\kilo\nothing} &  3 & 1.2 \\
-		impeller       & 2383 & \SI{400}{\kilo\nothing} & \SI{16}{\percent} & \SI{ 6000}{\kilo\nothing} & 64 & 5.5 \\
-		impeller\_2    & 1191 & \SI{400}{\kilo\nothing} & \SI{13}{\percent} & \SI{ 3000}{\kilo\nothing} & 64 & 3.6 \\
-		turbine        &  480 & \SI{200}{\kilo\nothing} & \SI{17}{\percent} & \SI{16000}{\kilo\nothing} &  6 & 2.3 \\
+		\cubes          &    1 & \SI{  1}{\kilo\nothing} & \SI{47}{\percent} & \SI{  0.8}{\kilo\nothing} &  2 & 1.1 \\
+		\cylindersd   &    1 & \SI{  1}{\kilo\nothing} & \SI{22}{\percent} & \SI{    7}{\kilo\nothing} &  2 & 1.1 \\
+		\cylinders      &    1 & \SI{  1}{\kilo\nothing} & \SI{22}{\percent} & \SI{    4}{\kilo\nothing} &  2 & 1.1 \\
+		\cylinderhead &   20 & \SI{ 75}{\kilo\nothing} & \SI{21}{\percent} & \SI{   80}{\kilo\nothing} &  3 & 1.2 \\
+		\impeller       & 2383 & \SI{400}{\kilo\nothing} & \SI{16}{\percent} & \SI{ 6000}{\kilo\nothing} & 64 & 5.5 \\
+		\impellerhalf    & 1191 & \SI{400}{\kilo\nothing} & \SI{13}{\percent} & \SI{ 3000}{\kilo\nothing} & 64 & 3.6 \\
+		\turbine        &  480 & \SI{200}{\kilo\nothing} & \SI{17}{\percent} & \SI{16000}{\kilo\nothing} &  6 & 2.3 \\
 	\end{tabular}
 	\caption{
 		The selected test scenes with their major parameters.
@@ -25,28 +25,28 @@ The test scenes and their configurations are shown in \cref{tbl:test_scenes}.
 	\label{tbl:test_scenes}
 \end{table}
 
-The cube2 scene is a simple intersection between a cubic stock and a cuboid swept volume.
+The \cubes scene is a simple intersection between a cubic stock and a cuboid swept volume.
 It is also used as an example in the discussion of the concept of the direct intersection approach at the beginning of this chapter in \cref{fig:cube2}.
 Instead of no grid, a small one with a resolution of $10\times10\times10$ cells is used.
 This scene is used as a proof of concept for each surface reconstruction algorithm in this thesis.
 
-The cylinders and cylinders\_d scenes each consist of a broader cylindrical stock with a smaller cylindrical swept volume drilled out.
-The cylinders in the cylinders\_d scene are triangulated into smaller and more regular triangles by constraining the edge lengths of the output triangles.
-The cylinders in the other scene contain longer and thinner triangles.
-The cylinders\_d scene requires more triangles to approximate the cylinders.
-Both scenes also use the same small grid resolution as the cube2 scene.
+The \cylinders and \cylindersd scenes each consist of a broader cylindrical stock with a smaller cylindrical swept volume drilled out.
+The cylinders in the \cylindersd scene are triangulated into smaller and more regular triangles by constraining the edge lengths of the output triangles.
+The cylinders in the \cylinders scene contain longer and thinner triangles.
+The \cylindersd scene requires more triangles to approximate the cylinders.
+Both scenes also use the same small grid resolution as the \cubes scene.
 These two scenes should have an almost identical visual outcome but quite different stress on the numeric robustness of the extraction.
 
-The cylinder\_head scene was the initial test scene when the ray casting subsystem was developed, \cf \cref{ch:previous_work}.
+The \cylinderhead scene was the initial test scene when the ray casting subsystem was developed, \cf \cref{ch:previous_work}.
 It is the smallest and easiest of the practical scenes used for benchmarking.
-The cylinder\_head uses a medium sized grid of $50\times50\times30$ cells with a moderate, but still little, number of triangles and swept volumes.
+The \cylinderhead uses a medium sized grid of $50\times50\times30$ cells with a moderate, but still little, number of triangles and swept volumes.
 
-The impeller scene provides a good real world example of a typical machining scenario.
+The \impeller scene provides a good real world example of a typical machining scenario.
 It contains a few thousand swept volumes organized in a larger grid of $100\times100\times40$ cells.
-With 6 million stored triangles and a lot more structures in each cell, the impeller scene should already pose a serious workload for the tested algorithms.
-To analyze the effect of the number of swept volumes, a second version of the impeller scene has been created, where only half the number of swept volumes have been loaded.
+With 6 million stored triangles and a lot more structures in each cell, the \impeller scene should already pose a serious workload for the tested algorithms.
+To analyze the effect of the number of swept volumes, a second version of the \impeller scene has been created, the \impellerhalf scene, where only half the number of swept volumes have been loaded.
 
-Finally, the turbine scene depicts a further practical example.
+Finally, the \turbine scene depicts a further practical example.
 The scene is conceived to stress the swept volume computation by its complex cutting tool, a fir-tree cutter.
 The fine tessellation of the cutter mesh results in high resolution swept volumes and the largest amount of triangles stored in a test scene.
 
@@ -61,43 +61,43 @@ An optimal distribution would be an almost empty histogram with a peak at a cert
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{c_hist}
-		\caption{cube2}
+		\caption{\cubes}
 		\label{fig:cube2_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{ch_hist}
-		\caption{cylinder\_head}
+		\caption{\cylinderhead}
 		\label{fig:cylinder_head_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{cy_hist}
-		\caption{cylinders}
+		\caption{\cylinders}
 		\label{fig:cylinders_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{cyd_hist}
-		\caption{cylinders\_d}
+		\caption{\cylindersd}
 		\label{fig:cylinders_d_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{hq_hist}
-		\caption{impeller}
+		\caption{\impeller}
 		\label{fig:impeller_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{hq2_hist}
-		\caption{impeller\_2}
+		\caption{\impellerhalf}
 		\label{fig:impeller_2_histogram}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{tr_hist}
-		\caption{turbine}
+		\caption{\turbine}
 		\label{fig:turbine_histogram}
 	\end{subfigure}
 	\caption{
@@ -108,23 +108,23 @@ An optimal distribution would be an almost empty histogram with a peak at a cert
 	\label{fig:histograms}
 \end{figure}
 
-The cube2 scene contains few triangles in general.
+The \cubes scene contains few triangles in general.
 Most cells contain only one or two triangles and probably not more than one structure.
 Larger cells contain four or five triangles occur infrequent.
 In general, the distribution is quite compact.
 
-The cylinder\_head is characterized by a quite divergent distribution, although the range is still modest from many cells with a small triangle count to only a few cells with 40 to 70 triangles.
+The \cylinderhead is characterized by a quite divergent distribution, although the range is still modest from many cells with a small triangle count to only a few cells with 40 to 70 triangles.
 
-Considering the cylinders scenes, the histograms show the difference in the total number of triangles.
-As the cylinders\_d scene contains more, smaller and more regular triangles, its cells are also occupied by more triangles.
-Whereas the cylinders scene holds mostly between 5 and 20 triangles, the cells of the cylinders\_d scene contain mostly between 20 and 45 triangles.
-Nevertheless, despite their lower triangle counts, there is a peek of triangles in the cylinders scene at 128 triangles, which are cells at the cylinder's center.
+Considering the cylindrical scenes, the histograms show the difference in the total number of triangles.
+As the \cylindersd scene contains more, smaller and more regular triangles, its cells are also occupied by more triangles.
+Whereas the \cylinders scene holds mostly between 5 and 20 triangles, the cells of the \cylindersd scene contain mostly between 20 and 45 triangles.
+Nevertheless, despite their lower triangle counts, there is a peek of triangles in the \cylinders scene at 128 triangles, which are cells at the cylinder's center.
 
-The impeller scene shows a quite good but broad distribution with most cells containing between 1 and 100 triangles.
+The \impeller scene shows a quite good but broad distribution with most cells containing between 1 and 100 triangles.
 The further large part of all cells store between 100 and around 500 triangles.
-Unfortunately, the impeller scene contains several cells with extraordinary high quantities of triangles, up to 2574 triangles in a single cell, 2563 for the impeller\_2 scene.
+Unfortunately, the \impeller scene contains several cells with extraordinary high quantities of triangles, up to 2574 triangles in a single cell, 2563 for the \impellerhalf scene.
 
-Finally, the turbine scene attracts attention by its smooth distribution of triangle counts.
+Finally, the \turbine scene attracts attention by its smooth distribution of triangle counts.
 Despite its uniformity, such distributions are unfortunately rather disadvantages as the workload per cell is highly diverse.
 Furthermore, the triangle counts per cell are quite high with amounts of up to 2000 triangles per cell occurring quite often.
 Cells with even more triangles exist only marginally.
@@ -136,43 +136,43 @@ For visual reference, \cref{fig:raycasted_scenes} shows images of the selected t
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_cube2}
-		\caption{cube2}
+		\caption{\cubes}
 		\label{fig:cube2_raycasted}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_cylinder_head}
-		\caption{cylinder\_head}
+		\caption{\cylinderhead}
 		\label{fig:cylinder_head_raycasted}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_cylinders}
-		\caption{cylinders}
+		\caption{\cylinders}
 		\label{fig:cylinders_raycasted}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_cylinders_d}
-		\caption{cylinders\_d}
+		\caption{\cylindersd}
 		\label{fig:cylinders_d_raycasted}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_impeller}
-		\caption{impeller}
+		\caption{\impeller}
 		\label{fig:impeller_raycasted}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_impeller_2}
-		\caption{impeller\_2}
+		\caption{\impellerhalf}
 		\label{fig:impeller_2_raycasted}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.43\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{raycasted_turbine}
-		\caption{turbine}
+		\caption{\turbine}
 		\label{fig:turbine_raycasted}
 	\end{subfigure}
 	\caption{

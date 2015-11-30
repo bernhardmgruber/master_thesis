@@ -7,7 +7,7 @@ draft,
 ]
 {scrreprt}
 
-\includeonly{results}
+%\includeonly{results}
 
 % ====================================================================================================
 % ===   Packages                                                                                   ===
@@ -102,12 +102,6 @@ draft,
 \renewcommand\p@subfigure{\thefigure~}
 \makeatother
 
-%
-% misc
-%
-% Increase line spacing for wbackfrieder for corrections
-%\linespread{1.6}
-
 % ====================================================================================================
 % ===   Macros                                                                                     ===
 % ====================================================================================================
@@ -125,14 +119,29 @@ draft,
 }
 \makeatother
 
-\newcommand{\dummytext}[1]{\textcolor{red}{\lipsum[1-#1]}}
-
+% floor, ceil, sub, mod
 \newcommand{\ceil}[1]{\lceil#1\rceil}
 \newcommand{\floor}[1]{\lfloor#1\rfloor}
-
 \newcommand{\sub}[1]{\textsubscript{#1}}
 
 \renewcommand{\mod}{\bmod}
+
+% scene constants
+\newcommand{\scene}[1]{\emph{#1}}
+
+\newcommand{\cubes}{\scene{cube2}\xspace}
+\newcommand{\cylinders}{\scene{cylinders}\xspace}
+\newcommand{\cylindersd}{\scene{cylinders\_d}\xspace}
+\newcommand{\cylinderhead}{\scene{cylinder\_head}\xspace}
+\newcommand{\impeller}{\scene{impeller}\xspace}
+\newcommand{\impellerhalf}{\scene{impeller2}\xspace}
+\newcommand{\turbine}{\scene{turbine}\xspace}
+
+%
+% misc
+%
+% Increase line spacing for wbackfrieder for corrections
+%\linespread{1.6}
 
 \begin{document}
 % ====================================================================================================
