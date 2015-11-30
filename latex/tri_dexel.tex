@@ -31,37 +31,37 @@ Combining these dexel images creates a uniform regular grid, the tri-dexel grid.
 
 \begin{figure}
 	\centering
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_stock_and_svs}
 		\caption{Stock and SVs}
 		\label{fig:cylinder_head_stock_sv}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_vml}
 		\caption{VML}
 		\label{fig:cylinder_head_classified}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_dexel_image}
 		\caption{Tri-dexel image}
 		\label{fig:cylinder_head_dexel_image}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_dexel_image_center}
 		\caption{Tri-dexel image center}
 		\label{fig:cylinder_head_dexel_image_center}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_dexel_image_fins}
 		\caption{Tri-dexel image fins}
 		\label{fig:cylinder_head_dexel_image_fins}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.3\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{images/cylinder_head_reconstructed}
 		\caption{Result}
@@ -1444,3 +1444,5 @@ These might be regularized in parallel.
 The \textproc{FindLoops} routine starting the depth-first searches on the cell might run its eight searches in parallel, accumulating the loops on a concurrent data structure.
 These loops may be further triangulated in parallel in \textproc{TriangulateCell}.
 Intermediate point calculation during refinement on each vertex pair of a loop might also be done in parallel, but is probably not worth the overhead.
+
+In the underlying implementation, parallelization has been applied where suitable, again using Microsoft's PPL and the parallel\_for primitive \cite{ppl_parallel_for}.

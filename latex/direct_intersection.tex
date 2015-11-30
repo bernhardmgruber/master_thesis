@@ -703,3 +703,5 @@ Furthermore, most GPU architectures rely on either vectorization or execution of
 	If some threads branch differently than others, \eg if, while or for statements, all threads execute both branches, but some of them are masked out to avoid changes by the executed instructions.
 	Intel's on-chip GPUs rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.} to achieve a high throughput.
 Thus, the uneven workloads in all loops, \eg number of structures per cell, number of triangles per structure or number of intersections, hardly saturate these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
+
+In the underlying implementation, only the topmost loop of the \textproc{DirectIntersection} function has been parallelized using Microsoft's Parallel Patterns Library (PPL) and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
