@@ -158,19 +158,20 @@ Considering the triangle count distributions of the test scenes in \cref{fig:his
 \subsection{CPU and memory utilization}
 \label{sec:tri_dexel_utilization}
 
-The CPU utilization during a single run of the tri-dexel surface extraction of the \impeller scene with a grid resolution of 200 is shown in \cref{fig:td_hq_impeller_cpu}.
+The CPU utilization during a single run of the tri-dexel surface extraction of the \impeller scene with a grid resolution of 400 is shown in \cref{fig:td_hq_impeller_cpu}.
 The extraction starts by performing a raycast on the VML's data model.
-It takes some time in the beginning until the CPU reaches full utilization.
 The profiler mostly highlights memory intensive operations during this time, such as pulling the triangles from RAM and allocations.
-After 1 - 1.5 seconds, the raycast has finished and the construction of the tri-dexel grid starts.
+
+After four seconds, the raycast has finished and the construction of the tri-dexel grid starts.
 Again, this process requires a lot of memory allocations, which are serialized by the operating system, causing the utilization to drop slightly.
 This drop includes the aggregation of data to form isolated cells, which is memory intensive as well.
 
 Processing cells starts right away after the first cells are available.
 At this point the CPU again reaches maximum utilization for almost the complete extraction, as the granularity of the parallelization is quite fine, \ie lots of cells are available to saturate all cores.
 However, as fully occupied and non-occupied cells do not need any processing, only boundary cells contribute to the surface, the intensity of a work item varies.
-In the last second, triangulation has been finished for almost all cells.
-Most of the work left is freeing allocated resources, which takes quite a while and is again serialized by the operating system, causing the utilization to drop drastically for the last second.
+
+In the last four seconds, triangulation has been finished for almost all cells.
+Most of the work left is freeing allocated resources, which takes quite a while and is again serialized by the operating system, causing the utilization to drop drastically.
 
 Regarding the allocated memory, in addition to the VML's regular grid holding the \impeller scene in \SI{600}{\mebi\byte}, the tri-dexel algorithm requires approximately \SI{425}{\mebi\byte} additional memory at a grid resolution of 400, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
 On third of the memory is allocated before the raycast, another third during the raycast and the last third when building the tri-dexel grid.
@@ -289,16 +290,23 @@ Furthermore, the runtime strongly depends on the scene's complexity and triangle
 The BPA timings in \cref{tbl:bpa_results}, especially at higher resolutions, further show that the algorithm's runtime is strongly related to the number of points of the cloud.
 For each \SI{1}{\kilo\nothing} points, the BPA requires roughly \SI{4}{\milli\second} runtime, emitting \SI{2}{\kilo\nothing} triangles.
 At lower resolutions, the overhead of the parallelization becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding work \cite{bpa_vml}.
+Despite the bad utilization and scalability on multiple cores, \cf \cref{sec:bpa_utilization}, the BPA of the VML delivers an overall impressive runtime, when compared with the timings of \eg the tri-dexel, \cf \cref{tbl:tri_dexel_results}.
+However, the BPA of the VML has a focus on real-time capabilities and has been developed and optimized for a significantly longer time than the implementation of the tri-dexel algorithm.
 
 
 \subsection{CPU and memory utilization}
+\label{sec:bpa_utilization}
 
-The CPU utilization of the raycast used for creating the point cloud is discussed as part of the tri-dexel algorithm, \cf \cref{sec:tri_dexel_runtime}.
+\Cref{fig:bpa_hq_impeller_cpu} shows the CPU utilization of the point cloud creation together with a run of the BPA on the \impeller scene at resolution 400.
+The utilization of the raycast used for creating the point cloud is also discussed as part of the tri-dexel algorithm, \cf \cref{sec:tri_dexel_runtime}.
+Regarding the BPA, which is hard to parallelize, \cf the corresponding work \cite{bpa_vml}, it takes some time until the CPU reaches full utilization.
+This through after the raycast is the result of building up data structures for the BPA, which are memory intensive operations.
+After the BPA has reached a good saturation of the CPU, it immediately starts to drop again, due to the coarse and badly schedulable parallelization.
+The last second is again spent cleaning up data structures and freeing memory.
+
 The memory required for the raycast is relatively small and mostly spent holding the points sampled so far.
 At a raycasting grid resolution if 400, the required memory peaked at roughly \SI{100}{\mebi\byte}.
-
-%TODO BPA CPU
-Concerning memory demands, the BPA requires quite a bit of space for its acceleration structure, a regular grid partitioning the point cloud.
+The BPA requires quite a bit of space for its acceleration structure, a regular grid partitioning the point cloud.
 This grid greatly speeds up the search for nearby points during pivoting.
 Furthermore, this grid is also the basis for a parallelization, \cf the corresponding work for details \cite{bpa_vml}.
 In addition to the grid, the currently built mesh is stored in a rich data structure, maintaining not only triangles but also a lot of connectivity information between vertices, edges and faces.

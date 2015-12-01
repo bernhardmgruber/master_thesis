@@ -41,14 +41,14 @@ The CPU utilization during an single run of the direct intersection approach on 
 	\centering
 	\begin{tikzpicture}
 	\begin{axis}[
-	width=0.95\textwidth,
-	height=0.5\textwidth,
-	xlabel={Wall clock time in \si{\second}},
-	ylabel={CPU utilization in \si{\percent}},
-	ymin=0,
-	ymax=100,
-	ytick={0,20,...,100},
-	xtick={6,9,...,33}
+		width=0.95\textwidth,
+		height=0.5\textwidth,
+		xlabel={Wall clock time in \si{\second}},
+		ylabel={CPU utilization in \si{\percent}},
+		ymin=0,
+		ymax=100,
+		ytick={0,20,...,100},
+		%xtick={0,3,...,99}
 	]
 	\addplot table [x=time, y=utilization, col sep=comma]{spreadsheets/di_hq_impeller_cpu.csv};
 	\end{axis}
@@ -59,7 +59,6 @@ The CPU utilization during an single run of the direct intersection approach on 
 	}
 	\label{fig:di_cpu}
 \end{figure}
-%
 
 \Cref{fig:di_results} contains renderings of the resulting triangle meshes.
 %
@@ -212,27 +211,27 @@ For testing the tri-dexel surface reconstruction approach, \cf \cref{ch:tri_dexe
 	\label{tbl:tri_dexel_results}
 \end{table}
 
-The CPU utilization during a single run of the tri-dexel surface extraction of the \impeller scene with a grid resolution of 200 is shown in \cref{fig:td_hq_impeller_cpu}.
+The CPU utilization during a single run of the tri-dexel surface extraction of the \impeller scene with a grid resolution of 400 is shown in \cref{fig:td_hq_impeller_cpu}.
 %
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
 	\begin{axis}[
-	width=0.95\textwidth,
-	height=0.5\textwidth,
-	xlabel={Wall clock time in \si{\second}},
-	ylabel={CPU utilization in \si{\percent}},
-	ymin=0,
-	ymax=100,
-	ytick={0,20,...,100},
-	xtick={7,8,...,16}
+		width=0.95\textwidth,
+		height=0.5\textwidth,
+		xlabel={Wall clock time in \si{\second}},
+		ylabel={CPU utilization in \si{\percent}},
+		ymin=0,
+		ymax=100,
+		ytick={0,20,...,100},
+		%xtick={0,5,...,100}
 	]
 	\addplot table [x=time, y=utilization, col sep=comma]{spreadsheets/td_hq_impeller_cpu.csv};
 	\end{axis}
 	\end{tikzpicture}
 	%\includegraphics[width=0.9\textwidth]{images/td_hq_impeller_cpu}
 	\caption{
-		CPU utilization during a run of the tri-dexel algorithm with a grid resolution of 200, all features enabled, reconstructing the surface of the \impeller scene.
+		CPU utilization during point cloud creation and a run of the tri-dexel algorithm with a grid resolution of 400, all features enabled, reconstructing the surface of the \impeller scene.
 	}
 	\label{fig:td_hq_impeller_cpu}
 \end{figure}
@@ -493,6 +492,30 @@ The ball's radius in the tests is derived from the raycasting resolution and set
 	}
 	\label{tbl:bpa_results}
 \end{table}
+
+The CPU utilization during a single run of the BPA surface extraction of the \impeller scene with a grid resolution of 400 is shown in \cref{fig:bpa_hq_impeller_cpu}.
+%
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+	\begin{axis}[
+		width=0.95\textwidth,
+		height=0.5\textwidth,
+		xlabel={Wall clock time in \si{\second}},
+		ylabel={CPU utilization in \si{\percent}},
+		ymin=0,
+		ymax=100,
+		ytick={0,20,...,100},
+		%xtick={0,2,...,100}
+	]
+	\addplot table [x=time, y=utilization, col sep=comma]{spreadsheets/bpa_hq_impeller_cpu.csv};
+	\end{axis}
+	\end{tikzpicture}
+	\caption{
+		CPU utilization during point cloud creation and a run of the BPA with a grid resolution of 400 on the \impeller scene.
+	}
+	\label{fig:bpa_hq_impeller_cpu}
+\end{figure}
 
 \Cref{fig:bpa_results} shows renderings of the result meshes on point clouds created with a resolution of 400.
 %
