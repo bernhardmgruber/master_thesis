@@ -1,4 +1,9 @@
 
+\begingroup
+% move all floats to the end of the chapter
+\renewcommand{\textfraction}{1.0}
+\renewcommand{\floatpagefraction}{0.9}
+
 \chapter{Results}
 \label{ch:results}
 
@@ -15,7 +20,7 @@ Finally, the number of created boundary edges is given for each reconstructed me
 \label{sec:direct_intersection_results}
 
 The runtime and output size of the test runs of the direct intersection surface reconstruction, \cf \cref{ch:direct_intersection}, are detailed in \cref{tbl:direct_intersection_results}.
-%
+
 \begin{table}
 	\centering
 	\begin{tabular}{lrrrrr}
@@ -36,7 +41,7 @@ The runtime and output size of the test runs of the direct intersection surface 
 \end{table}
 
 The CPU utilization during an single run of the direct intersection approach on the \impeller scene is shown in \cref{fig:di_cpu}.
-%
+
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
@@ -61,7 +66,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 \end{figure}
 
 \Cref{fig:di_results} contains renderings of the resulting triangle meshes.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.34\textwidth}
@@ -116,7 +121,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 \end{figure}
 
 \Cref{fig:di_scenes_artifacts} shows two detailed views, one centered on a smaller blade of the \impeller and one centered on a milling groove of the \turbine.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{\textwidth}
@@ -138,7 +143,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 \end{figure}
 
 The created boundary edges are listed in \cref{tbl:direct_intersection_boundary_edges}.
-%
+
 \begin{table}
 	\centering
 	\begin{tabular}{l|r}
@@ -164,7 +169,7 @@ The created boundary edges are listed in \cref{tbl:direct_intersection_boundary_
 
 For testing the tri-dexel surface reconstruction approach, \cf \cref{ch:tri_dexel}, a few different grid resolutions have been used, which are 50, 100, 200 and 400.
 \Cref{tbl:tri_dexel_results} contains the runtime and output size of the test runs.
-%
+
 \begin{table}
 	\begin{subtable}{\textwidth}
 		\centering
@@ -212,7 +217,7 @@ For testing the tri-dexel surface reconstruction approach, \cf \cref{ch:tri_dexe
 \end{table}
 
 The CPU utilization during a single run of the tri-dexel surface extraction of the \impeller scene with a grid resolution of 400 is shown in \cref{fig:td_hq_impeller_cpu}.
-%
+
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
@@ -237,7 +242,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \end{figure}
 
 \Cref{fig:di_results} contains renderings of the resulting triangle meshes.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.34\textwidth}
@@ -292,7 +297,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \end{figure}
 
 \Cref{fig:td_hq_impeller_details} shows two detailed renderings of the \impeller scene.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -314,7 +319,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \end{figure}
 
 \Cref{fig:td_grooves} shows renderings of a detailed view on one of the grooves in different resolutions.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.24\textwidth}
@@ -349,7 +354,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \end{figure}
 
 \Cref{fig:td_features_and_cell_slicing} shows the different outcome when using no refinement/feature reconstruction, using feature reconstruction and using feature reconstruction and cell slicing.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.67\textwidth}
@@ -381,7 +386,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \end{figure}
 
 \Cref{fig:td_cylinder_head_issues} shows cell slicing issues of the outmost rip of the \cylinderhead.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -407,7 +412,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \end{figure}
 
 \Cref{tbl:tri_dexel_boundary edges} contains the number of boundary edges for the tested resolutions and the tri-dexel variant using cell slicing.
-%
+
 \begin{table}
 	\centering
 	\begin{tabular}{l|r|r|r|r}
@@ -436,7 +441,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 The point cloud creation and the subsequent reconstruction using the VML's BPA, \cf \cref{sec:point_cloud_reconstruction}, have been benchmarked individually.
 Analogously to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 have been used for the raycaster creating the point clouds.
 \Cref{tbl:point_cloud_results} contains the runtime and output size of the created point clouds.
-%
+
 \begin{table}
 	\centering
 	\begin{tabular}{l|rr|rr|rr|rr}
@@ -459,7 +464,7 @@ Analogously to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 ha
 
 The mesh sizes and timings for the VML's BPA implementation are given in \cref{tbl:bpa_results}.
 The ball's radius in the tests is derived from the raycasting resolution and set to 1.5 times the diameter of a cell of the sampling grid created by three axis aligned raycasts.
-%
+
 \begin{table}
 	\centering
 	\begin{tabular}{l|rrr|rrr}
@@ -494,7 +499,7 @@ The ball's radius in the tests is derived from the raycasting resolution and set
 \end{table}
 
 The CPU utilization during a single run of the BPA surface extraction of the \impeller scene with a grid resolution of 400 is shown in \cref{fig:bpa_hq_impeller_cpu}.
-%
+
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
@@ -518,7 +523,7 @@ The CPU utilization during a single run of the BPA surface extraction of the \im
 \end{figure}
 
 \Cref{fig:bpa_results} shows renderings of the result meshes on point clouds created with a resolution of 400.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.34\textwidth}
@@ -573,7 +578,7 @@ The CPU utilization during a single run of the BPA surface extraction of the \im
 \end{figure}
 
 Several concave and convex edges of the \cylinderhead scene which were not correctly reconstructed are shown in \cref{fig:bpa_cylinder_head_edges}.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -596,7 +601,7 @@ Several concave and convex edges of the \cylinderhead scene which were not corre
 \end{figure}
 
 \Cref{fig:bpa_grooves} shows the grooves of the \turbine reconstructed from point clouds with various resolutions.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.24\textwidth}
@@ -630,8 +635,8 @@ Several concave and convex edges of the \cylinderhead scene which were not corre
 	\label{fig:bpa_grooves}
 \end{figure}
 
-Problematic cases \Cref{fig:bpa_issues} shows cases for these two problems.
-%
+Problematic cases for the BPA are shown in \cref{fig:bpa_issues}.
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -654,7 +659,7 @@ Problematic cases \Cref{fig:bpa_issues} shows cases for these two problems.
 \end{figure}
 
 The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges}.
-%
+
 \begin{table}
 	\centering
 	\begin{tabular}{l|r|r|r|r}
@@ -675,7 +680,7 @@ The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges
 \end{table}
 
 \Cref{fig:poisson_results} shows renderings of the \cylinderhead and \impeller scene after applying the Poisson surface reconstruction filter available in MeshLab.
-%
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -711,7 +716,7 @@ The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges
 \end{figure}
 
 \Cref{fig:poi_grooves} shows a groove of the \turbine reconstructed from point clouds with various resolutions.
-%
+
 \begin{figure}
 	\begin{subfigure}[b]{0.24\textwidth}
 		\centering
@@ -743,3 +748,5 @@ The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges
 	}
 	\label{fig:poi_grooves}
 \end{figure}
+
+\endgroup
