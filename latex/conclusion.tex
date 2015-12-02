@@ -4,9 +4,69 @@
 \section{Summary}
 \label{sec:summary}
 
+% introduction
+Many different representations exist for discribing solids, their volumes and surfaces.
+Triangle meshes are one of the most prominent representations, as they are perfectly suited for immediate visualization using modern hardware architectures, \ie GPUs, and APIs, \eg OpenGL and DirectX.
+They are also well-established for processing, storing, editing, distributing and celling geometric models.
+Other representations such as depth and dexel images, spatial decomposition, functional models and CSG are mostly tailored towards specific applications and found in their repsective domains.
+One example is the description of a workpiece created by subtractive manufacturing based on Boolean operations as a special kind of CSG tree.
+Sometimes, these representations have to be converted into triangle meshes.
+
+% previous work
+Based on the research projects Enlight and Engrave, the Virtual Modeling Library (VML) is developed as a simulation and visualization software for subtractive manufacturing by the RISC Software GmbH.
+The VML maintains a stock and several swept volume meshes in a regular grid data structure to describe a machined workpiece.
+No explicit surface representation is stored by the VML.
+Obtaining images of this workpiece uses a raycasting technique to sample the surface of the workpiece.
+
+% related work and state of the art
+To create a triangle mesh representation of the data model of the VML, conversion and reconstruction algorithms have been researched.
+%
+Directly intersecting the stock and swept volume meshes to compute their Boolean difference is a straight forward solution but calculatively expensive.
+%
+Using an adaption of the existing raycasting system allows the sampling of surface points.
+For reconstructing triangle meshes from point clouds created this way many algorithms are available in literature and software libraries.
+%
+An adapted raycast does also allow the sampling of dexel and multi-dexel images from the VML.
+Dexel images are rich in semantic and well-working surface reconstruction algorithms exist.
+%
+Based on the regular grid data structure of the VML, voxel based surface reconstruction algorithms might benefit from the existing infrastructure.
+
+% implementations
+Three approaches to create a triangle mesh from the data model of the VML have been implemented and discussed in this thesis.
+
+
+% implementations: direct intersection
+As first implementation, a direct intersection approach has been implemented.
+The algorithm separates the distinct stock and swept volume meshes and performs a pairwise reduction until a final mesh is left.
+Due to the high number of calculations involved and the limited precision of conventional computers, this algorithm is susceptible to nummerical instabilities with an increasing complexity of the scene, \eg the number of swept volumes.
+Although several extensions have been proposed to mitigate these numeric issues, the algorithm was only able to reconstruct simple scenes.
+The implementation provides good scalability on multiple cores but scaled directly with the number of swept volumes and their resolution, considerably increasing the runtime for complex scenes.
+
+% implementations: tri-dexel
+To provide a more robust and sampling based reconstruction, a tri-dexel based approach has been implemented.
+An adapted raycast along the three axes of the coordinate system creates a tri-dexel image of the workpiece.
+This image is converted into a tri-dexel grid and is regularized.
+Based on this grid, boundary loops are detected in boundary cells
+These loops are refined using surface normal information and triangulated.
+The tri-dexel approach reconstructs all test scenes successfully and creates oriented and closed meshes.
+Cell slicing is proposed as an extension to this tri-dexel reconstruction to allow adaptive resampling of features at the cost of creating T-vertices and thin holes.
+The tri-dexel implementation scales well on multi-core processors and, without cell slicing, requires roughly the same runtime for all scenes.
+The raycasting resolution provides a good steering parameter between quality and runtime.
+
+% implementations: point cloud based
+The same raycast used for creating a tri-dexel image may also be used to create a point cloud of the workpiece maintained by the VML.
+This way, a lot of algorithms found in literature and ready-to-use libraries become available.
+As examples, the BPA used internally by the VML for computing swept volumes as well as the Poisson surface reconstruction of MeshLab have been tested.
+Both algorithms provide good results.
+The BPA is sometimes troubled by smaller features, leading to non-manifold meshes and holes.
+The Poisson surface reconstruction creates perfectly oriented, closed and manifold meshes but looses sharp features due to its robust design against noisy input.
+The BPA does not scale well on multiple cores, but is heavily optimized and generally fast.
+Similar to the tri-dexel variant, the raycasting resolution is used to steer quality and computational demands.
 
 \section{Outlook}
 \label{sec:outlook}
+
+
 
 
 Outlook:
