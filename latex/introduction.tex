@@ -48,7 +48,7 @@ An example is found in computer-aided engineering (CAE), specifically CAM verifi
 
 Due to the broad field of surface representations and the author's previous experience, this thesis narrows its focus on models used in subtractive manufacturing simulations and focuses solely on the transformation of these models into explicit triangle representations.
 During the authors work at the RISC Software GmbH a visualization and solid modeling software was developed during two research projects, Enlight and Engrave (\cf previous work in \cref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
-Development is continued under the name virtual machining library (VML) and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
+Development is continued under the name VML and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
 Although the presented implementations are tailored to this application context, the underlying algorithms are discussed as general as possible to explore broader usage scenarios.
 
 
@@ -95,7 +95,7 @@ After this overview, the thesis discusses the prototypic implementation of selec
 These implementations are based on the data model used inside the VML.
 Nevertheless, adaptations to support different kinds of data structures are pointed out where possible.
 All algorithms are compared using the aspects given in the second problem statement.
-Although time constrained surface extracting is not focused, estimating the potential of each algorithm to be used in real-time scenarios has been tried, as this is an important scenario in collision detection and avoidance during machining.
+Although time constrained surface extracting is not focused, estimating the potential of each algorithm to be used in real-time scenarios has been tried, as this is an important scenario in collision detection and avoidance during machining. %TODO: time?
 Furthermore, as modern hardware architectures become increasingly parallel and heterogeneous, this thesis provides hints and estimates about the suitability to parallelize the chosen algorithms.
 
 Additionally, a suite of representative test models has been created and used to benchmark the prototyped approaches.
@@ -134,4 +134,8 @@ As surface reconstruction algorithms for point clouds are greatly available in l
 The main example is a variant of the Ball Pivoting Algorithm used by the VML for swept volume computation.
 Furthermore, a Poisson surface reconstruction algorithm is also shortly presented.
 
-%\dummytext{2}
+\Cref{ch:test_scenes} proposes several tests scenes, which are used to explore the strengths and weaknesses of the presented algorithms and compare them with each other.
+
+\Cref{ch:results,ch:discussion} contain all benchmark results, measurements and renderings of the implemented algorithms as well as a detailed discussion on these outcomes.
+
+Finally, \cref{ch:conclusion} concludes the thesis with a summary and outlook.
