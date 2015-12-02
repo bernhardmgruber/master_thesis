@@ -213,7 +213,7 @@ Concluding, all extracted meshes offer great detail.
 Especially convex features like sharp corners and edges are retrieved almost perfectly.
 Concave features, like the ones of the \turbine, seem a bit harder to reconstruct and require an appropriate resolution.
 
-Regarding the cell slicing enhancement in addition to the refinement of the original algorithm \cite{tri_dexel_reconstruction}, slicing irregular cells greatly reduces dropping valuable information during regularization, resulting in far better refined features.
+Regarding the cell slicing enhancement in addition to the refinement of the original algorithm \cite{tridexel_reconstruction}, slicing irregular cells greatly reduces dropping valuable information during regularization, resulting in far better refined features.
 \Cref{fig:td_features_and_cell_slicing} shows the different reconstructed meshes when using no refinement/feature reconstruction, using feature reconstruction and using feature reconstruction and cell slicing.
 Without feature reconstruction, almost no edges are reconstructed correctly.
 This is very well observable at the drilling and the flat surface around it.
@@ -315,7 +315,7 @@ These data structures sum up to roughly \SI{1.2}{\gibi\byte} memory during a rec
 
 \subsection{Visual quality}
 
-Concerning the rendered result meshes, \cf \cref{bpa_results}, all scenes except the \turbine have been extracted without errors.
+Concerning the rendered result meshes, \cf \cref{fig:bpa_results}, all scenes except the \turbine have been extracted without errors.
 The BPA did a good job in creating a mesh for each point cloud, although the reconstructions are not perfect.
 Especially sharp edges and corners are missing in all reconstructions.
 Furthermore, similar to the tri-dexel, the BPA also produces a high number of triangles in flat regions, where far less triangles would be needed to express the same surface.
@@ -385,7 +385,7 @@ The amount of lost volume, especially at the blade's tip and edge at the left, i
 Nevertheless, the resulting triangulation is appealing with even a bit of adaptivity, containing larger triangles in flatter regions.
 All runs of the algorithm generated manifold and closed meshes for all tested point clouds.
 
-The Poisson reconstruction, as the BPA, depends on a sufficient resolution of the point cloud, \cf the renderings of a groove of the \turbine in \cref{poi_grooves}.
+The Poisson reconstruction, as the BPA, depends on a sufficient resolution of the point cloud, \cf the renderings of a groove of the \turbine in \cref{fig:poi_grooves}.
 At a resolution of 50, the groove is simply sampled too poor for the Poisson reconstruction to create the indentation.
 This result is comparable to the BPA's performance at the same resolution in \cref{fig:bpa_turbine_groove_50}, where the ball was too big to roll inside the groove.
 At a resolution of 100, the groove becomes visible as the indentation is created.
@@ -394,7 +394,7 @@ The rills are acceptably reconstructed at a resolution of 200 while the bottom n
 Compared with the tri-dexel approach and similarly to the BPA, the Poisson surface reconstruction also requires roughly twice the resolution of the tri-dexel for a visually comparable output regarding the captured features.
 However, as detailed in \cref{sec:point_cloud_concept}, the main reason for this issue is the richer semantic carried by the tri-dexel image when compared with a point cloud.
 
-Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10 - 20 times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
+Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10~-~20~times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
 The runtimes for the \turbine scene, for example, at the resolutions 50, 100, 200 and 400, averaged over five runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
 However, the algorithm employed by MeshLab runs single threaded.
 Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude
