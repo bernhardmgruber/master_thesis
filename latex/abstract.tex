@@ -5,3 +5,19 @@
 
 \chapter*{Abstract}
 
+Using the Virtual Modeling Library (VML) developed at the RISC Software GmbH as an example, this thesis discusses surface reconstruction algorithms from data models used to simulate subtractive manufacturing.
+Specifically, to describe a machined workpiece created during this process, the VML stores a stock and a series of swept volume triangle meshes, similar to a CSG tree.
+Via a custom raycasting process, surface points of the workpiece are sampled to produce visualizations of the scene.
+
+Sometimes, an explicit surface mesh representation of the workpiece is desired.
+To reconstruct such a mesh, three approaches are presented.
+
+The first one relies on calculating the boolean subtraction of the maintained stock and swept volume by direct mesh intersection.
+Although producing exact results for simple scenes, this method fails for complex scenes due to numerical issues.
+
+The second approach samples a Tri-dexel image using an adapted raycast and reconstructs a triangle mesh from the tri-dexel representation.
+With overall good robustness, an acceptable visual outcome and excellent mesh qualities, this method works well for all tested scenarios.
+Additionally, a novel extension further improves the reconstruction of features at the cost of creating thin holes in the surface.
+
+Finally, a raycast may also be used to sample a point cloud from the workpiece.
+By the example of the Ball Pivoting Algorithm (BPA) of the VML and a Poisson surface reconstruction implementation of MeshLab, the use of point cloud based surface reconstruction algorithms is discussed as well.
