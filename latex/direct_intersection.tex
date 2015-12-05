@@ -70,7 +70,7 @@ This final structure is the reconstructed surface of the VML's data model.
 		\caption{Result}
 		\label{fig:cube2_result}
 	\end{subfigure}
-	\caption{
+	\caption[Direct intersection concept]{
 		Surface reconstruction from the VML's data model by the example of intersecting a cube and a cuboid.
 		The cubic stock, in the lower left, and a tilted cuboid as swept volume, in the upper right, is shown in \subref{fig:cube2_stock_sv}.
 		The classification result when these two solids are mapped into the VML's regular grid is shown in \subref{fig:cube2_classified}.
@@ -316,7 +316,7 @@ Otherwise, there is no intersection.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\textwidth]{tri_intersect}
-	\caption{
+	\caption[Möller triangle-triangle intersection test]{
 		Intersection line calculation in Möller's triangle intersection test.
 		The image shows intervals on the intersection line between two triangle's planes.
 		The green line is the intersection line of both planes.
@@ -474,7 +474,7 @@ An example of such an issue is shown in \cref{fig:inside_test_error}.
 \begin{figure}[!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{inside_test_error}
-	\caption{
+	\caption[Triangle inside structure test]{
 		Testing if a triangle of one structure is inside another structure using a ray.
 		Due to triangle elimination, the ray can miss removed structures, \eg when traversing outside cells, causing the inside test to fail, \cf left ray.
 		As structures are guaranteed to be closed within a cell, this test is only valid within a cell, \cf right ray.
@@ -559,7 +559,7 @@ The idea of the algorithm is shown in \cref{fig:ray_triangle_intersect}.
 	\begin{equation*}
 		\left[-D, V_1 - V_0, V_2 - V_0 \right] \left[ \begin{array}{c} t \\ u \\ v \end{array} \right] = O - V_0
 	\end{equation*}
-	\caption{
+	\caption[Möller-Trumbore ray-triangle intersection test]{
 		Principle of the famous Möller-Trumbore ray-triangle intersection test \cite{enlight_demo_workshop}.
 	}
 	\label{fig:ray_triangle_intersect}

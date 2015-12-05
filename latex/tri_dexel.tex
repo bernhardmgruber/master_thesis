@@ -67,7 +67,7 @@ Combining these dexel images creates a uniform regular grid, the tri-dexel grid.
 		\caption{Result}
 		\label{fig:cylinder_head_reconstructed}
 	\end{subfigure}
-	\caption{
+	\caption[Tri-dexel concept]{
 		Tri-dexel based surface reconstruction from the VML's data model of a cylinder head.
 		The stock and a few swept volumes creating the fins and drillings are shown in \subref{fig:cylinder_head_stock_sv}.
 		The classification result after these solids have been mapped into the VML's regular grid is shown in \subref{fig:cylinder_head_classified}.
@@ -91,7 +91,7 @@ Each grid cell is then processed independently.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/tri_dexel_cell}
-	\caption{
+	\caption[Tri-dexel cell]{
 		A cell of a tri-dexel grid \cite{tridexel_reconstruction}.
 		Occupied grid points are drawn in red, dexel nodes in green, dexel segments in blue.
 		Each grid point is referenced using a number between 0 and 7.
@@ -129,7 +129,7 @@ The additional types needed for the tri-dexel implementation are shown in the cl
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_datamodel}
-	\caption{
+	\caption[Tri-dexel UML class diagram]{
 		Simplified UML class diagram of the types needed for the tri-dexel reconstruction algorithm in addition to the types used by the VML, \cf \cref{fig:vml_datamodel}.
 	}
 	\label{fig:tri_dexel_datamodel}
@@ -458,7 +458,7 @@ These rules are illustrated in \cref{fig:tri_dexel_regularization} and described
 		\caption{Deletion of non-spanning segments}
 		\label{fig:tri_dexel_regularization_4}
 	\end{subfigure}
-	\caption{
+	\caption[Regularization rules]{
 		The four regularization rules which are applied to each tri-dexel cell before it is triangulated.
 		Image adapted from \cite{tridexel_reconstruction}.
 	}
@@ -631,7 +631,7 @@ These tables are shown in \cref{fig:tri_dexel_tables} and relate cell corners, e
 			\binom{\{0, 1, 2, 3\}}{3} &\colon (\phantom{-}0,\phantom{-}0,\phantom{-}1) \\
 		\end{align*}
 	\end{subfigure}
-	\caption{
+	\caption[Helper tables]{
 		Helper tables used by regularization and triangulation algorithms.
 	}
 	\label{fig:tri_dexel_tables}
@@ -694,7 +694,7 @@ A cell might contain multiple boundary loops, which are found in multiple search
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_triangulation}
-	\caption{
+	\caption[Depth-first search loop discovery]{
 		Triangulating a tri-dexel cell by finding boundary loops using depth-first search along the cube, starting at non-occupied nodes \cite{tridexel_reconstruction}.
 	}
 	\label{fig:tri_dexel_triangulation}
@@ -914,7 +914,7 @@ The one on the right shows the creation of three intermediate vertices and the c
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_refinement}
-	\caption{
+	\caption[Feature reconstruction]{
 		Triangulating a tri-dexel cell's boundary loops with additional feature information \cite{tridexel_reconstruction}.
 		The left image shows the creation of two intermediate vertices, F and H.
 		The right image shows the creation of three intermediate vertices, D, E and F, and an apex vertex, G.
@@ -1181,7 +1181,7 @@ However, as the dexel model used for surface reconstruction is derived from the 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.7\textwidth]{images/tri_dexel_cellslicing}
-	\caption{
+	\caption[Cell slicing]{
 		Creating regular cells by slicing two irregular cells sharing an irregular edge.
 		The actual surface is drawn in green, the reconstructed one in red.
 		A possible intermediate vertex in the left scenario is discarded, as it is outside the cell's bounding box.
@@ -1211,7 +1211,7 @@ When this limit is hit, the cell, despite being irregular, is passed to the stan
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_hole_creation}
-	\caption{
+	\caption[Cell slicing creating a hole]{
 		Creating a hole at the border of a normal and a sliced cell by estimating different feature points.
 		The original surface is drawn in green, the reconstructed one in red.
 	}
@@ -1340,7 +1340,7 @@ These boxes are then used to launch subsequent tri-dexel reconstructions, by rec
 \begin{figure}
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/cellslicing_dividers}
-	\caption{
+	\caption[Divider plane configurations]{
 		Definition of divider planes to slice the ranges derived from the dexel segments and the space between them.
 		Segments are blue, ranges in orange, dividers in dotted green lines.
 		On the left drawing, dividers are set using an algorithm reducing the total number of dividers needed.

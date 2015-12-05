@@ -37,7 +37,7 @@ The \cylindersd scene requires more triangles to approximate the cylinders.
 Both scenes also use the same small grid resolution as the \cubes scene.
 These two scenes should have an almost identical visual outcome but quite different stress on the numeric robustness of the extraction.
 
-The \cylinderhead scene was the initial test scene when the ray casting subsystem was developed, \cf \cref{ch:previous_work}.
+The \cylinderhead scene was the initial test scene when the raycasting subsystem was developed, \cf \cref{ch:previous_work}.
 It is the smallest and easiest of the practical scenes used for benchmarking.
 The \cylinderhead uses a medium sized grid of $50\times50\times30$ cells with a moderate, but still little, number of triangles and swept volumes.
 
@@ -100,7 +100,7 @@ An optimal distribution would be an almost empty histogram with a peak at a cert
 		\caption{\turbine}
 		\label{fig:turbine_histogram}
 	\end{subfigure}
-	\caption{
+	\caption[Test scene histograms]{
 		Histograms showing the distribution of triangle counts per cell for the selected test scenes in \cref{tbl:test_scenes}.
 		The horizontal axis shows the number of triangles per cell.
 		The vertical axis is logarithmic and shows the number of cells with a specific triangle count.
@@ -175,7 +175,7 @@ For visual reference, \cref{fig:raycasted_scenes} shows images of the selected t
 		\caption{\turbine}
 		\label{fig:turbine_raycasted}
 	\end{subfigure}
-	\caption{
+	\caption[Raycasted images of test scenes]{
 		Images of the test scenes given in \cref{tbl:test_scenes}.
 		The images are created by the VML's raycasting system in combination with visual enhancements using OpenGL shaders.
 		These images are used as references for the renderings of result meshes produced by the extraction methods discussed in this thesis.

@@ -59,7 +59,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 	\end{axis}
 	\end{tikzpicture}
 	%\includegraphics[width=0.8\textwidth]{di_hq_impeller_cpu}
-	\caption{
+	\caption[Direct intersection CPU utilization]{
 		CPU utilization during a run of the direct intersection algorithm to reconstruct the surface of the \impeller scene.
 	}
 	\label{fig:di_cpu}
@@ -114,7 +114,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 		\caption{\turbine}
 		\label{fig:di_turbine}
 	\end{subfigure}
-	\caption{
+	\caption[Direct intersection result renderings]{
 		Renderings of the result meshes after applying the direct intersection reconstruction approach on the selected test scenes in \cref{tbl:test_scenes}.
 	}
 	\label{fig:di_results}
@@ -136,7 +136,7 @@ The CPU utilization during an single run of the direct intersection approach on 
 		\caption{\turbine}
 		\label{fig:di_turbine_detail}
 	\end{subfigure}
-	\caption{
+	\caption[Direct intersection artifacts]{
 		Renderings of selected areas from the \impeller \subref{fig:di_impeller_detail} and \turbine \subref{fig:di_turbine_detail} scene after applying the direct intersection reconstruction approach.
 	}
 	\label{fig:di_scenes_artifacts}
@@ -235,7 +235,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 	\end{axis}
 	\end{tikzpicture}
 	%\includegraphics[width=0.9\textwidth]{images/td_hq_impeller_cpu}
-	\caption{
+	\caption[Tri-dexel CPU utilization]{
 		CPU utilization during point cloud creation and a run of the tri-dexel algorithm with a grid resolution of 400, all features enabled, reconstructing the surface of the \impeller scene.
 	}
 	\label{fig:td_hq_impeller_cpu}
@@ -290,7 +290,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 		\caption{\turbine}
 		\label{fig:td_turbine}
 	\end{subfigure}
-	\caption{
+	\caption[Tri-dexel result renderings]{
 		Renderings of the result meshes after applying the tri-dexel reconstruction approach with a grid resolution of 400 on the selected test scenes in \cref{tbl:test_scenes}.
 	}
 	\label{fig:td_results}
@@ -312,7 +312,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 		\caption{\impeller blades}
 		\label{fig:td_hq_impeller_blades}
 	\end{subfigure}
-	\caption{
+	\caption[Tri-dexel result details]{
 		Details of the \impeller scene extracted using the tri-dexel approach with a grid resolution of 400.
 	}
 	\label{fig:td_hq_impeller_details}
@@ -346,7 +346,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 		\caption{400}
 		\label{fig:td_turbine_groove_400}
 	\end{subfigure}
-	\caption{
+	\caption[Tri-dexel turbine grooves]{
 		Detailed renderings with the same perspective of a groove of the \turbine scene.
 		The meshes were created using the tri-dexel reconstruction algorithm with the grid resolutions 50, 100, 200 and 400.
 	}
@@ -377,7 +377,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 		\caption{feature reconstruction and cell slicing}
 		\label{fig:td_cylinder_head_drilling_cell_slicing}
 	\end{subfigure}
-	\caption{
+	\caption[Tri-dexel feature reconstruction and cell slicing]{
 		Details of the \cylinderhead scene rendered with the same perspective.
 		The renderings show the effects of refinement, feature reconstruction and cell slicing.
 		The meshes have been extracted using the tri-dexel approach at a grid resolution of 100.
@@ -401,7 +401,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 		\caption{hole}
 		\label{fig:td_cylinder_head_hole}
 	\end{subfigure}
-	\caption{
+	\caption[Tri-dexel T-vertices and holes]{
 		Details of the \cylinderhead scene.
 		Boundary edges are marked in green.
 		The renderings show the creation of T-vertices and holes at the border of normal and sliced cells.
@@ -517,7 +517,7 @@ The CPU utilization during a single run of the BPA surface extraction of the \im
 	\addplot table [x=time, y=utilization, col sep=comma]{spreadsheets/bpa_hq_impeller_cpu.csv};
 	\end{axis}
 	\end{tikzpicture}
-	\caption{
+	\caption[BPA CPU utilization]{
 		CPU utilization during point cloud creation and a run of the BPA with a grid resolution of 400 on the \impeller scene.
 	}
 	\label{fig:bpa_hq_impeller_cpu}
@@ -572,7 +572,7 @@ The CPU utilization during a single run of the BPA surface extraction of the \im
 		\caption{\turbine}
 		\label{fig:bpa_turbine}
 	\end{subfigure}
-	\caption{
+	\caption[BPA result renderings]{
 		Renderings of the result meshes after applying the BPA reconstruction approach on a point cloud created with a resolution of 400 on the selected test scenes in \cref{tbl:test_scenes}.
 	}
 	\label{fig:bpa_results}
@@ -594,7 +594,7 @@ Several concave and convex edges of the \cylinderhead scene which were not corre
 		\caption{\cylinderhead drilling at fin}
 		\label{fig:bpa_cylinder_head_thin_fin}
 	\end{subfigure}
-	\caption{
+	\caption[BPA result details]{
 		Details of the \cylinderhead scene.
 		The meshes have been extracted using the BPA approach with a resolution of 400.
 	}
@@ -629,7 +629,7 @@ Several concave and convex edges of the \cylinderhead scene which were not corre
 		\caption{400}
 		\label{fig:bpa_turbine_groove_400}
 	\end{subfigure}
-	\caption{
+	\caption[BPA turbine grooves]{
 		Detailed renderings with the same perspective of a groove of the \turbine scene.
 		The meshes were created using the BPA reconstruction algorithm run on a point cloud with the resolutions 50, 100, 200 and 400.
 	}
@@ -652,7 +652,7 @@ Problematic cases for the BPA are shown in \cref{fig:bpa_issues}.
 		\caption{\turbine 200}
 		\label{fig:bpa_turbine_inside}
 	\end{subfigure}
-	\caption{
+	\caption[BPA artifacts]{
 		Error in the \cylinderhead and \turbine scene after BPA reconstruction.
 		Boundary edges are marked in green.
 	}
@@ -708,7 +708,7 @@ The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges
 		\caption{\impeller edges}
 		\label{fig:poi_hq_impeller_points}
 	\end{subfigure}
-	\caption{
+	\caption[Poisson result renderings]{
 		Renderings of the \cylinderhead and \impeller scenes of reconstructions using the Poisson surface reconstruction filter from MeshLab.
 		The point cloud was created with a resolution of 400.
 		The Poisson filter was parameterized with an octree depth of ten, solver divide at eight, one sample per node and a surface offsetting of one, \cf corresponding dialog in MeshLab.
@@ -743,7 +743,7 @@ The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges
 		\caption{400}
 		\label{fig:poi_turbine_groove_400}
 	\end{subfigure}
-	\caption{
+	\caption[Poisson \turbine grooves]{
 		Detailed renderings with the same perspective of a groove of the \turbine scene.
 		The meshes were created using the Poisson surface reconstruction filter of MeshLab.
 	}

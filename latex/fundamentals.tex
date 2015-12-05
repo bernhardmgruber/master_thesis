@@ -96,7 +96,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 				}
 			\label{fig:t_vertex}
 		\end{subfigure}
-		\caption{
+		\caption[Manifold meshes]{
 			The upper images show a closed and opened fan of triangles incident to a vertex.
 			Each edge is connected to only one or two faces.
 			Both triangulations are 2-manifolds.
@@ -140,7 +140,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 			\caption{The Klein bottle.}
 			\label{fig:klein_bottle}
 		\end{subfigure}
-		\caption{
+		\caption[Orientable meshes]{
 			The left and central image show an orientable and not orientable mesh.
 			A mesh is orientable, if each pair of adjacent faces has a different vertex order on the shared edge.
 			A famous example of a not orientable mesh is the Klein bottle on the right image, for which a strict inside and outside facing cannot be determined.
@@ -176,7 +176,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.9\textwidth]{images/delaunay_triangulation}
-		\caption{
+		\caption[Delaunay triangulations]{
 			Three different triangulations for the same set of points.
 			Only the left one is a conforming Delaunay triangulation.
 			The image in the middle is a constrained Delaunay triangulation with respect to the red constraints.
@@ -240,7 +240,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{images/vector_clipping}
-		\caption{
+		\caption[Vector clipping]{
 			The vector clipping method \cite{virtual_machining_review}.
 		}
 		\label{fig:vector_clipping}
@@ -279,7 +279,7 @@ The following section is based on a comprehensive overview with sketches and des
 			\caption{Depth image.}
 			\label{fig:depth_image}
 		\end{subfigure}
-		\caption{
+		\caption[Z-map and depth image]{
 			Representation of a cuboid stock with material removed using a ball-end cutter.
 			The solid described by the z-map is represented using right square prisms in the left image.
 			The z-map can be stored in a grayscale image as shown on the right  \cite{virtual_machining_review}.
@@ -309,7 +309,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.8\textwidth]{images/dexels}
-		\caption{
+		\caption[Dexel image]{
 			Dexel image of a half sphere with a smaller, concentric half sphere drilled out \cite{virtual_machining_review}.
 		}
 		\label{fig:dexel_image}
@@ -327,7 +327,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.8\textwidth]{images/tridexels}
-		\caption{
+		\caption[Tri-dexel image]{
 			Tri-dexel images of an octant of a centered unit sphere.
 			The left, blue image shows dexels along the x-axis, the centered, red image along the z-axis and the right, green image along the y-axis \cite{virtual_machining_review}.
 		}
@@ -353,7 +353,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.8\textwidth]{images/csg_tree}
-		\caption{
+		\caption[CSG tree]{
 			A solid object modeled using CSG.
 			The final shape of the object at the top is the result of combining the primitives at the bottom using Boolean operations \cite{csg_tree}.
 		}
@@ -406,7 +406,7 @@ The following section is based on a comprehensive overview with sketches and des
 			\caption{HSD}
 			\label{fig:spatial_decomposition_hsd}
 		\end{subfigure}
-		\caption{
+		\caption[USD and HSD]{
 			The solid on the left side can be described using spatial decomposition in either a uniform manner, central image, or a hierarchical manner, right image \cite{virtual_machining_review}.
 		}
 		\label{fig:spatial_decomposition}
@@ -431,7 +431,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.8\textwidth]{images/brep}
-		\caption{
+		\caption[B-rep]{
 			A boundary representation describes a machining part be specifying its boundary surface. A popular surface representation is a set of connected triangles \cite{virtual_machining_review}.
 		}
 		\label{fig:brep}
