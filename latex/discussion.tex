@@ -255,11 +255,10 @@ The sliced cells are again irregular and caught by the recursion limit of the ce
 \subsection {Output size}
 
 Regarding the point cloud sizes, \cf \cref{tbl:point_cloud_results}, two trends, similar to the ones of the tri-dexel reconstruction in \cref{tbl:tri_dexel_results}, are also observable here.
-Firstly, the number of created points p\sub{out} for a given resolution is again similar for all scenes.
-And secondly, p\sub{out} increases quadratically with the resolution.
+The number of created points p\sub{out} for a given resolution is again similar for all scenes and  p\sub{out} increases quadratically with the resolution.
 The reasons are the same as for the triangle count of the tri-dexel output meshes, discussed in \cref{sec:tri_dexel_output_size}.
 
-Comparing the results of the VML's BPA implementation, \cf \cref{tbl:bpa_results}, with the tri-dexel results in \cref{tbl:tri_dexel_results}, the BPA outputs less than a half as much triangles.
+Comparing the results of the VML's BPA implementation, \cf \cref{tbl:bpa_results}, with the tri-dexel results in \cref{tbl:tri_dexel_results}, the BPA produces less than a half as much triangles.
 This is due to the additional feature reconstruction and triangle fans created inside each cell by the tri-dexel approach.
 As the BPA only operates on the vertices of the point cloud, it cannot create any further vertices.
 
@@ -334,8 +333,8 @@ Only geometry for which points are present in the point cloud is reconstructed b
 Surprisingly, due to the BPA's sole concentration on points, thin convex features such as the drilling at a fin of the \cylinderhead, \cf \cref{fig:bpa_cylinder_head_thin_fin}, are reconstructed quite robustly.
 This part of the scene challenges the tri-dexel approach much more, as the cells almost collapse along one axis during slicing.
 
-The \turbine scene looks reasonable from a distance, \cf \cref{fig:bpa_turbine}.
-However, the BPA has a hard time reconstructing the concave grooves, failing horribly at lower resolutions, \cf \cref{fig:bpa_grooves}.
+The \turbine scene looks good from a distance, \cf \cref{fig:bpa_turbine}.
+However, the BPA has a hard time reconstructing the concave grooves, failing completely at lower resolutions, \cf \cref{fig:bpa_grooves}.
 At a resolution of 50, the grooves are simply too small for the ball to roll inside.
 Compared with the tri-dexel approach using the same resolution, which succeeds in recreating the groove, the BPA's result is terrible.
 Increasing the resolution to 100 allows the ball to slip inside the groove, although still a lot of geometry is created spanning it.
@@ -363,7 +362,7 @@ Concerning the created boundary edges and holes, \cf \cref{tbl:bpa_boundary edge
 The only point clouds where boundary edges have been generated are the \cylinderhead, at a resolution of 50, and all \turbine clouds higher than 50.
 
 In all of these cases, the ball rolls inside a concave feature/hole and creates triangles spanning the sides of the feature, \cf \cref{fig:bpa_cylinder_head_non_manif,fig:bpa_turbine_groove_100}.
-These cases could be resolved by analyzing the created mesh, finding non-manifold vertices/edges, removing affected triangles and rerunning the BPA on the remaining holes, maybe with different ball sizes.
+These cases may be resolved by analyzing the created mesh, finding non-manifold vertices/edges, removing affected triangles and rerunning the BPA on the remaining holes, maybe with different ball sizes.
 If sufficient memory is available, the point cloud resolution may also be increased which allows the ball to be smaller and have more space to pivot in such small features.
 
 In the \turbine cases, the ball also frequently rolls inside the point cloud, even if it is only for smaller regions.
@@ -375,7 +374,7 @@ This kind of problem occurs primarily numerically and may only be mitigated by i
 
 Finally, to show the suitability of the point cloud for other algorithms outside the VML, a few renderings of the more complex scenes from meshes reconstructed with an external Poisson reconstruction approach are discussed, \cf \cref{fig:poisson_results}.
 As the Poisson algorithm tries to be robust against inhomogeneous and noisy inputs, sharp features are considered outliers and lost during the function fitting process.
-This gives the reconstructed meshes a smooth and roundish appearance, as visible in the general renderings in \cref{fig:poi_cylinder_head,fig:poi_hq_impeller}.
+This gives the reconstructed meshes a smooth and round appearance, as visible in the general renderings in \cref{fig:poi_cylinder_head,fig:poi_hq_impeller}.
 
 The detailed rendering of a drilling of the \cylinderhead in \cref{fig:poi_cylinder_head_detail} further demonstrates the loss of sharp edges.
 Additionally, the structure in the upper right, the drilling at the fin, is almost completely lost as the structure is too thin to allow the creation of a surface.
