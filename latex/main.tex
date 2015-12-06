@@ -14,6 +14,7 @@ draft,
 \usepackage{lmodern}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{csquotes}
 \usepackage[ngerman,english]{babel}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -80,6 +81,15 @@ draft,
 \makeatletter
 \newcommand{\setalglineno}[1]{%
 	\setcounter{ALG@line}{\numexpr#1-1}}
+\makeatother
+
+% hack to create spacing between algorithms of different chapters in list of algorithms
+\makeatletter
+\let\oldchapter\chapter
+\renewcommand{\chapter}{%
+	\addtocontents{loa}{\protect\addvspace{10\p@}}%
+	\oldchapter%
+}
 \makeatother
 
 %
@@ -206,14 +216,17 @@ draft,
 % ====================================================================================================
 
 % wbackfrieder thinks a list of figures is unnecessary
-\addcontentsline{toc}{chapter}{List of Figures}
-\renewcommand\listfigurename{List of Figures}
-\listoffigures
-\clearpage
 
-%\addcontentsline{toc}{chapter}{List of Listings}
-%\renewcommand\lstlistlistingname{List of Listings}
-%\lstlistoflistings
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+%\clearpage
+
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+%\clearpage
+
+\addcontentsline{toc}{chapter}{\listalgorithmname}
+\listofalgorithms
 %\clearpage
 
 \addcontentsline{toc}{chapter}{References}
