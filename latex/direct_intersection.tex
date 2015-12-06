@@ -156,7 +156,7 @@ It returns a list of structures, where each structure is a set of triangles.
 			\State \Return $\var{result}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Direct intersection workflow]{
 		Abstract workflow of the surface reconstruction using direct intersection of the VML's stored structures.
 	}
 	\label{alg:direct_intersection}
@@ -260,7 +260,7 @@ After all vertices have been processed, the result list is return, representing 
 			\State \Return $\var{result}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Sutherland-Hodgeman variant]{
 		A Sutherland-Hodgeman algorithm variant for clipping polygons against a bounding box in three dimensions.
 	}
 	\label{alg:clip}
@@ -292,7 +292,7 @@ The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersec
 			\EndIf
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Möller's triangle-triangle intersection adapter]{
 		Adapter to the Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
 		This algorithm calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p}_1$ and $\var{p}_2$ as output parameters.
 	}
@@ -363,7 +363,7 @@ As output they generate a Delaunay triangulation, with the convex hull of the po
 		Triangulation Template Library (TTL)             & \cite{ttl}                & C++      & GPL                                      & Supports usage of own data structures via C++ templates           \\
 		GNU Triangulated Surface Library (GTS)           & \cite{gts}                & C        & LGPL                                     & object-oriented design using GLib                                 \\
 	\end{tabular}
-	\caption{
+	\caption[CDT libraries]{
 		Several libraries offering a constrained Delaunay triangulation.
 	}
 	\label{tbl:delaunay_libs}
@@ -440,7 +440,7 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 			\EndIf
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[GTE CDT adapter]{
 		Adapter to the CDT routine provided by the GTE library.
 		Uses the \var{ConstrainedDelaunay2} class template to generate a CDT for a given triangle and a set of constrained edges.
 		The resulting triangulation is returned.
@@ -529,7 +529,7 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in \cre
 			\State \Return $(\var{u} \geq 0) \wedge (\var{v} \geq 0) \wedge (\var{u} + \var{v} \leq 1)$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Triangle inside structure test]{
 		Algorithm for testing whether a triangle is inside another structure.
 		The \textproc{IntersectRayTriangle} function is a branch-free version of the famous Möller-Trumbore ray-triangle intersection test \cite{ray_triangle_intersection_moller}.
 	}

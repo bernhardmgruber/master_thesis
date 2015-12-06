@@ -34,7 +34,7 @@ The runtime and output size of the test runs of the direct intersection surface 
 		\impellerhalf & 1191 & \SI{ 3000}{\kilo\nothing} & \SI{1296}{\kilo\nothing} & \SI{ 11.0}{      \second}\phantom{m} &  \\
 		\turbine      &  480 & \SI{16000}{\kilo\nothing} & \SI{ 752}{\kilo\nothing} & \SI{280.0}{      \second}\phantom{m} &
 	\end{tabular}
-	\caption{
+	\caption[Direct intersection results]{
 		Test results for the direct intersection surface extraction approach.
 	}
 	\label{tbl:direct_intersection_results}
@@ -157,7 +157,7 @@ The created boundary edges are listed in \cref{tbl:direct_intersection_boundary_
 		\impellerhalf & \SI{326}{\kilo\nothing} \\ % 326171
 		\turbine      & \SI{402}{\kilo\nothing} \\ % 401917
 	\end{tabular}
-	\caption{
+	\caption[Direct intersection boundary edges]{
 		Created boundary edges by the direct intersection surface extraction.
 	}
 	\label{tbl:direct_intersection_boundary_edges}
@@ -210,7 +210,7 @@ For testing the tri-dexel surface reconstruction approach, \cf \cref{ch:tri_dexe
 		}
 		\label{tbl:tri_dexel_results_slicing}
 	\end{subtable}
-	\caption{
+	\caption[Tri-dexel results]{
 		Test results for the tri-dexel surface extraction approach without and with one recursion of cell slicing.
 	}
 	\label{tbl:tri_dexel_results}
@@ -427,7 +427,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 		\impellerhalf &  574 & 1191 & 3033 &  6050 \\
 		\turbine      & 2006 & 3703 & 7181 & 13803 \\
 	\end{tabular}
-	\caption{
+	\caption[Tri-dexel boundary edges]{
 		Created boundary edges by the tri-dexel surface extraction using cell-slicing and the test scenes described in \cref{tbl:test_scenes}.
 		The meshes created without cell-slicing do not contain boundary edges.
 	}
@@ -456,7 +456,7 @@ Similar to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 have b
 		\impellerhalf & \SI{ 9}{\kilo\nothing} & \SI{ 54}{\milli\second} & \SI{38}{\kilo\nothing} & \SI{193}{\milli\second} & \SI{155}{\kilo\nothing} & \SI{ 600}{\milli\second} & \SI{625}{\kilo\nothing} & \SI{2037}{\milli\second} \\
 		\turbine      & \SI{ 7}{\kilo\nothing} & \SI{165}{\milli\second} & \SI{31}{\kilo\nothing} & \SI{650}{\milli\second} & \SI{132}{\kilo\nothing} & \SI{2509}{\milli\second} & \SI{532}{\kilo\nothing} & \SI{9610}{\milli\second} \\
 	\end{tabular}
-	\caption{
+	\caption[Point cloud results]{
 		Test results for the point cloud creation.
 	}
 	\label{tbl:point_cloud_results}
@@ -493,7 +493,7 @@ The ball's radius in the tests is derived from the raycasting resolution and set
 		\impellerhalf & \SI{155}{\kilo\nothing}& \SI{309}{\kilo\nothing} & \SI{ 695}{\milli\second} & \SI{625}{\kilo\nothing}& \SI{1248}{\kilo\nothing} & \SI{3135}{\milli\second} \\
 		\turbine      & \SI{132}{\kilo\nothing}& \SI{246}{\kilo\nothing} & \SI{ 613}{\milli\second} & \SI{532}{\kilo\nothing}& \SI{1049}{\kilo\nothing} & \SI{2222}{\milli\second} \\
 	\end{tabular}
-	\caption{
+	\caption[BPA results]{
 		Test results for surface reconstruction using the VML's internal BPA implementation excluding the time required to generate the point cloud, \cf \cref{tbl:point_cloud_results}.
 	}
 	\label{tbl:bpa_results}
@@ -674,7 +674,7 @@ The created boundary edges of the BPA are listed in \cref{tbl:bpa_boundary edges
 		\impellerhalf &   0 &    0 &    0 &    0 \\
 		\turbine      &   0 & 3055 & 1721 & 3293 \\
 	\end{tabular}
-	\caption{
+	\caption[BPA boundary edges]{
 		Created boundary edges by the BPA surface extraction.
 	}
 	\label{tbl:bpa_boundary edges}

@@ -194,7 +194,7 @@ Based on the discussed tri-dexel types, the basic reconstruction algorithm is sh
 			\State \Return $\var{triangles}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Tri-dexel workflow]{
 		Abstract workflow of the surface reconstruction using a tri-dexel approach.
 	}
 	\label{alg:tri_dexel}
@@ -259,7 +259,7 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 			\EndWhile
 		\EndProcedure
 	\end{algorithmic}
-	\caption{
+	\caption[Axis parallel raycast]{
 		Basic algorithm for performing a parallel raycast along all three coordinate system axes on the VML's data model.
 	}
 	\label{alg:tri_dexel_raycast}
@@ -377,7 +377,7 @@ Converting the tri-dexel image into a tri-dexel grid is achieved by the \textpro
 			\State \Return $\var{gridCoord} \div (\var{res}_{\var{axis}} - 1) \cdot (\var{box}.\var{upper}_{\var{axis}} - \var{box}.\var{lower}_{\var{axis}}) + \var{box}.\var{lower}_{\var{axis}}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Tri-dexel grid creation]{
 		Creating a tri-dexel grid from the raycasted dexel images.
 	}
 	\label{alg:tri_dexel_grid_generation}
@@ -539,7 +539,7 @@ The implementation of these regularization rules, \ie the \textproc{RegularizeCe
 			\EndFor
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Regularizing]{
 		Regularizing a cell of the tri-dexel grid by applying the four rules specified in \cref{fig:tri_dexel_regularization}.
 	}
 	\label{alg:tri_dexel_regularization}
@@ -792,8 +792,8 @@ A simple solution is to just start the depth-first search at the occupied grid p
 			\State \Return $\Call{TriangulateLoopIntoFan}{\var{vertices}}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
-		Basic triangulating routine for a tri-dexel cell.
+	\caption[Depth-first search and basic triangulation]{
+		Depth-first search and basic triangulating routine for a tri-dexel cell.
 		No refinement or feature reconstruction is done.
 	}
 	\label{alg:tri_dexel_triangulation}
@@ -875,7 +875,7 @@ These primitives are listed in \cref{alg:tri_dexel_loop_triangulation_primitives
 			\State \Return $\var{triangles}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Loop triangulation primitives]{
 		Loop triangulation primitives.
 	}
 	\label{alg:tri_dexel_loop_triangulation_primitives}
@@ -998,8 +998,8 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 			\State $\dots$
 		\algstore{refinement}
 	\end{algorithmic}
-	\caption{
-		Refinement, feature reconstruction by calculating intermediate vertices and an optiona apex based on the original boundary loops.
+	\caption[Feature reconstruction 1]{
+		Feature reconstruction by calculating intermediate vertices and an optiona apex based on the original boundary loops.
 		The algorithm is continued in \cref{alg:tri_dexel_refinement_triangulation}.
 	}
 	\label{alg:tri_dexel_refinement}
@@ -1084,7 +1084,7 @@ This second part of the \textproc{TriangulateLoopRefined} function is listed in 
 			\State \Return $|(\var{p} - \var{a}) \times (\var{p} - \var{b})| \div |\var{a} - \var{b}|$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Feature reconstruction 2]{
 		Continuation of \cref{alg:tri_dexel_refinement}.
 		Triangulation of a boundary loop enhanced with intermediate vertices and an optional apex.
 	}
@@ -1250,7 +1250,7 @@ This new cell slicing algorithm is integrated into the existing code by adapting
 			\State \Return $\var{triangles}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Cell slicing workflow]{
 		Adaption to the abstract workflow given in \cref{alg:tri_dexel} to support cell slicing.
 	}
 	\label{alg:tri_dexel_2}
@@ -1323,7 +1323,7 @@ In this case, the cell is not sent to triangulation but to a new cell slicing al
 			\State \Return $\var{ranges}$
 		\EndFunction
 	\end{algorithmic}
-	\caption{
+	\caption[Cell slicing]{
 		Cell slicing algorithm.
 		The \textproc{SliceCell} function is indirectly recursive with \textproc{Reconstruct}.
 	}
