@@ -1,7 +1,7 @@
 \chapter*{Kurzfassung}
 
 \begin{otherlanguage}{ngerman}
-	Am Beispiel der Virtual Modeling Library (VML), die an der RISC Software GmbH entwickelt wird, diskutiert diese Arbeit Algorithmen zur Oberflächenrekonstruktion von Datenmodellen zur Simulation zerspanender Bearbeitungsprocesse.
+	Am Beispiel der Virtual Modeling Library (VML), die an der RISC Software GmbH entwickelt wird, diskutiert diese Arbeit Algorithmen zur Oberflächenrekonstruktion aus Datenmodellen zur Simulation zerspanender Bearbeitungsprocesse.
 	Um ein Werkstück einer derartigen Bearbeitung zu beschreiben, verwaltet die VML Dreiecksmodelle des Ausgangs- und einer Serie an Abzugsvolumen, ähnlich einem CSG Baum.
 	Unter Verwendung eines angepassen Raycastingprozesses werden Oberflächenpunkte des Werkstücks abgetastet um Visualisierungen der Szene zu erzeugen.
 	
@@ -13,7 +13,7 @@
 	
 	Die zweite Methode tastet unter Verwendung eines adaptierten Raycastings ein Tri-Dexel-Bild ab und rekonstruiert daraus ein Dreiecksnetz.
 	Mit durchwegs guter Robustheit, einem visuell vertretbaren Resultat und exzellenter Qualität des Netzes, funktioniert diese Methode gut in allen getesteten Szenarios.
-	Zusätzliche verbessert eine neuartige Erweiterung des Tri-Dexel-Algorithmus die Rekonstruktion von Details auf Kosten kleiner Löcher in der erzeugten Oberfläche.
+	Zusätzlich verbessert eine neuartige Erweiterung des Tri-Dexel Algorithmus die Rekonstruktion von Details auf Kosten kleiner Löcher in der erzeugten Oberfläche.
 	
 	Als dritte Methode kann ein Raycast auch zur Abtastung einer Punktwolke der Werkstücksoberfläche herangezogen werden.
 	Am Beispiel des Ball Pivoting Algorithm der VML und der Implementierung einer Poisson Oberflächenrekonstruktion in MeshLab werden noch die Verwendung von punktwolkenbasierten Algorithmen diskutiert.
@@ -30,7 +30,7 @@ Via a custom raycasting process, surface points of the workpiece are sampled to 
 Sometimes, an explicit surface mesh representation of the workpiece is desired.
 To reconstruct such a mesh, three approaches are presented.
 
-The first one relies on calculating the Boolean subtraction of the maintained stock and swept volume by direct mesh intersection.
+The first one relies on calculating the Boolean subtraction of the maintained stock and swept volumes by direct mesh intersection.
 Although producing exact results for simple scenes, this method fails for complex scenes due to numerical issues.
 
 The second approach samples a Tri-dexel image using an adapted raycast and reconstructs a triangle mesh from the tri-dexel representation.

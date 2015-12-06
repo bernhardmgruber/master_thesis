@@ -16,12 +16,12 @@ Sometimes, these representations have to be converted into triangle meshes.
 Based on the research projects Enlight and Engrave, the Virtual Modeling Library (VML) is developed as a simulation and visualization software for subtractive manufacturing by the RISC Software GmbH.
 The VML maintains a stock and several swept volume meshes in a regular grid data structure to describe a machined workpiece.
 No explicit surface representation is stored by the VML.
-Obtaining images of this workpiece uses a raycasting technique to sample the surface of the workpiece.
+Obtaining images of this workpiece requires a raycasting technique to sample the surface of the workpiece.
 
 % related work and state of the art
 To create a triangle mesh representation of the data model of the VML, conversion and reconstruction algorithms have been researched.
 %
-Directly intersecting the stock and swept volume meshes to compute their Boolean difference is a straight forward solution but calculatively expensive.
+Directly intersecting the stock and swept volume meshes to compute their Boolean difference is a straight forward solution, but calculatively expensive.
 %
 Using an adaption of the existing raycasting system allows the sampling of surface points.
 For reconstructing triangle meshes from point clouds created this way many algorithms are available in literature and software libraries.
@@ -46,7 +46,7 @@ The implementation provides good scalability on multiple cores but scaled direct
 To provide a more robust and sampling based reconstruction, a tri-dexel based approach has been implemented.
 An adapted raycast along the three axes of the coordinate system creates a tri-dexel image of the workpiece.
 This image is converted into a tri-dexel grid and is regularized.
-Based on this grid, boundary loops are detected in boundary cells
+Based on this grid, boundary loops are detected in boundary cells.
 These loops are refined using surface normal information and triangulated.
 The tri-dexel approach reconstructs all test scenes successfully and creates oriented and closed meshes.
 Cell slicing is proposed as an extension to this tri-dexel reconstruction to allow adaptive resampling of features at the cost of creating T-vertices and thin holes.
@@ -85,7 +85,7 @@ A post processing pass might identify these irregularities and solve them by fil
 Another solution could propagate the additional vertices created in sliced cells to the boundary loops of their neighboring cells, preventing the problem in the first place.
 
 In its current state, the tri-dexel implementation is still notably slow when compared with fully optimized algorithms like the BPA of the VML.
-There are a several potentialities for improving both runtime and memory requirements.
+There are several potentialities for improving both runtime and memory requirements.
 Apart from increasing the performance of the raycaster, the tri-dexel image intermediate representation could be eliminated and the dexels of a ray mapped directly to the tri-dexel grid, saving time and memory.
 A further problem is the large amount of copied data, \eg aggregating all data of a cell from the tri-dexel grid into a new data item before processing it further.
 Although these copies allow easier parallelization, the additional allocations still require memory and a not negligible amount of time.
