@@ -10,18 +10,13 @@ As a trade-off for robustness, the approach may offer up surface exactness and f
 Dexel-based representations comply well with these requirements.
 They provide a good abstraction of a machined workpiece with rich semantics.
 The resolution of the dexel grid supplies an easy to configure level of detail and steering parameter between representation quality and memory/CPU demands.
-Creating dexel-based representations from the data model of the VML is achieved using an adaption of the already implemented, well-working and robust raycasting subsystem used for visualization, \cf \cref{sec:raycasting}.
-To achieve good portrayal, independently of the orientation of the workpiece, three axis-aligned dexel images are generated, thus creating a tri-dexel representation.
-For converting such a tri-dexel model into a final triangle mesh, various algorithms are presented in literature.
-A well-written example by Ren \etal forms the idea and foundation of the implementation presented in this chapter \cite{tridexel_reconstruction}.
-
 
 \subsection{Concept}
 \label{sec:tri_dexel_concept}
 
-Firstly, a tri-dexel representation of the data model of the VML has to be obtained.
+To achieve good portrayal, independently of the orientation of the workpiece, three axis-aligned dexel images are generated, thus creating a tri-dexel representation.
 Dexel images, in general, are created by sampling the surface of the workpiece along parallel lines.
-This sampling process is already implemented in the raycasting subsystem as part of the visualization.
+This sampling process is already implemented in the well-working raycasting subsystem used for visualization, \cf \cref{sec:raycasting}.
 However, when sampling dexels, a ray must not stop at the first surface intersection, but continue through the whole data model and collect all intersections along its path.
 At each intersection, the intersection depth, \ie distance from the origin of the ray, and the surface normal of the intersected triangle is recorded as a dexel node.
 From the origin of the dexel and the depth of a node the intersection point may be calculated.
@@ -81,33 +76,43 @@ Combining these dexel images creates a uniform regular grid, the tri-dexel grid.
 	\label{fig:cylinder_head_dexel}
 \end{figure}
 
-Secondly, the tri-dexel representation is converted into a triangle mesh \cite{tridexel_reconstruction}.
+In a subsequent step, the created tri-dexel representation is converted into a triangle mesh.
+For this conversion, various algorithms are presented in literature.
+A well-written algorithm by Ren \etal forms the idea and foundation of the implementation presented in this section \cite{tridexel_reconstruction}.
+Triangulation is done independently for each grid cell.
+Before a cell is triangulated, a few consistency checks and corrections are applied to the cell.
+This process is called regularization and ensures a successful triangulation into a water-tight mesh.
+For triangulation, a depth-first search process is iteratively started at non-occupied grid points of the cell to discover boundary loops.
+Basically, the detected loops may be triangulated right away.
+However, the quality of the triangulation is further enhanced by taking normal information at the dexel nodes into account.
+This is especially necessary to reconstruct features of the model.
+This optional feature reconstruction pass is run on the loops found in the previous step and may create additional vertices.
+Taking these vertices into account allows the creation of better loop triangulations.
+
+
+\subsection{Fundamentals}
+\label{sec:tri_dexel_fundamentals}
+
 Each intersection point of three orthogonal dexels from the tri-dexel grid forms a grid point.
-If a grid point lies within a dexel segment on any of these dexels, it is said to be occupied, \ie lies within the volume of the workpiece.
+If a grid point lies within a dexel segment on any of these dexels, it is said to be occupied.
+The grid point thus lies within the volume of the workpiece.
 Eight grid points and their twelve connecting edges along with their dexel segments are grouped into cells of the grid.
-Each grid cell is then processed independently.
 \Cref{fig:tri_dexel_cell} shows the structure of a tri-dexel cell.
 %
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/tri_dexel_cell}
 	\caption[Tri-dexel cell]{
-		A cell of a tri-dexel grid \cite{tridexel_reconstruction}.
+		A cell of a tri-dexel grid, modified from \cite{tridexel_reconstruction}.
 		Occupied grid points are drawn in red, dexel nodes in green, dexel segments in blue.
-		Each grid point is referenced using a number between 0 and 7.
 	}
 	\label{fig:tri_dexel_cell}
 \end{figure}
 %
-Before a cell is triangulated, a few consistency checks and corrections are applied to the cell.
-This process is called regularization and ensures a successful triangulation into a water-tight mesh.
-Then, the cell is triangulated.
-For this purpose, a depth-first search process is iteratively started at non-occupied grid points of the cell to discover boundary loops.
-Basically, the detected loops may be triangulated right away to obtain a water tight mesh.
-However, the quality of the triangulation is further enhanced by taking normal information at the dexel nodes into account.
-This is especially necessary to reconstruct features of the model.
-This optional feature reconstruction pass is run on the loops found in the previous step and may create additional vertices.
-Taking these vertices into account allows the creation of better loop triangulations.
+The edges of a tri-dexel cell contain dexel segments, or parts of them if the segment spans multiple cells.
+At the end of each dexel segment is a dexel node, containing a depth value and a surface normal.
+In the algorithms of this section, each grid point is referenced using a number between 0 and 7 and each edge using a number between 0 and 11.
+
 
 \subsection{Overview}
 \label{sec:tri_dexel_implementation}
