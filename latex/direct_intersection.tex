@@ -2,7 +2,7 @@
 \chapter{Direct intersection method}
 \label{ch:direct_intersection}
 
-The first presented method to extract a triangulated surface from the VML's data model is by directly processing the stored triangles inside the VML's regular grid.
+The first presented method to extract a triangulated surface from the data model of the VML is by directly processing the stored triangles inside the regular grid of the VML.
 This approach is the most straightforward, computationally intensive, but, in theory, most accurate one.
 It is conceptually equivalent to directly intersecting the mesh of the stock with each swept volume mesh.
 Boolean operations on triangle meshes are already available in most CAD kernels.
@@ -14,7 +14,7 @@ The idea of this approach is based on a work about finding and deforming the int
 \section{Concept}
 \label{sec:direct_intersection_concept}
 
-Every time a swept volume is added to the VML, a unique identifier, \ie a number, is generated and assigned to each of the swept volume's triangles before they are mapped to the cells of the regular grid.
+Every time a swept volume is added to the VML, a unique identifier, \ie a number, is generated and assigned to each of the swept volume triangles before they are mapped to the cells of the regular grid.
 As the stock is internally treated as a swept volume, by inverting the surface normals, all stock triangles are also assigned a unique identifier.
 These identifiers allow to separate the triangles contained in the regular grid into the previous swept volumes, referred to as structures.
 The identifiers of these structures are called structure ids.
@@ -29,7 +29,7 @@ Each triangle of one structure is then tested against the other structure, wheth
 As all triangles, which initially intersected the opposite structure, have been split, this inside-or-outside property should be unambiguously determinable for each triangle.
 By removing all triangles of a structure which are inside the opposite structure, the remaining triangles of both structures form a new surface which corresponds to the union of both structures.
 This new structure is then again pairwise united with other structures until only one structure is left, \ie all structures are reduced to one.
-This final structure is the reconstructed surface of the VML's data model.
+This final structure is the reconstructed surface of the data model of the VML.
 \Cref{fig:cube2} demonstrates this workflow by the example of intersecting a cube with a cuboid.
 
 \begin{figure}
@@ -71,15 +71,15 @@ This final structure is the reconstructed surface of the VML's data model.
 		\label{fig:cube2_result}
 	\end{subfigure}
 	\caption[Direct intersection concept]{
-		Surface reconstruction from the VML's data model by the example of intersecting a cube and a cuboid.
+		Surface reconstruction from the data model of the VML by the example of intersecting a cube and a cuboid.
 		The cubic stock, in the lower left, and a tilted cuboid as swept volume, in the upper right, is shown in \subref{fig:cube2_stock_sv}.
-		The classification result when these two solids are mapped into the VML's regular grid is shown in \subref{fig:cube2_classified}.
-		Most of the swept volume's triangles have been removed.
+		The classification result when these two solids are mapped into the regular grid of the VML is shown in \subref{fig:cube2_classified}.
+		Most of the swept volume triangles have been removed.
 		When intersecting both structures, \ie swept volume and stock triangles, all intersection lines per triangle are recorded.
-		For the swept volume's triangles, \subref{fig:cube2_constraints} shows these lines.
+		For the swept volume triangles, \subref{fig:cube2_constraints} shows these lines.
 		The triangles are then retriangulated with respect to those intersections as shown in \subref{fig:cube2_retriangulated}.
 		Afterwards, each triangle is tested against the other structure, whether they are inside and can be removed.
-		The result of testing the retriangulated swept volume's triangles against the stock is shown in \subref{fig:cube2_eliminated}.
+		The result of testing the retriangulated swept volume triangles against the stock is shown in \subref{fig:cube2_eliminated}.
 		The retriangulation and inside test is analogously done for the stock structure.
 		Finally, the reconstructed surface is the union of the remaining triangles, \cf \subref{fig:cube2_result}.
 	}
@@ -94,7 +94,7 @@ In general, intersecting each triangle of a structure against each other triangl
 The cost of this operation is $\mathcal{O}(n^2)$, assuming both structures have $n$ triangles.
 Intersecting the structures at the level of each cell greatly reduces the value of $n$.
 Unfortunately, many triangles usually span the bounding boxes of several cells and are duplicated in each encompassed one.
-To avoid duplicates or overlapping triangles when combining results from neighboring cells, all triangles of a cell have to be clipped against the cell's bounding box.
+To avoid duplicates or overlapping triangles when combining results from neighboring cells, all triangles of a cell have to be clipped against the bounding box of the cell.
 This step can be done before or after intersecting the structures of a cell, but always before starting to eliminate triangles against the opposite structure.
 There is also a second reason why this direct intersection approach must be run on a cell level which is discussed in \cref{sec:triangle_inside_test}.
 
@@ -157,7 +157,7 @@ It returns a list of structures, where each structure is a set of triangles.
 		\EndFunction
 	\end{algorithmic}
 	\caption[Direct intersection workflow]{
-		Abstract workflow of the surface reconstruction using direct intersection of the VML's stored structures.
+		Abstract workflow of the surface reconstruction using direct intersection of the structures stored by the VML.
 	}
 	\label{alg:direct_intersection}
 \end{algorithm}
@@ -168,7 +168,7 @@ It returns a list of structures, where each structure is a set of triangles.
 
 Clipping triangles against the bounding box of a cell is necessary to avoid duplicated or invalid surfaces.
 In cases where triangles span multiple cells, the VML duplicates each triangle into each cell it encompasses.
-During intersection, only a triangle's intersections with structures of the current cell are recorded, although the triangle might be intersected by additional geometry in neighboring cells.
+During intersection, only the intersections of a triangle with structures of the current cell are recorded, although the triangle might be intersected by additional geometry in neighboring cells.
 Therefore, after splitting, parts of the triangle which are outside the current cell are never split, might pass the inside test as a whole and remain as additional triangles outside the actual surface or remain collinear with surface triangles from neighboring cells.
 To circumvent these issues, all triangles of a cell have to be clipped either before or after intersecting the two structures in \textproc{UnionStructure}.
 
@@ -187,19 +187,19 @@ The resulting triangles after clipping, if any, are collected to form the new, c
 
 The Sutherland-Hodgeman algorithm clips against a convex polygon, or its equivalent in higher dimensions, \ie a polytope, by iteratively clipping against each side.
 In case of a bounding box, the input polygon has to be clipped against each of the six sides of the cell.
-These sides are extended and described as planes by specifying a normal vector and the plane's distance to the origin.
-The six planes built from a cell's bounding box are given in the \textproc{ClipPolygonAABB} function of \cref{alg:clip}.
+These sides are extended and described as planes by specifying a normal vector and the plane distance to the origin.
+The six planes built from the bounding box of a cell are given in the \textproc{ClipPolygonAABB} function of \cref{alg:clip}.
 The input polygon itself is represented as an ordered list of vertices, where each pair of adjacent vertices form an edge of the polygon, including the last and the first vertex as a pair.
 The order of the vertices remains the same during the clipping process, but vertices may be removed or additional ones added.
 The final vertex list, after clipping against all planes, needs to be triangulated again.
-As the clipping volume, \ie the cell's bounding box, is convex, the resulting clipped polygon is also convex.
+As the clipping volume, \ie the bounding box of a cell, is convex, the resulting clipped polygon is also convex.
 Therefore, the list of vertices can be simply triangulated into a fan by selecting one vertex and emitting a triangle for every adjacent pair of vertices excluding the selected vertex, where each triangle is built from the pair and the selected vertex.
 Note that in some edge cases, duplicate vertices may be generated.
 Thus, duplicates should be removed from the result vertex list before passing it to the triangulation subroutine.
 
 The core routine of the clipping procedure is clipping the list of vertices against a single plane.
 Initially, an empty list of result vertices is created.
-For each of the polygon's vertices, the signed distance to the clipping plane is calculated.
+For each of the vertices of the polygon, the signed distance to the clipping plane is calculated.
 The distance of each vertex is compared with the distance of its preceding vertex.
 If the signs of the distances are different, the edge represented by the current vertex and its predecessor intersects the clipping plane.
 In this case, the intersection point with the clipping plane is calculated, \cf \cref{alg:clip} for details, and the point is added to the result list.
@@ -274,9 +274,9 @@ After all vertices have been processed, the result list is return, representing 
 Every time the union surface of two structures is calculated, each triangle of one structure has to be intersected with each triangle of the other structure.
 Triangle-triangle intersection is a common problem in collision detection and has been solved numerous times.
 The intersection test of Möller \cite{tri_tri_intersection_moller}, despite being older and marginally slower than more recent developments \cite{tri_tri_intersection_2}, is also available as public domain C code on the authors website \cite{tri_tri_intersection_moller_code}.
-As only a few adaptations were necessary, Möller's code was taken and thoroughly refactored to fit a modern C++ style without changing its behavior.
-Since the code is quite long and freely available on Möller's website, an implementation/algorithm is not included here.
-The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersection} is thus merely a small adapter calling into Möller's code and is given in \cref{alg:triangle_intersection}.
+As only a few adaptations were necessary, the code of Möller was taken and thoroughly refactored to fit a modern C++ style without changing its behavior.
+Since the code is quite long and freely available on the website of Möller, an implementation/algorithm is not included here.
+The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersection} is thus merely a small adapter calling into the code of Möller and is given in \cref{alg:triangle_intersection}.
 
 \begin{algorithm}
 	\centering
@@ -292,8 +292,8 @@ The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersec
 			\EndIf
 		\EndFunction
 	\end{algorithmic}
-	\caption[Möller's triangle-triangle intersection adapter]{
-		Adapter to the Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
+	\caption[Möller triangle-triangle intersection adapter]{
+		Adapter to Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
 		This algorithm calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p}_1$ and $\var{p}_2$ as output parameters.
 	}
 	\label{alg:triangle_intersection}
@@ -303,33 +303,33 @@ The triangle intersection test itself starts with an early exit test by computin
 Then, the signed plane distance of each vertex of one triangle to the plane of the other triangle is calculated.
 If the signs of these three values is the same for one triangle, it completely lies on one side of the plane and therefore does not intersect the other triangle.
 This test is run for both triangles.
-Afterwards, the intersection line between the two planes is calculated by crossing the planes' normal vectors.
+The intersection line between the two planes is calculated by crossing the normal vectors of the planes.
 \Cref{fig:tri_intersect} shows the intersection line of the two triangle planes in green and is used to discuss the remaining part of the algorithm.
 Now, the intervals of the line which lie inside the triangle have to be calculated.
-For each pair of vertices of a triangle, \ie each triangle's edges, the two signed distances of the vertices to the plane of the other triangle are compared.
-If they have a different sign, this edge intersects the other triangle's plane and therefore crosses the intersection line of both planes.
+For each pair of vertices of a triangle, \ie each edge, the two signed distances of the vertices to the plane of the other triangle are compared.
+If they have a different sign, this edge intersects the plane of the other triangle and therefore crosses the intersection line of both planes.
 The intersection point splits the edge with the same ratio as the signed distances of both vertices.
 For each triangle, two intersecting edges are found, thus yielding an interval for each triangle, \cf blue segments of the line in \cref{fig:tri_intersect}.
-If these two intervals overlap, the triangles intersect and their intersection line is the overlapping segment of the planes' intersection line, \cf red segment in \cref{fig:tri_intersect}.
+If these two intervals overlap, the triangles intersect and their intersection line is the overlapping segment of the intersection line of the planes, \cf red segment in \cref{fig:tri_intersect}.
 Otherwise, there is no intersection.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\textwidth]{tri_intersect}
 	\caption[Möller triangle-triangle intersection test]{
-		Intersection line calculation in Möller's triangle intersection test.
-		The image shows intervals on the intersection line between two triangle's planes.
+		Intersection line calculation in Möller's triangle-triangle intersection test.
+		The image shows intervals on the intersection line between the planes of two triangle.
 		The green line is the intersection line of both planes.
 		Blue parts of the intersection line are intervals of one triangle.
-		The red part is the overlap of both triangle's line intervals, \ie the triangle's intersection.
+		The red part is the overlap of the the line intervals of both triangles, \ie the intersection of both triangles.
 		Image modeled after \cite[p757]{tri_tri_intersection_moller_image}.
 	}
 	\label{fig:tri_intersect}
 \end{figure}
 
-Extending beyond this concept, a further optimization is to do not use the planes' intersection line to project the triangle's intervals onto, but to use the coordinate system's axis where the intersection line's direction has the largest magnitude.
+Extending beyond this concept, a further optimization is to not use the intersection line of the planes to project the intervals of the triangles onto, but to use the axis of the coordinate system where the direction of the intersection line has the largest magnitude.
 This greatly simplifies several calculations except the actual points of the intersection segment.
-Furthermore, Möller's code additionally handles the case when both triangles are coplanar, \ie the signed distances of the vertices of one triangle to the other triangle's plane are almost zero.
+Furthermore, the code of Möller additionally handles the case when both triangles are coplanar, \ie the signed distances of the vertices of one triangle to the plane of the other triangle are almost zero.
 
 
 
@@ -379,14 +379,14 @@ Furthermore, passing in and returning geometric data structures requires extensi
 The library does not reliably work for all triangulation cases and sometimes crashes.
 
 The Geometric Tools Engine (GTE) is a rather modern library with an excellent C++ interface.
-The algorithms' precision may be configured via templates.
+The precision of the algorithms may be configured via templates.
 The library runs outstandingly stable with only a few troubles in cases where the input was numerically problematic, \eg contained points with differences only at the last few digits representable with double precision.
 However, these issues can be fixed with appropriate preprocessing of the input, \cf \cref{sec:numeric_improvements}.
 Furthermore, the GTE library is licensed under the Boost License and therefore perfectly usable in commercial products like the VML.
 
 The remaining libraries have not been further tested, mainly for the reason that the VML is a commercial product and the use of these libraries would require to drop the code again later.
 
-The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which is given in \cref{alg:triangle_splitting}.
+The integration of the CDT of the GTE is done inside \textproc{SplitTriangle} which is given in \cref{alg:triangle_splitting}.
 %
 \begin{algorithm}
 	\centering
@@ -449,9 +449,9 @@ The integration of the GTE's CDT is done inside \textproc{SplitTriangle} which i
 \end{algorithm}
 %
 A few preparations are necessary before the CDT subroutine can be called.
-All points used by constrained edges must be part of the input point cloud and are therefore added to the point cloud formed by the input triangle's vertices.
+All points used by constrained edges must be part of the input point cloud and are therefore added to the point cloud formed by the input vertices of the triangle.
 
-Furthermore, as the CDT only runs in two dimensions, all vertices are projected onto the plane spanned by the two coordinate system axes with the smaller magnitude in the triangle's normal vector.
+Furthermore, as the CDT only runs in two dimensions, all vertices are projected onto the plane spanned by the two coordinate system axes with the smaller magnitude in the normal vector of the triangle.
 This operation is simple as it only requires the selection of two components of each point and no calculation.
 As all constraints as well as the resulting triangulation are specified using indexes into the point cloud, the list containing the 2-dimensional, projected vertices must have the same order as the original point list.
 Before starting the triangulation, the constrained edges have to be specified.
@@ -467,7 +467,7 @@ These triangles are finally returned.
 \label{sec:triangle_inside_test}
 
 After all triangles of two intersecting structures have been split on their intersection lines, all triangles which do not contribute to the union surface, \ie are inside the other structure, have to be removed.
-Due to the regular grid's classification, \cf \cref{sec:classification}, triangles might have been removed and, consequently, structures put together from multiple cells of the regular grid may no longer be closed meshes.
+Due to the classification of the regular grid, \cf \cref{sec:classification}, triangles might have been removed and, consequently, structures put together from multiple cells of the regular grid may no longer be closed meshes.
 As it turns out, the test whether a triangle is inside another structure may fail if the tested structure is not a closed mesh, a common case.
 An example of such an issue is shown in \cref{fig:inside_test_error}.
 %
@@ -483,8 +483,8 @@ An example of such an issue is shown in \cref{fig:inside_test_error}.
 \end{figure}
 %
 A triangle is tested against a structure by using a ray.
-This ray is shot from an arbitrary point on the triangle, which does not lie on an edge, \eg the triangle's centroid, to an arbitrary point on a triangle of the other structure.
-If the ray does not intersect the other structure on its way, a comparison of the ray's direction with the normal of the targeted triangle determines whether the ray's origin, \ie the centroid of the tested triangle, is inside the other structure or not.
+This ray is shot from an arbitrary point on the triangle, which does not lie on an edge, \eg the centroid of the triangle, to an arbitrary point on a triangle of the other structure.
+If the ray does not intersect the other structure on its way, a comparison of the direction of the ray with the normal of the targeted triangle determines whether the origin of the ray, \ie the centroid of the tested triangle, is inside the other structure or not.
 However, as classification might eliminate triangles, the ray could potentially intersect triangles of the structure which have been removed, \cf left ray in \cref{fig:inside_test_error}.
 The regular grid only guarantees closed meshes within a cell.
 To circumvent this issue, the inside test for a triangle must be conducted within a cell.
@@ -542,14 +542,14 @@ Distance and normal of the targeted triangle are stored.
 Then, all other triangles of the structure are tested for intersection with the created ray.
 If an intersection happens and the distance to the newly intersected triangle is shorter than the distance to the currently targeted triangle, the distance and normal are updated to the new triangle, \ie the ray now targets the new triangle.
 This procedure ensures that after all triangles have been tested for intersection, the maintained distance and normal store the values of the closest intersection of the ray.
-The normal of the closest intersected triangle of the other structure is then finally compared to the ray's direction.
-If they point into the same half space, the ray's origin and therefore the tested triangle is inside the tested structure.
+The normal of the closest intersected triangle of the other structure is then finally compared to the direction of the ray.
+If they point into the same half space, the origin of the ray and therefore the tested triangle is inside the tested structure.
 
 For ray-triangle intersection the famous Möller-Trumbore intersection test is used \cite{ray_triangle_intersection_moller}.
 An implementation of their algorithm in C is already given in the corresponding work.
 The original version has a few early exit tests on \var{u} and \var{v}, which might save some work in case the ray misses the triangle.
 However, branching is becoming increasingly expensive on modern hardware architectures, especially in vectorized code paths or GPU code.
-A branch-free version of Möller-Trumbore's code, which is currently used and performs slightly better, is shown in \cref{alg:triangle_inside_test}.
+A branch-free version of Möller-Trumbore's intersection test, which is currently used and performs slightly better, is shown in \cref{alg:triangle_inside_test}.
 
 The idea of the algorithm is shown in \cref{fig:ray_triangle_intersect}.
 %
@@ -568,10 +568,10 @@ The idea of the algorithm is shown in \cref{fig:ray_triangle_intersect}.
 The intersection test relies on the idea that, with a simple transformation, the problem can be represented in a coordinate system where the solution is almost given.
 This transformation should put the origin of the coordinate system at one vertex of the triangle.
 The axes of the new system are the two triangle edges as well as the inverted ray direction.
-If the problem is represented in this space, the ray's origin holds the values of the $u$ and $v$ barycentric coordinate of the intersection point on the triangle as well as the distance $t$ of the triangle to the origin in multiples of the ray direction vector's length.
+If the problem is represented in this space, the origin of the ray holds the values of the $u$ and $v$ barycentric coordinate of the intersection point on the triangle as well as the distance $t$ of the triangle to the origin in multiples of the length of the ray direction vector.
 $u$ and $v$ are used to test whether the intersection point lies within the triangle and $t$ can be used as parameter in the line equation of the ray, $X = O + D \cdot t$, to retrieve the point of intersection.
 The transformation necessary consists of two steps.
-The first is a translation of $O$ by $-V_0$ to move the coordinate system's origin to a triangle vertex.
+The first is a translation of $O$ by $-V_0$ to move the origin of the coordinate system to a triangle vertex.
 The second step is a change of basis with $\left[-D, V_1 - V_0, V_2 - V_0 \right]$ as base matrix.
 This is done by multiplying with the inverse base matrix.
 The result vector $\left[ t,  u,  v \right]$ then contains the desired values.
@@ -631,8 +631,8 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 
 
 	\item[Collapse constraint vertices with structure vertices] \hfill \\
-	Some of the intersection lines on a triangle might be very close to the triangle's vertices.
-	To avoid creating degenerated triangles during CDT, all constraints' vertices are checked against the triangle's vertices to ensure a minimum distance.
+	Some of the intersection lines on a triangle might be very close to its vertices.
+	To avoid creating degenerated triangles during CDT, all vertices of constraints are checked against the vertices of the triangle to ensure a minimum distance.
 	If a distance is less than a specified minimum, the affected vertex is set to the corresponding vertex of the triangle.
 
 
@@ -653,12 +653,12 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 	\item[Specify hull constraints] \hfill \\
 	Most CDT libraries triangulate a given point cloud within the convex hull of the cloud.
 	Identifying the edges belonging to the convex hull is usually deterministic if the points are in what is called general position, \ie no coincident or collinear points.
-	However, the vertices of a triangle and a set of constraints where many constraints end at the triangle's edges contain a lot of collinear points.
+	However, the vertices of a triangle and a set of constraints where many constraints end at the edges of the triangle contain a lot of collinear points.
 	In order to help the CDT in finding the right hull, it is recommended to specify the hull manually via additional constraints.
-	These hull constraints are constructed from the triangle's vertices and the constraint vertices touching an edge of the triangle.
-	The latter are identified by counting the number of constraints incident to each vertex of a point set formed by all constraints' vertices.
-	Vertices with only one incident constraint must lie at the triangle's border and are therefore hull vertices.
-	Together with the triangle's vertices, the hull vertices are ordered cyclical around their center of mass.
+	These hull constraints are constructed from the triangle vertices and the constraint vertices touching an edge of the triangle.
+	The latter are identified by counting the number of constraints incident to each vertex of a point set formed by all vertices of constraints.
+	Vertices with only one incident constraint must lie at the border of the triangle and are therefore hull vertices.
+	Together with the vertices of the triangle, the hull vertices are ordered cyclical around their center of mass.
 	The hull constraints are then formed from each adjacent pair of the ordered hull vertices including the constraint from the last to the first hull vertex.
 	These hull constraints are appended to the constraints created by the intersection lines as input to the CDT.
 
@@ -666,7 +666,7 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 	\item[Remove degenerate triangles after CDT] \hfill \\
 	Despite good preparation of the input, it might still be the case that tiny or degenerated triangles are generated by the CDT routine, especially along the hull.
 	The vertices of such triangles are apart far enough to pass vertex collapse in a following iteration.
-	Therefore, a check on the triangle's angles is preferred.
+	Therefore, a check on the angles of the triangle is preferred.
 	If the dot product of any pair of incident, normalized edges of the triangle is approaching zero, \ie is below a defined epsilon, the triangle is removed from the triangulation result.
 \end{description}
 
@@ -693,7 +693,7 @@ A structure inside a cell usually does not consist of more than 50 - 100 triangl
 These routines would probably benefit from data parallelism and SIMD constructs, \ie vectorization.
 Especially the \textproc{ClipPolygonAABB}, \textproc{IntersectTriangles} and \textproc{IsTriangleInsideStructure} algorithms contain only a few branches and operate on simple data structures, \ie arrays.
 
-Considering alternative hardware architectures like GPUs or similar accelerators, \eg Intel's Xeon Phi coprocessor, a parallelization based on the regular grid's cells is recommended.
+Considering alternative hardware architectures like GPUs or similar accelerators, \eg the Intel Xeon Phi coprocessor, a parallelization based on the cells of the regular grid is recommended.
 The reason is that the number of cells is known at the beginning of the whole calculation which allows static scheduling of the entire work size.
 This property is mandatory when programming for GPUs, but has been softened in recent years by the introduction of dynamic parallelism in CUDA 5.0 and OpenCL 2.0.
 Furthermore, most GPU architectures rely on either vectorization or execution of thread groups in lockstep\footnote{
@@ -701,7 +701,7 @@ Furthermore, most GPU architectures rely on either vectorization or execution of
 	These threads are tied together and executed instruction-wise, meaning all threads execute the same instruction on their individual data in parallel.
 	This behavior is also called lockstep execution and the paradigm single instruction, multiple threads (SIMT).
 	If some threads branch differently than others, \eg if, while or for statements, all threads execute both branches, but some of them are masked out to avoid changes by the executed instructions.
-	Intel's on-chip GPUs rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.} to achieve a high throughput.
+	The on-chip GPUs of Intel rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.} to achieve a high throughput.
 Thus, the uneven workloads in all loops, \eg number of structures per cell, number of triangles per structure or number of intersections, hardly saturate these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
 
-In the underlying implementation, only the topmost loop of the \textproc{DirectIntersection} function has been parallelized using Microsoft's Parallel Patterns Library (PPL) and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
+In the underlying implementation, only the topmost loop of the \textproc{DirectIntersection} function has been parallelized using the Parallel Patterns Library (PPL) of Microsoft and the parallel\_for function which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.

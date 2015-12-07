@@ -51,7 +51,7 @@ The scene is conceived to stress the swept volume computation by its complex cut
 The fine tessellation of the cutter mesh results in high resolution swept volumes and the largest amount of triangles stored in a test scene.
 
 The amount of triangles in each grid cell varies greatly between the test scenes and also in the scenes themselves.
-This property is interesting, as it has the largest impact on algorithms which have to iterate over the triangles of the grid's cell.
+This property is interesting, as it has the largest impact on algorithms which have to iterate over the triangles of a cell.
 Furthermore, largely divergent triangle counts inside cells challenge schedulers in parallel processing of cells and increase branch divergence on GPU architectures.
 An optimal distribution would be an almost empty histogram with a peak at a certain location, meaning all surface cells contain roughly the same number of triangles.
 \Cref{fig:histograms} shows histograms of the triangles per cell distribution for the test scenes of \cref{tbl:test_scenes}.
@@ -118,7 +118,7 @@ The \cylinderhead is characterized by a quite divergent distribution, although t
 Considering the cylindrical scenes, the histograms show the difference in the total number of triangles.
 As the \cylindersd scene contains more, smaller and more regular triangles, its cells are also occupied by more triangles.
 Whereas the \cylinders scene holds mostly between 5 and 20 triangles, the cells of the \cylindersd scene contain mostly between 20 and 45 triangles.
-Nevertheless, despite their lower triangle counts, there is a peek of triangles in the \cylinders scene at 128 triangles, which are cells at the cylinder's center.
+Nevertheless, despite their lower triangle counts, there is a peek of triangles in the \cylinders scene at 128 triangles, which are cells at the center of the cylinder.
 
 The \impeller scene shows a quite good but broad distribution with most cells containing between 1 and 100 triangles.
 The further large part of all cells store between 100 and around 500 triangles.
@@ -177,7 +177,7 @@ For visual reference, \cref{fig:raycasted_scenes} shows images of the selected t
 	\end{subfigure}
 	\caption[Raycasted images of test scenes]{
 		Images of the test scenes given in \cref{tbl:test_scenes}.
-		The images are created by the VML's raycasting system in combination with visual enhancements using OpenGL shaders.
+		The images are created by the raycasting system of the VML in combination with visual enhancements using OpenGL shaders.
 		These images are used as references for the renderings of result meshes produced by the extraction methods discussed in this thesis.
 	}
 	\label{fig:raycasted_scenes}

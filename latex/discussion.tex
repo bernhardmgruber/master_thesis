@@ -40,7 +40,7 @@ Resolutions between 100 and 150 cells in one dimensions usually proofed to be go
 The CPU utilization during an single run on the \impeller scene is shown in \cref{fig:di_cpu}.
 The CPU cores are almost perfectly utilized for the first 20 seconds.
 Afterwards, the workload drops down to zero within the last three seconds of the run.
-The PPL's default scheduler already works well, keeping all cores utilized for \SI{85}{\percent} of the runtime.
+The default scheduler of the PPL already works well, keeping all cores utilized for \SI{85}{\percent} of the runtime.
 This slow drop at the end of the test run might be improved by employing a better scheduling strategy.
 However, more complex scheduling usually also increases the parallelization overhead.
 
@@ -64,7 +64,7 @@ In early stages, before the GTE library had been used for its excellent CDT, the
 With the use of GTE, the numeric problems shifted from the CDT to the \textproc{IsTriangleInsideStructure} test.
 The reason why smaller and more regular triangles entail a higher error rate in this test is not entirely clear.
 The test is quite sensitive to the chosen target point of the structure used for casting the test ray.
-Furthermore, a lot if ray-triangle intersections are performed where triangle normals are compared with the ray's direction, \cf details of \cref{alg:triangle_inside_test}.
+Furthermore, a lot if ray-triangle intersections are performed where triangle normals are compared with ray directions, \cf details of \cref{alg:triangle_inside_test}.
 All these tests are numerically unstable, if the ray is almost parallel to the tested triangles.
 Assuming infinite precision, the tested triangle should always lie clearly inside or outside the structure it is tested against, otherwise there must have been an intersection and the triangle would have been split.
 In practice, if an intersection is missed and the triangle spans the structure, or the tested triangle is almost degenerated and very close to the structure, errors may occur.
@@ -119,7 +119,7 @@ This correlation stems from the fact that the resolution is applied to both side
 The rows of the results without cell slicing prove this statement, although scenes with richer features, \eg \cylinderhead and \impeller, do not follow this rule as closely as flatter scenes, \eg \cubes and \cylinders.
 The results with cell slicing are less representative for this observation.
 The reason is the adaptivity of the algorithm.
-Lower resolutions tend to produce more irregular cells, as the grid resolution is too coarse to capture a model's features.
+Lower resolutions tend to produce more irregular cells, as the grid resolution is too coarse to capture the features of a model.
 Therefore, a lot more sub cells are created.
 Consequently, the resolution and triangle count is automatically increased in feature rich areas.
 The finer the initial resolution is, the lesser this effect manifests itself.
@@ -134,7 +134,7 @@ Regarding the runtime of the extraction, the relation to the resolution is a bit
 To start with, the basic algorithms used throughout the tri-dexel extraction are either of quadratic or cubic complexity.
 The raycast is asymptotically $\mathcal{O}(n^2)$, whereas the cell processing is $\mathcal{O}(n^3)$ and the dexel assignment somewhere in between, $\mathcal{O}(n^2p)$ which $p$ being the average number of grid points spanned by segments on a dexel.
 However, cell processing is only intensive on boundary cells, which only grow quadratically with the resolution.
-The tri-dexel's runtime is therefore somewhere between $\mathcal{O}(n^2)$ and $\mathcal{O}(n^3)$.
+The runtime of the tri-dexel is therefore somewhere between $\mathcal{O}(n^2)$ and $\mathcal{O}(n^3)$.
 To some degree, this hypothesis is observable at the data in \cref{tbl:tri_dexel_results}, where the increase in runtime is somewhere around five to seven times when the resolution is doubled.
 The \cubes scene seems to be an exception to this rule.
 However, the \cubes scene, by being completely cubic, also results in a tri-dexel grid with the most cells possible for a given resolution.
@@ -149,7 +149,7 @@ are all found within the raycasting component.
 They are \textproc{IntersectCell} with \SI{24}{\percent}, \textproc{IntersectTriangle} with \SI{17}{\percent} and a operating system function handling heap allocations with \SI{9}{\percent}.
 Further interesting is the stage of the algorithm at which these functions are heavily used.
 Apart from the initial raycast, these functions still consume half of the available CPU power.
-The reason therefore is the high cost of traversing rays through the VML's regular grid and intersecting them with the encountered triangles.
+The reason therefore is the high cost of traversing rays through the regular grid of the VML and intersecting them with the encountered triangles.
 Now, every time a tri-dexel cell is sliced, tri-dexel images have to be recreated for the resulting sub cells, requiring further raycasts.
 The performance of the raycast itself depends mostly on the number of triangles per cell, as all these triangles have to be pulled from RAM and tested for intersection.
 Considering the triangle count distributions of the test scenes in \cref{fig:histograms}, it is obvious why the \impeller and especially the \turbine require a far longer runtime than other scenes. %TODO remove obvious
@@ -159,7 +159,7 @@ Considering the triangle count distributions of the test scenes in \cref{fig:his
 \label{sec:tri_dexel_utilization}
 
 The CPU utilization during a single run of the tri-dexel surface extraction of the \impeller scene with a grid resolution of 400 is shown in \cref{fig:td_hq_impeller_cpu}.
-The extraction starts by performing a raycast on the VML's data model.
+The extraction starts by performing a raycast on the data model of the VML.
 The profiler mostly highlights memory intensive operations during this time, such as pulling the triangles from RAM and allocations.
 
 After four seconds, the raycast has finished and the construction of the tri-dexel grid starts.
@@ -173,7 +173,7 @@ However, as fully occupied and non-occupied cells do not need any processing, on
 In the last four seconds, triangulation has been finished for almost all cells.
 Most of the work left is freeing allocated resources, which takes quite a while and is again serialized by the operating system, causing the utilization to drop drastically.
 
-Regarding the allocated memory, in addition to the VML's regular grid holding the \impeller scene in \SI{600}{\mebi\byte}, the tri-dexel algorithm requires approximately \SI{425}{\mebi\byte} additional memory at a grid resolution of 400, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
+Regarding the allocated memory, in addition to the VML holding the \impeller scene in \SI{600}{\mebi\byte}, the tri-dexel algorithm requires approximately \SI{425}{\mebi\byte} additional memory at a grid resolution of 400, mostly for storing the dexel images, grid point occupancies and grid edges with their segments.
 On third of the memory is allocated before the raycast, another third during the raycast and the last third when building the tri-dexel grid.
 While cells are processed, cell data is aggregated, regularized, triangulated and immediately freed again.
 Therefore, the memory consumption remains almost constant during the further execution after the grid construction.
@@ -184,15 +184,15 @@ Therefore, the memory consumption remains almost constant during the further exe
 Regarding the renderings of the extracted meshes in \cref{fig:td_results}, the \cubes scene has been extracted flawlessly.
 All features, \ie edges and corners, of the cube have been perfectly reconstructed.
 The only flaw is the high number of triangles outputted, \cf \cref{tbl:tri_dexel_results}. %TODO wrong section? triangle count
-However, this number is steered by the dexel grid's resolution and may be set very low for this simple scene.
-Furthermore, an additional post-processing pass may be used to recombine adjacent triangles facing in the same direction\footnote{Third-party tools may also be used to manually reduce the triangle count, \eg MeshLab's Quadric Edge Collapse Decimation filter.}.
+However, this number is steered by the resolution of the dexel grid and may be set very low for this simple scene.
+Furthermore, an additional post-processing pass may be used to recombine adjacent triangles facing in the same direction\footnote{Third-party tools may also be used to manually reduce the triangle count, \eg the Quadric Edge Collapse Decimation filter of MeshLab.}.
 
 Both of the cylindrical scenes deliver great results as well.
 They show perfect edges at the stock as well as at the intersection with the smaller cylindrical swept volume.
 However, the \cylinders scene, on the top and bottom side, contains a small notch beside the hole drilled out.
 This small error is the result of a numeric miscalculation in the raycaster, due to the thin triangles, which could not correctly identify the surface entry and exit for two incident rays.
 Therefore, two dexels are completely empty at this location.
-This case is handled by regularization rule three, which creates small segments at the grid's occupied points where the two dexels are empty.
+This case is handled by regularization rule three, which creates small segments at the occupied points of the grid where the two dexels are empty.
 The \cylindersd scene does not contain any notches or other errors.
 Concerning the feature reconstruction capabilities, the algorithm also managed to recover the shape of the original triangulation, which is clearly visible at the side of the stock and at the drilled hole.
 
@@ -202,7 +202,7 @@ The blades of the \impeller have sharp edges and, between them, even the rills o
 Nonetheless, similarly to the \cylinders scene, several numeric issues occurred during the dexel image creation by the raycaster, resulting in numerous notches at the surface.
 
 Finally, the \turbine scene looks good as well.
-However, as the grooves of the \turbine contain mostly concave features, a sufficient resolution is required to capture the scene's small peculiarities, \cf detailed renderings in different resolutions in \cref{fig:td_grooves}.
+However, as the grooves of the \turbine contain mostly concave features, a sufficient resolution is required to capture the small peculiarities of the scene, \cf detailed renderings in different resolutions in \cref{fig:td_grooves}.
 At a resolution of 50, the groove itself is spanned by a bit of geometry.
 Doubling the resolution lets the tri-dexel algorithm reconstruct the groove but leaves some geometry left in the wavy sides of the groove.
 Increasing the level of detail to a resolution of 200 already retrieves a quite good surface with only a few missing subtleties at the tips of the waves.
@@ -237,7 +237,7 @@ The reason therefore is that the geometry of both scenes is completely convex, r
 The triangulation of \cylindersd, compared with the one of \cylinders, for example is slightly concave at the lateral surface.
 Thus, close rays along these surfaces alternatingly enter and exit the surface, sometimes yielding short dexel segments which lead to irregular edges later.
 
-The more complex scenes produce a larger number of boundary edges, mostly attributed to T-vertices, although the results show, that the number of boundaries is not related to the scene's input triangle or swept volume count, \cf \cref{tbl:test_scenes}.
+The more complex scenes produce a larger number of boundary edges, mostly attributed to T-vertices, although the results show, that the number of boundaries is not related to the input triangle or swept volume count of the scene, \cf \cref{tbl:test_scenes}.
 The number of boundaries is directly related to the number of irregular cells, which depends on the feature richness, \ie the shape, of the workpiece.
 The \impellerhalf scene, for example, contains roughly half as much feature-rich geometry as the \impeller scene.
 In contrast, the \cylinderhead, despite consisting of two orders of magnitude less swept volumes as the \impeller, still produces a third of the boundary edge count of the \impeller scene.
@@ -258,13 +258,13 @@ Regarding the point cloud sizes, \cf \cref{tbl:point_cloud_results}, two trends,
 The number of created points p\sub{out} for a given resolution is again similar for all scenes and  p\sub{out} increases quadratically with the resolution.
 The reasons are the same as for the triangle count of the tri-dexel output meshes, discussed in \cref{sec:tri_dexel_output_size}.
 
-Comparing the results of the VML's BPA implementation, \cf \cref{tbl:bpa_results}, with the tri-dexel results in \cref{tbl:tri_dexel_results}, the BPA produces less than a half as much triangles.
+Comparing the results of the BPA implementation of the VML, \cf \cref{tbl:bpa_results}, with the tri-dexel results in \cref{tbl:tri_dexel_results}, the BPA produces less than a half as much triangles.
 This is due to the additional feature reconstruction and triangle fans created inside each cell by the tri-dexel approach.
 As the BPA only operates on the vertices of the point cloud, it cannot create any further vertices.
 
 Another consequence of this behavior is a correlation of the number of input points, \cf \cref{tbl:point_cloud_results}, and the number of outputted triangles, \cf \cref{tbl:bpa_results}.
 For each point of the input roughly two triangles are created.
-This ratio is smaller at lower resolutions as more features/points are skipped by the ball's size, but, with increasing density, almost all points are used by the BPA and this ratio approaches two.
+This ratio is smaller at lower resolutions as more features/points are skipped by the size of the ball, but, with increasing density, almost all points are used by the BPA and this ratio approaches two.
 An explanation for this ratio is given in \cref{fig:bpa_point_triangle_ratio}.
 %
 \begin{figure}
@@ -284,9 +284,9 @@ This correlation now allows to calculate an approximation for the input raycasti
 
 Regarding the timings of the point cloud creation, \cf \cref{tbl:point_cloud_results}, the runtime increases quadratically with the resolution, similar to the tri-dexel reconstruction, \cf \cref{tbl:tri_dexel_results}.
 The reasons is solely the asymptotic complexity of $\mathcal{O}(n^2)$ of the raycaster.
-Furthermore, the runtime strongly depends on the scene's complexity and triangle distribution, which is discussed at the end of \cref{sec:tri_dexel_runtime}.
+Furthermore, the runtime strongly depends on the complexity and triangle distribution of the scene, which is discussed at the end of \cref{sec:tri_dexel_runtime}.
 
-The BPA timings in \cref{tbl:bpa_results}, especially at higher resolutions, further show that the algorithm's runtime is strongly related to the number of points of the cloud.
+The BPA timings in \cref{tbl:bpa_results}, especially at higher resolutions, further show that the runtime of the algorithm is strongly related to the number of points of the cloud.
 For each \SI{1}{\kilo\nothing} points, the BPA requires roughly \SI{4}{\milli\second} runtime, emitting \SI{2}{\kilo\nothing} triangles.
 At lower resolutions, the overhead of the parallelization becomes visible, which is not as straight-forward as for the embarrassingly parallel tri-dexel or direct intersection, \cf the corresponding work \cite{bpa_vml}.
 Despite the bad utilization and scalability on multiple cores, \cf \cref{sec:bpa_utilization}, the BPA of the VML delivers an overall impressive runtime, when compared with the timings of \eg the tri-dexel, \cf \cref{tbl:tri_dexel_results}.
@@ -326,20 +326,20 @@ Although the tri-dexel does a slightly better job with these nuances, as it may 
 The BPA does not use point normals for reconstructing features, although a post processing pass might \eg further bend/tessellate created triangles based on their vertex normals.
 
 Consequently, the only difficulty of the BPA is reconstructing small features, both convex and concave, \cf \cref{fig:bpa_cylinder_head_edges}.
-Concerning concave features, the ball size is the BPA's limiting component as it does not allow the created surface to \enquote{crawl} into the sharp corners.
+Concerning concave features, the ball size is the limiting component of the BPA as it does not allow the created surface to \enquote{crawl} into the sharp corners.
 These features are simply rolled over.
 Fine convex and concave features are only reconstructible from the normals of the point cloud and therefore ignored by the BPA.
 Only geometry for which points are present in the point cloud is reconstructed by the BPA.
-Surprisingly, due to the BPA's sole concentration on points, thin convex features such as the drilling at a fin of the \cylinderhead, \cf \cref{fig:bpa_cylinder_head_thin_fin}, are reconstructed quite robustly.
+Surprisingly, due to the sole concentration on points, thin convex features such as the drilling at a fin of the \cylinderhead, \cf \cref{fig:bpa_cylinder_head_thin_fin}, are reconstructed quite robustly by the BPA.
 This part of the scene challenges the tri-dexel approach much more, as the cells almost collapse along one axis during slicing.
 
 The \turbine scene looks good from a distance, \cf \cref{fig:bpa_turbine}.
 However, the BPA has a hard time reconstructing the concave grooves, failing completely at lower resolutions, \cf \cref{fig:bpa_grooves}.
 At a resolution of 50, the grooves are simply too small for the ball to roll inside.
-Compared with the tri-dexel approach using the same resolution, which succeeds in recreating the groove, the BPA's result is terrible.
+Compared with the tri-dexel approach using the same resolution, which succeeds in recreating the groove, the result of the BPA is terrible.
 Increasing the resolution to 100 allows the ball to slip inside the groove, although still a lot of geometry is created spanning it.
 At a resolution of 200, the groove becomes clearly visible.
-However, the concave indentations at the groove's sides are still captured badly, especially the indentation at the bottom.
+However, the concave indentations at the sides of the groove are still captured badly, especially the indentation at the bottom.
 Finally, at a resolution of 400 the groove is reconstructed almost correctly, which only a few artifacts at the bottom.
 Compared again with the tri-dexel results for the grooves of the \turbine, \cf \cref{fig:td_grooves}, the BPA requires approximately twice the resolution for a similar visual quality.
 
@@ -353,7 +353,7 @@ The right rendering shows a cog of the \turbine where the ball has fell inside t
 Between the differently oriented meshes, one created from outside, one from inside, lots of boundary edges and overlapping triangles are created.
 If sufficient density of the point cloud is guaranteed, this case should, theoretically, never occur.
 However, since all pivotings are subject to numeric calculations, there are indeed cases where the ball may still roll inside the point cloud.
-Increasing the ball's size may help to minimize the likelihood of such an error, but comes at the cost of worse feature reconstruction.
+Increasing the size of the ball may help to minimize the likelihood of such an error, but comes at the cost of worse feature reconstruction.
 
 
 \subsection{Mesh quality}
@@ -380,13 +380,13 @@ The detailed rendering of a drilling of the \cylinderhead in \cref{fig:poi_cylin
 Additionally, the structure in the upper right, the drilling at the fin, is almost completely lost as the structure is too thin to allow the creation of a surface.
 
 The blades of the \impeller shown in \cref{fig:poi_hq_impeller_points}, together with the sampled point cloud, demonstrate the divergence of the surface from the sampled points.
-The amount of lost volume, especially at the blade's tip and edge at the left, is clearly visible, as the surface only bends towards the points in flatter regions.
+The amount of lost volume, especially at the tip and left edge of the blade, is clearly visible, as the surface only bends towards the points in flatter regions.
 Nevertheless, the resulting triangulation is appealing with even a bit of adaptivity, containing larger triangles in flatter regions.
 All runs of the algorithm generated manifold and closed meshes for all tested point clouds.
 
 The Poisson reconstruction, as the BPA, depends on a sufficient resolution of the point cloud, \cf the renderings of a groove of the \turbine in \cref{fig:poi_grooves}.
 At a resolution of 50, the groove is simply sampled too poor for the Poisson reconstruction to create the indentation.
-This result is comparable to the BPA's performance at the same resolution in \cref{fig:bpa_turbine_groove_50}, where the ball was too big to roll inside the groove.
+This result is comparable to the performance of the BPA at the same resolution in \cref{fig:bpa_turbine_groove_50}, where the ball was too big to roll inside the groove.
 At a resolution of 100, the groove becomes visible as the indentation is created.
 Still, the concave rills inside the notch as well as the indentation at the bottom of the groove are not visible yet.
 The rills are acceptably reconstructed at a resolution of 200 while the bottom notch requires a resolution of 400 to appear.
@@ -396,7 +396,7 @@ However, as detailed in \cref{sec:point_cloud_concept}, the main reason for this
 Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10~-~20~times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
 The runtimes for the \turbine scene, for example, at the resolutions 50, 100, 200 and 400, averaged over five runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
 However, the algorithm employed by MeshLab runs single threaded.
-Accounting for this difference, MeshLab's Poisson implementation and the VML's BPA would both require a runtime in the same order of magnitude
+Accounting for this difference, the Poisson implementation of MeshLab and the BPA of the VML would both require a runtime in the same order of magnitude
 During the reconstruction at resolution 400, roughly \SI{400}{\mebi\byte} were allocated, making the Poisson algorithm significantly more light-weight than the BPA.
 
 Similar to the external Poisson surface reconstruction algorithm of MeshLab, any other external algorithm may be run on the point clouds created from the raycaster in \cref{sec:point_cloud_implementation}.

@@ -438,7 +438,7 @@ The CPU utilization during a single run of the tri-dexel surface extraction of t
 \section{Point cloud based}
 \label{sec:point_cloud_results}
 
-The point cloud creation and the subsequent reconstruction using the VML's BPA, \cf \cref{sec:point_cloud_reconstruction}, have been benchmarked individually.
+The point cloud creation and the subsequent reconstruction using the BPA of the VML, \cf \cref{sec:point_cloud_reconstruction}, have been benchmarked individually.
 Similar to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 have been used for the raycaster creating the point clouds.
 \Cref{tbl:point_cloud_results} contains the runtime and output size of the created point clouds.
 
@@ -462,8 +462,8 @@ Similar to the tri-dexel benchmarks, the resolutions 50, 100, 200 and 400 have b
 	\label{tbl:point_cloud_results}
 \end{table}
 
-The mesh sizes and timings for the VML's BPA implementation are given in \cref{tbl:bpa_results}.
-The ball's radius in the tests is derived from the raycasting resolution and set to 1.5 times the diameter of a cell of the sampling grid created by three axis aligned raycasts.
+The mesh sizes and timings for the BPA implementation of the VML are given in \cref{tbl:bpa_results}.
+The diameter if the ball in the tests is derived from the raycasting resolution and set to 1.5 times the diameter of a cell of the sampling grid created by three axis aligned raycasts.
 
 %TODO consider different table separation: remove pin columns and move into own table with pin and tout
 \begin{table}
@@ -494,7 +494,7 @@ The ball's radius in the tests is derived from the raycasting resolution and set
 		\turbine      & \SI{132}{\kilo\nothing}& \SI{246}{\kilo\nothing} & \SI{ 613}{\milli\second} & \SI{532}{\kilo\nothing}& \SI{1049}{\kilo\nothing} & \SI{2222}{\milli\second} \\
 	\end{tabular}
 	\caption[BPA results]{
-		Test results for surface reconstruction using the VML's internal BPA implementation excluding the time required to generate the point cloud, \cf \cref{tbl:point_cloud_results}.
+		Test results for surface reconstruction using the VML internal BPA implementation excluding the time required to generate the point cloud, \cf \cref{tbl:point_cloud_results}.
 	}
 	\label{tbl:bpa_results}
 \end{table}

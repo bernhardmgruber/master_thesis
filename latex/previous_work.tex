@@ -3,14 +3,14 @@
 
 As mentioned in the problem statement in \cref{sec:problem} the focus of the implementations underlying this thesis is to develop multiple strategies to extract a triangulated surface mesh from the data model used inside the VML.
 To ease the understanding of the implementations presented in this thesis, a short introduction to the VML and its data model is given.
-Parts of this description have been taken from the author's bachelor thesis, where the data model has been previously described with a focus on visualization \cite{bachelor}.
+Parts of this description have been taken from the bachelor thesis of the author, where the data model has been previously described with a focus on visualization \cite{bachelor}.
 
 \section{Project history}
 \label{sec:project_history}
 
 % TODO: rethink choice of past vs. present tense
 From the middle of 2011 to the end of 2013 the project Enlight was conducted for research by the RISC Software GmbH in Hagenberg im Mühlkreis, Austria.
-Enlight's goals were the development of a faster, scalable and numerically stable method for modeling and visualizing subtractive manufacturing.
+The goals of Enlight were the development of a faster, scalable and numerically stable method for modeling and visualizing subtractive manufacturing.
 Enlight uses a regular grid data structure to store a stock solid and add precomputed swept volumes.
 A triangle elimination strategy is employed to keep the total number of triangles held by the grid within manageable bounds, \cf classification in \cref{sec:classification}.
 For visualization, a custom raycasting approach was developed \cite{enlight} and accelerated using GPUs and many-core architectures.
@@ -18,7 +18,7 @@ For visualization, a custom raycasting approach was developed \cite{enlight} and
 From the beginning to the end of 2014, the follow-up research project Engrave focused on solving swept volume computation for arbitrary cutter geometries and tool paths.
 Engrave basically allows dynamic swept volume computation from a set of cutter solids and transformation lists.
 Swept volume computation is done by extruding a point cloud along the tool path and then reconstructing a closed triangle mesh from it using a parallel and highly optimized variant of the ball pivoting algorithm \cite{engrave}.
-The computed swept volumes where directly imported into Enlight's data model.
+The computed swept volumes where directly imported into the data model of Enlight.
 
 With the beginning of 2015, the prototype developed during Enlight and Engrave was rebranded to Virtual Machining Library (VML) and, later that year, to Virtual Modeling Library.
 The VML is currently further developed as a commercial product.
@@ -64,7 +64,7 @@ The VML is currently further developed as a commercial product.
 			\label{fig:turbine_complete}
 		\end{subfigure}
 	\caption[VML demo]{
-		Demonstration of the VML's capabilities.
+		Demonstration of the capabilities of the VML.
 		Cutter meshes, \cf \subref{fig:hq_impeller_tool} and~\subref{fig:turbine_tool}, are loaded and then transformed using a list of transformation matrices to calculate swept volumes, \cf \subref{fig:hq_impeller_swept} and~\subref{fig:turbine_swept}.
 		By applying a series of these swept volumes to a stock, the machining of a workpiece is simulated.
 		The result can be visualized using raycasting, \cf \subref{fig:hq_impeller_complete} and~\subref{fig:turbine_complete} \cite{engrave_report}.
@@ -102,7 +102,7 @@ Although there is a wide variety of acceleration structures available, \eg kd-tr
 This is especially beneficial in cases where those data structures have to be updated regularly.
 Particularly animated scenes in computer-animated films or changing geometries as in virtual machining require frequent rebuilds or updates of those data structures.
 Due to their simplicity and regularity, regular grids provide viable candidates for these scenarios.
-However, the VML's regular grid is also the basis for a triangle count optimization called classification which is described in the following section.
+However, the regular grid of the VML is also the basis for a triangle count optimization called classification which is described in the following section.
 
 
 \subsection{Classification}
@@ -112,7 +112,7 @@ Every time a solid triangle mesh, stock or swept volume, is added to the grid, t
 Thereby, each triangle is added to each cell it intersects.
 A triangle is therefore potentially referenced from multiple cells.
 When the mapping is complete, the affected cells are classified into one of three categories with respect to the newly added mesh.
-Cells which are occupied by triangles of the mesh's surface are surface cells.
+Cells which are occupied by triangles of the mesh surface are surface cells.
 Cells inside and outside the mesh are inside and outside cells and contain no triangles.
 The sketches in \cref{fig:classification_before,fig:classification_sv} illustrate the classification of a single solid inside the grid, \ie stock, as well as a swept volume before it is merged.
 
@@ -157,7 +157,7 @@ The sketches in \cref{fig:classification_before,fig:classification_sv} illustrat
 \end{figure}
 
 When a new swept volume is added to the grid, its triangle mesh is classified itself and merged into the existing cell classification of the grid.
-By limiting the modifiability of the scene to only allow subtracting swept volumes, a set of rules for merging a new mesh's classification into the grid's one can be derived and is shown in \cref{tbl:classification_rules}.
+By limiting the modifiability of the scene to only allow subtracting swept volumes, a set of rules for merging the classification of a new mesh into the one of the grid can be derived and is shown in \cref{tbl:classification_rules}.
 
 \begin{table}[h]
 	\centering
@@ -178,7 +178,7 @@ By limiting the modifiability of the scene to only allow subtracting swept volum
 	\label{tbl:classification_rules}
 \end{table}
 
-When a new swept volume has been classified, it is merged into the grid's classification as follows:
+When a new swept volume has been classified, it is merged into the classification of the grid as follows:
 Grid cells which are outside the added swept volume remain unchanged.
 Surface cells of the added volume become surface cells except they were outside cells before.
 Cells inside a swept volume always become outside cells, as they are \enquote{cut away} by the swept volume.
@@ -219,10 +219,10 @@ Surface points can still be calculated as shown by the example of the raycast us
 \subsection{Visualization by raycasting}
 \label{sec:raycasting}
 
-The VML's regular grid with its open geometries resulting from classification are visualized using an adapted raycasting approach.
+The regular grid of the VML with its open geometries resulting from classification are visualized using an adapted raycasting approach.
 For this purpose a virtual camera is placed relative to the regular grid.
-The camera's position and orientation describe an image plane, \ie a rectangle, in front of the camera which will correspond to the final image.
-Originating from the camera's position, a ray is sent through each pixel of the image plane into the scene.
+The position of the camera and orientation describe an image plane, \ie a rectangle, in front of the camera which will correspond to the final image.
+Originating from the position of the camera, a ray is sent through each pixel of the image plane into the scene.
 If an intersection occurs, the pixel associated with the ray is colored according to properties of the intersected surface, \eg color, normal and material.
 \Cref{fig:raycasting_principle} shows the basic principle of raycasting inside the VML.
 
@@ -238,7 +238,7 @@ If an intersection occurs, the pixel associated with the ray is colored accordin
 	\label{fig:raycasting_principle}
 \end{figure}
 
-When the rays hit the regular grid, they have to be traversed through the grid's cells.
+When the rays hit the regular grid, they have to be traversed through the cells of the grid.
 A fast algorithm for traversing regular grids using a single ray is found in literature \cite{3DDDA}.
 The algorithm is a slight modification of the digital differential analyzer (DDA) which is used for the rasterization of lines.
 \Cref{fig:cell_traverser} shows a sketch of a single ray traversed cell by cell through the grid.
@@ -269,7 +269,7 @@ This approach has been implemented for the VML using CPU SIMD vector extensions 
 
 Cells classified as outside or inside are empty, \ie contain no triangles, but each surface cell contains triangles which can potentially intersect the ray.
 A surface cell also typically contains parts, \ie meshes, of multiple swept volumes which are called structures in the context of a cell.
-Upon entry into a surface cell, the ray has to determined the number of structures, \ie swept volumes, the ray's entry point is inside of.
+Upon entry into a surface cell, the ray has to determined the number of structures, \ie swept volumes, the entry point of the ray is inside of.
 This number is called the inside counter.
 The stock volume is handled specially during the raycast, as it is inverted and turned into a swept volume itself to allow uniform handling.
 After the inside counter has been determined, all intersections of the ray with structures inside the cell are iterated from the nearest to the farthest.
@@ -323,8 +323,8 @@ This information conceptually reflects the actual implementation, providing a si
 
 The regular grid data structure relies on a few classes shown in \cref{fig:vml_datamodel}.
 The \var{RegularGrid} class basically stores a bit of meta data together with a large set of cells.
-The meta data consists of the grid's axis-aligned bounding box (AABB), \var{aabb}, the size of a cell in one dimension, \var{cellSize}, as well as the number of cells in each dimension, \var{cellCount}.
-The grid's cells are stored linearized in a flat array.
+The meta data consists of the axis-aligned bounding box (AABB) of the grid, \var{aabb}, the size of a cell in one dimension, \var{cellSize}, as well as the number of cells in each dimension, \var{cellCount}.
+The cells of the grid are stored linearized in a flat array.
 
 An axis-aligned bounding box is represented by the \var{Extends} class.
 It stores two vertices, \var{lower} and \var{upper}, which contain the minimum and maximum values for each Cartesian coordinate axis.
@@ -333,7 +333,7 @@ The cells of the regular grid are modeled by the \var{Cell} class.
 Each cell contains its own bounding box, \var{aabb}, the classification of the cell, \var{classification}, and an array of the triangles contained within this cell, \var{triangles}.
 
 Each triangle, described by the class \var{Triangle}, stores its three vertices in counterclockwise order in the member \var{vertices}.
-Additionally, the normal of the triangle is stored in \var{normal}, computed from the triangle's vertices for performance reasons.
+Additionally, the normal of the triangle is stored in \var{normal}, computed from the vertices of the triangle for performance reasons.
 Especially intersection tests, \eg during raycasting or classification, read this field very frequently and benefit from precomputation.
 Each triangle also stores an unsigned integer, \var{structure}, referencing the swept volume/structure this triangle belongs to.
 This field is used to group triangles inside a cell by the swept volume they originated from.

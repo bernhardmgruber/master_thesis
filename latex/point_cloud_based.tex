@@ -10,9 +10,9 @@ Some algorithms temporarily create intermediate representations, \eg Voronoi dia
 Thus, some of these algorithms are conceived for other purposes than surface reconstruction.
 Other methods create surface triangles directly, mostly by growing a region on the sampled surface.
 These so-called region-growing or advancing front algorithms are typically faster but more susceptible to noisy input, \eg BPA and G2S.
-Eventually, this collection of algorithms should also be available for reconstructing surfaces from the VML's data model.
+Eventually, this collection of algorithms should also be available for reconstructing surfaces from the data model of the VML.
 
-In the previous \cref{ch:tri_dexel}, the tri-dexel based surface reconstruction approach relied on a raycast to sample the VML's regular grid into dexels.
+In the previous \cref{ch:tri_dexel}, the tri-dexel based surface reconstruction approach relied on a raycast to sample the regular grid of the VML into dexels.
 This raycast be used to sample other data structures as well.
 In its simplest form, by only collecting the surface hits, a point cloud is obtained.
 This point cloud may then be used as input to most of the point cloud based surface reconstruction algorithms, including the ones mentioned above.
@@ -26,10 +26,10 @@ However, giving the ability to export a point cloud opens up another huge world 
 \section{Concept}
 \label{sec:point_cloud_concept}
 
-Using any kind of point cloud based algorithm for surface reconstruction from the VML's data model boils down to two steps.
-Firstly, a point cloud has to be created from the VML's data model.
+Using any kind of point cloud based algorithm for surface reconstruction from the data model of the VML boils down to two steps.
+Firstly, a point cloud has to be created from this data model.
 This step is very similar and even simpler than the creation of the dexel image discussed in the previous \cref{ch:tri_dexel}.
-The same raycasting technique, with all its error correcting and robustness enhancing code, will be used to sample surface intersections on the VML's data model.
+The same raycasting technique, with all its error correcting and robustness enhancing code, will be used to sample surface intersections on the data model of the VML.
 The resolution of the raycasting grid for each of the three axis-aligned casts is again supplied by the user, again providing a good parameter for steering quality and computational demands.
 \Cref{fig:cylinder_head_point_cloud} shows a point cloud created from the \cylinderhead scene using a raycast with resolution 200.
 %
@@ -48,17 +48,17 @@ The resolution of the raycasting grid for each of the three axis-aligned casts i
 		\label{fig:cylinder_head_point_cloud_fins}
 	\end{subfigure}
 	\caption[Example point cloud]{
-		Point cloud created by raycasting the \cylinderhead scene using three axis-aligned raycasts along the coordinate system's axes with a resolution of 200.
+		Point cloud created by raycasting the \cylinderhead scene using three axis-aligned raycasts along the axes of the coordinate system with a resolution of 200.
 	}
 	\label{fig:cylinder_head_point_cloud}
 \end{figure}
 %
 Secondly, after the point cloud has been created, a surface reconstruction algorithm is run on it.
 
-Regarding its quality, a point cloud sampled from the VML's regular grid using a uniform, axis-aligned raycast has a few properties:
+Regarding its quality, a point cloud sampled from the regular grid of the VML using a uniform, axis-aligned raycast has a few properties:
 \begin{itemize}
 	\item
-	All surface points, excluding numeric errors, are usually perfect samples, lying directly on the workpiece's surface.
+	All surface points, excluding numeric errors, are usually perfect samples, lying directly on the surface of the workpiece.
 	There is neither noise on the surface nor are there irrelevant inner or outer points.
 	\item
 	Each surface sample provides a perfect surface normal.
@@ -122,7 +122,7 @@ Using the \textproc{UniformResolution} function, the algorithm starts off by com
 This step is performed, too, before the tri-dexel raycast, but with an increased bounding box, \cf \cref{alg:tri_dexel}.
 For the details of \textproc{UniformResolution} \cf \cref{sec:tri_dexel_implementation}.
 An empty set of points, \var{cloud}, is created, which will accumulate all surface points emitted by the raycaster.
-The raycast is launched with the calculated resolution and the grid's bounding box.
+The raycast is launched with the calculated resolution and the bounding box of the grid.
 The closure passed to the raycasting subroutine \textproc{AxisParallelRaycast} is called at every surface hit with a list of arguments.
 From these arguments only the last two, the intersection point \var{v} and the corresponding surface normal \var{n}, are relevant.
 Both are added as tuple to the current point cloud \var{cloud}.

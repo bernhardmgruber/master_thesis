@@ -30,7 +30,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	\item[Mesh] \hfill \\
 	In 3-dimensional computer graphics, a mesh usually refers to a polygonal surface mesh:
 	A mesh is a collection of faces, \ie polygons, edges between those faces, \ie lines, and vertices, \ie points in 3-dimensional space \cite{mesh_basics}.
-	These mesh elements are described by the mesh's geometry and connectivity.
+	These mesh elements are described by the geometry and connectivity of the mesh.
 	Whereas the geometry simply specifies attributes of the vertices, the connectivity describes the complete topology, \eg edges connected to a vertex or face to vertices relationship.
 	As a further aspect, the intersection between any pair of faces must be either a shared edge, a shared vertex or nothing \cite{mesh_lecture10}.
 	In other words, faces can only connect to and not insect each other.
@@ -205,7 +205,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 
 	\item[Swept volume] \hfill \\
 	In the context of virtual machining, a single move of a cutting tool along a path is called a sweep.
-	A swept volume is the volume which is covered by the cutting tool's solid during a sweep.
+	A swept volume is the volume which is covered by the solid of the cutting tool during a sweep.
 	The fast and efficient computation of such swept volumes for all kinds of paths, including self-intersection, is still subject to research and discussed in the field of envelope theory.
 
 
@@ -257,8 +257,8 @@ The following section is based on a comprehensive overview with sketches and des
 	As a z-map is a 2-dimensional scalar field with values at discrete regular positions, it can therefore be seen as an image, commonly referred to as depth image, \cf \cref{fig:depth_image}.
 
 	Material is removed by creating a depth image for each cutter movement, \ie a sweep, with the same position and orientation as the depth image of the workpiece.
-	The sweep's depth image describes the removed material during the sweep.
-	It is combined with the depth image of the workpiece by updating all depth values to be the minimum value of the workpiece's and sweep's depth image.
+	The depth image of the sweep describes the removed material during the sweep.
+	It is combined with the depth image of the workpiece by updating all depth values to be the minimum value of the depth image of workpiece and sweep.
 
 	Processing depth images can be greatly accelerated using GPUs as they contain special hardware for dealing with per-pixel depth information, \ie depth buffer or z-buffer.
 
@@ -290,7 +290,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\item[Dexel images] \hfill \\
 	Dexel-based representations have been proposed by Hook to circumvent the shortcomings of depth images \cite{dexel}.
 	Instead of a scalar value per pixel of a regular 2-dimensional grid, z-maps, a complex data element is stored, called a dexel, abbreviated from depth element.
-	A dexel is created by tracing a ray, starting at a grid point, perpendicular to the grid's plane through the workpiece and collecting all surface intersections.
+	A dexel is created by tracing a ray, starting at a grid point, perpendicular to the plane of the grid through the workpiece and collecting all surface intersections.
 	Therefore, a 2-dimensional dexel image is sometimes also referred to as ray-rep, abbreviated from ray representation.
 	Each dexel stores a sorted list of these intersections, where an intersection is also called a dexel node.
 	A node basically contains the depth value of the intersection and can contain further information such as a surface normal or a color value.
@@ -302,7 +302,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Instead of updating to the minimum value as done with z-maps, a 1-dimensional Boolean subtraction of all sweep dexels from the workpiece dexels is performed.
 
 	In comparison with image-based representations like z-maps and depth images, dexel-based approaches are able to represent overlapping surfaces and workpieces with a front- and a back-face.
-	Nevertheless, the sampling resolution from the surface's perspective is dependent on the orientation of the surface towards the dexel grid.
+	Nevertheless, the sampling resolution from the perspective of the surface is dependent on the orientation of the surface towards the dexel grid.
 	The more parallel the surface lies to to the grid, the smaller becomes the distance between two neighboring entry/exit points on the surface.
 	In case the surface is perpendicular to the grid, the dexels lie parallel to the surface and do not capture any intersections.
 
@@ -320,7 +320,7 @@ The following section is based on a comprehensive overview with sketches and des
 	To increase the accuracy of dexel-based models, especially in regions of the surface where the surface normals are parallel to the dexels, multiple dexel images can be used.
 	This idea was described by Benouamer \etal in 1997 to provide a good representation that can combine B-rep and CSG models \cite{tridexel_intersection}.
 	Although multiple dexel images can be created from any orientations, it is common to create three dexel images along the three axes of a Cartesian coordinate system.
-	Therefore, the 2-dimensional dexel grids lie in the three planes defined by pairs of the coordinate system's axes, \ie xy-, yz-, zx-plane.
+	Therefore, the 2-dimensional dexel grids lie in the three planes defined by pairs of axes of the coordinate system, \ie xy-, yz-, zx-plane.
 	This case of multi-dexel image is also referred to as triple- or tri-dexel image.
 	\Cref{fig:tri_dexel_image} shows a triple-dexel representation of an octant of a centered unit sphere.
 
@@ -347,7 +347,7 @@ The following section is based on a comprehensive overview with sketches and des
 	In virtual machining, material removal can be described as iteratively subtracting a new solid corresponding to the swept volume of the cutter during a single movement.
 	Additive manufacturing, e.g. 3-dimensional printing, is also easily representable by adding a new solid.
 
-	CSG trees can also be rendered directly using OpenGL or DirectX by making use of the GPU's depth and stencil buffers.
+	CSG trees can also be rendered directly using OpenGL or DirectX by making use of the depth and stencil buffers of a GPU.
 	Well known algorithms in this area include Goldfeather's algorithm \cite{goldfeather} and Nigel's Sequenced Convex Subtraction (SCS) algorithm \cite{scs}.
 
 	\begin{figure}[H]

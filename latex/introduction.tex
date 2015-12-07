@@ -31,7 +31,8 @@ Another example are dexel images when used for material removal in sculpturing.
 %
 Finally, some surface descriptions are just inherently non-explicit, \eg described procedurally.
 Simulating milling processes in computer-aided manufacturing (CAM) for example is usually described as the subtraction of swept volumes from an initial volume.
-Swept volumes are volumes swept by a cutting tool. They are therefore described as the cutter's geometry moved along a specified path.
+Swept volumes are volumes swept by a cutting tool.
+They are therefore described as the geometry of the cutter moved along a specified path.
 The final workpiece is obtained by subtraction of all swept volumes from the initial volume.
 
 
@@ -46,7 +47,7 @@ An example is found in computer-aided engineering (CAE), specifically CAM verifi
 
 \section{Previous work}
 
-Due to the broad field of surface representations and the author's previous experience, this thesis narrows its focus on models used in subtractive manufacturing simulations and focuses solely on the transformation of these models into explicit triangle representations.
+Due to the broad field of surface representations and the previous experience of the author, this thesis narrows its focus on models used in subtractive manufacturing simulations and focuses solely on the transformation of these models into explicit triangle representations.
 During the authors work at the RISC Software GmbH a visualization and solid modeling software was developed during two research projects, Enlight and Engrave (\cf previous work in \cref{ch:previous_work}), to visualize and simulate subtractive manufacturing as done by milling machines.
 Development is continued under the name VML and includes a feature for surface reconstruction/extraction from the internal data model, which forms the practical foundation of this thesis.
 Although the presented implementations are tailored to this application context, the underlying algorithms are discussed as general as possible to explore broader usage scenarios.
@@ -60,7 +61,7 @@ The thesis on top of these prototypes provides a comprehensive documentation, an
 In detail, the following questions are answered:
 
 \begin{enumerate}
-	\item What is the state of the art in surface reconstruction from geometric data models similar to the VML's?
+	\item What is the state of the art in surface reconstruction from geometric data models similar to the one of the VML?
 	What are common ideas, key concepts and restrictions of these existing algorithms and how can they be categorized?
 	Are these algorithms generic enough to be suitable for other kinds of models, \ie models apart from the VML?
 
@@ -114,22 +115,22 @@ However, the potential for optimizations is discussed.
 In \cref{ch:fundamentals} a coverage of the most important terms related to solid modeling, meshes and virtual machining as well as a comprehensive list of wide-spread representations used in CAD and CAM are discussed.
 
 \Cref{ch:previous_work} contains background information on the VML, the software this thesis is based on.
-After a bit of history on this project, the VML's data model and a few core algorithms are elaborated to allow a deeper understanding of various design aspects of the presented implementations. These include the VML's regular grid data structure, a triangle elimination strategy called classification and the raycasting subsystem used for visualization.
+After a bit of history on this project, the data model of the VML and a few core algorithms are elaborated to allow a deeper understanding of various design aspects of the presented implementations. These include the regular grid data structure of the VML, a triangle elimination strategy called classification and the raycasting subsystem used for visualization.
 
-\Cref{ch:state_of_the_art} provides a literature review of existing algorithms and approaches which could be, fully or partially, used to tackle the problem of surface reconstruction for the VML's data model.
+\Cref{ch:state_of_the_art} provides a literature review of existing algorithms and approaches which could be, fully or partially, used to tackle the problem of surface reconstruction for the data model of the VML.
 The presented references include means for direct triangle intersection, surface reconstruction from point clouds and triangulation of dexel-based as well as voxel-based representations.
 
-\Cref{ch:direct_intersection} discusses the first implemented approach to reconstruct a surface from the VML's data model.
+\Cref{ch:direct_intersection} discusses the first implemented approach to reconstruct a surface from the data model of the VML.
 It relies on directly intersecting the triangles of the swept volumes stored within the VML.
 This method is the most naive, but, in theory, most exact.
 
 \Cref{ch:tri_dexel} describes the second implementation which is based on a tri-dexel representation.
-Utilizing an axis-aligned raycast to sample the VML's data model, a tri-dexel image is created.
+Utilizing an axis-aligned raycast to sample the data model of the VML, a tri-dexel image is created.
 This sampled data model is regularized to fight numeric issues and sampling errors.
 A subsequent feature reconstruction pass greatly enhances the visual quality of the output.
 At the end, a novel extension for adaptive resampling is introduced.
 
-\Cref{ch:point_cloud_based} builds on the idea of the axis-aligned raycast to sample a point cloud of the VML's data model.
+\Cref{ch:point_cloud_based} builds on the idea of the axis-aligned raycast to sample a point cloud of the data model of the VML.
 As surface reconstruction algorithms for point clouds are greatly available in literature, the potential of these kinds of algorithms is discussed.
 The main example is a variant of the Ball Pivoting Algorithm used by the VML for swept volume computation.
 Furthermore, a Poisson surface reconstruction algorithm is also shortly presented.

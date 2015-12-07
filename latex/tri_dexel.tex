@@ -2,16 +2,16 @@
 \chapter{Tri-dexel method}
 \label{ch:tri_dexel}
 
-The second discussed method to extract a triangulated surface from the VML's data model is based on a tri-dexel representation, \cf \cref{sec:surface_representations}.
-As observed with the previously shown method in \cref{ch:direct_intersection}, reconstructing a surface form the many triangles stored in the VML's grid, by directly intersecting them, is computationally expensive, highly numerically unstable and prone to errors.
+The second discussed method to extract a triangulated surface from the data model of the VML is based on a tri-dexel representation, \cf \cref{sec:surface_representations}.
+As observed with the previously shown method in \cref{ch:direct_intersection}, reconstructing a surface form the many triangles stored in the regular grid of the VML, by directly intersecting them, is computationally expensive, highly numerically unstable and prone to errors.
 A more robust approach is desirable, which is able to always successfully reconstruct a surface with good quality.
 This reconstruction should succeed independently of the complexity of the maintained geometry.
 As a trade-off for robustness, the approach may offer up surface exactness and fine features.
 Dexel-based representations comply well with these requirements.
 They provide a good abstraction of a machined workpiece with rich semantics.
 The resolution of the dexel grid supplies an easy to configure level of detail and steering parameter between representation quality and memory/CPU demands.
-Creating dexel-based representations from the VML's data model is achieved using an adaption of the already implemented, well-working and robust raycasting subsystem used for visualization, \cf \cref{sec:raycasting}.
-To achieve good portrayal, independently of the workpiece's orientation, three axis-aligned dexel images are generated, thus creating a tri-dexel representation.
+Creating dexel-based representations from the data model of the VML is achieved using an adaption of the already implemented, well-working and robust raycasting subsystem used for visualization, \cf \cref{sec:raycasting}.
+To achieve good portrayal, independently of the orientation of the workpiece, three axis-aligned dexel images are generated, thus creating a tri-dexel representation.
 For converting such a tri-dexel model into a final triangle mesh, various algorithms are presented in literature.
 A well-written example by Ren \etal forms the idea and foundation of the implementation presented in this chapter \cite{tridexel_reconstruction}.
 
@@ -19,13 +19,13 @@ A well-written example by Ren \etal forms the idea and foundation of the impleme
 \section{Concept}
 \label{sec:tri_dexel_concept}
 
-Firstly, a tri-dexel representation of the VML's data model has to be obtained.
-Dexel images, in general, are created by sampling the workpiece's surface along parallel lines.
+Firstly, a tri-dexel representation of the data model of the VML has to be obtained.
+Dexel images, in general, are created by sampling the surface of the workpiece along parallel lines.
 This sampling process is already implemented in the raycasting subsystem as part of the visualization.
 However, when sampling dexels, a ray must not stop at the first surface intersection, but continue through the whole data model and collect all intersections along its path.
-At each intersection, the intersection depth, \ie distance from the ray's origin, and the surface normal of the intersected triangle is recorded as a dexel node.
-From the dexel's origin and a node's depth the intersection point may be calculated.
-The raycast itself is performed with axis-parallel rays starting at equidistant origins from three sides of the VML's data model, thus creating three dexel images.
+At each intersection, the intersection depth, \ie distance from the origin of the ray, and the surface normal of the intersected triangle is recorded as a dexel node.
+From the origin of the dexel and the depth of a node the intersection point may be calculated.
+The raycast itself is performed with axis-parallel rays starting at equidistant origins from three sides of the data model of the VML, thus creating three dexel images.
 Combining these dexel images creates a uniform regular grid, the tri-dexel grid.
 \Cref{fig:cylinder_head_dexel} shows the cylinder head scene with a low-resolution dexel image and the final reconstruction.
 
@@ -68,22 +68,22 @@ Combining these dexel images creates a uniform regular grid, the tri-dexel grid.
 		\label{fig:cylinder_head_reconstructed}
 	\end{subfigure}
 	\caption[Tri-dexel concept]{
-		Tri-dexel based surface reconstruction from the VML's data model of a cylinder head.
+		Tri-dexel based surface reconstruction from the data model of the VML of a cylinder head.
 		The stock and a few swept volumes creating the fins and drillings are shown in \subref{fig:cylinder_head_stock_sv}.
-		The classification result after these solids have been mapped into the VML's regular grid is shown in \subref{fig:cylinder_head_classified}.
+		The classification result after these solids have been mapped into the regular grid of the VML is shown in \subref{fig:cylinder_head_classified}.
 		The removed triangles are clearly visible, especially at the swept volumes.
 		By using a raycast of axis-parallel rays along all three coordinate system axes a tri-dexel representation is created as shown in figure \subref{fig:cylinder_head_dexel_image}.
 		The resolution of the grid spawning the rays is 30 along the longest dimension.
-		Renderings of details of the tri-dexel image in \subref{fig:cylinder_head_dexel_image_center} and~\subref{fig:cylinder_head_dexel_image_fins} show the drilling at the center from above and the cylinder head's fins from the center.
+		Renderings of details of the tri-dexel image in \subref{fig:cylinder_head_dexel_image_center} and~\subref{fig:cylinder_head_dexel_image_fins} show the drilling at the center from above and the fins of the cylinder head from the center.
 		Finally, the reconstructed surface is shown in \subref{fig:cylinder_head_reconstructed}.
-		Note the imperfections at the fin's edges and bases.
+		Note the imperfections at the edges and bases of the fins.
 	}
 	\label{fig:cylinder_head_dexel}
 \end{figure}
 
 Secondly, the tri-dexel representation is converted into a triangle mesh \cite{tridexel_reconstruction}.
 Each intersection point of three orthogonal dexels from the tri-dexel grid forms a grid point.
-If a grid point lies within a dexel segment on any of these dexels, it is said to be occupied, \ie lies within the workpiece's volume.
+If a grid point lies within a dexel segment on any of these dexels, it is said to be occupied, \ie lies within the volume of the workpiece.
 Eight grid points and their twelve connecting edges along with their dexel segments are grouped into cells of the grid.
 Each grid cell is then processed independently.
 \Cref{fig:tri_dexel_cell} shows the structure of a tri-dexel cell.
@@ -137,17 +137,17 @@ The additional types needed for the tri-dexel implementation are shown in the cl
 %
 The most central data structure is the \var{TriDexelGrid} class.
 It represents a tri-dexel representation of the complete VML workpiece, prepared for subsequent regularization and triangulation.
-In addition to the tri-dexel grid's resolution \var{res} and bounding box \var{aabb}, the \var{TriDexelGrid} class further contains the occupancy information for each grid point in \var{occupancy}, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \var{edges}.
+In addition to the resolution of the tri-dexel \var{res} and bounding box \var{aabb}, the \var{TriDexelGrid} class further contains the occupancy information for each grid point in \var{occupancy}, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \var{edges}.
 The \var{cells} method separates all this information into distinct and independent cells.
 
 Each cell is an instance of the \var{Cell} class and contains the same information as the tri-dexel grid, but locally for a single cell.
-A cell stores its bounding box \var{box}, the point occupancy of each of the cell's corners in \var{occupancy}, the corners' coordinates in \var{realPoints} and the twelve edges of the cell, stored in \var{edges}.
-Each edge of the cell is an instance of \var{Edge} and contains all spanning dexel segments, clamped to the interval between the edge's incident grid points.
-Furthermore, a method \var{isBoundary} is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points, and therefore contains a part of the workpiece's surface.
+A cell stores its bounding box in \var{box}, the point occupancy of each of the corners corners in \var{occupancy}, the coordinates of the corners in \var{realPoints} and the twelve edges of the cell, stored in \var{edges}.
+Each edge of the cell is an instance of \var{Edge} and contains all spanning dexel segments, clamped to the interval between the incident grid points of the edge.
+Furthermore, a method \var{isBoundary} is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points, and therefore contains a part of the surface of the workpiece.
 
 The \var{TriDexelGrid} is constructed from the \var{TriDexelImage} class, which, fundamentally, contains the same information as the tri-dexel grid.
-The difference is substantially clearer from the workflow's point of view.
-Whereas the \var{TriDexelGrid} is already prepared for further processing, the \var{TriDexelImage} class only contains the raw data created by raycasting the VML's data model from three orthogonal directions.
+The difference is substantially clearer from the perspective of the workflow.
+Whereas the \var{TriDexelGrid} is already prepared for further processing, the \var{TriDexelImage} class only contains the raw data created by raycasting the data model of the VML from three orthogonal directions.
 This data only consists of the resolution \var{res} used for raycasting as well as three dexel images \var{images} along the three coordinate system axes.
 
 A \var{DexelImage} describes the result of a single raycast along the axis specified in \var{axis0}, where 0 denotes the x-, 1 the y- and 2 the z-axis.
@@ -168,7 +168,7 @@ Unrelated to the tri-dexel types are two additional classes, which are used in s
 The \var{Ray} class represents a ray starting at the vertex \var{origin} and traveling into the direction stored by \var{direction}.
 
 The \var{EdgeVertex} class holds data to represent a vertex on an edge of a tri-dexel cell.
-It contains grid point indices for the two points incident to this vertex's edge, a position and the surface normal of the vertex.
+It contains grid point indices for the two points incident to the edge of this vertex, a position and the surface normal of the vertex.
 
 Based on the discussed tri-dexel types, the basic reconstruction algorithm is shown in \cref{alg:tri_dexel}.
 %
@@ -201,8 +201,8 @@ Based on the discussed tri-dexel types, the basic reconstruction algorithm is sh
 \end{algorithm}
 %
 At the beginning, a slightly enlarged bounding box is calculated for the size of the tri-dexel grid and raycast.
-In this way, edge cases with a surface exactly at the grid's border are avoided.
-The \textproc{UniformResolution} function takes the user-specified resolution and the tri-dexel grid's bounding box and calculates three resolutions, one for each axis.
+In this way, edge cases with a surface exactly at the border of the grid are avoided.
+The \textproc{UniformResolution} function takes the user-specified resolution and the bounding box of the tri-dexel grid and calculates three resolutions, one for each axis.
 The longest one is equal to the specified resolution and the other two are calculated in such a way that the resulting cells of the tri-dexel grid are as cubic as possible.
 This tri-dexel grid resolution is used to preallocate space for the tri-dexel image, which is then filled in the subsequent raycasting process.
 The remaining part of the algorithm closely follows the concept discussed in the previous \cref{sec:tri_dexel_concept}.
@@ -212,9 +212,9 @@ The subsequent sections discuss the functions and procedures of the algorithm in
 \subsection{Raycast}
 \label{sec:tri_dexel_raycast}
 
-The raycast is the prime algorithm for converting the VML's data model into a tri-dexel representation.
+The raycast is the prime algorithm for converting the data model of the VML into a tri-dexel representation.
 The raycast is performed with parallel, axis-aligned and equidistant rays.
-All rays start at the intersection points of a uniform, 2-dimensional grid placed on one side of the data model's slightly enlarged bounding box, and end at the opposite side, \cf \cref{fig:dexel_image}.
+All rays start at the intersection points of a uniform, 2-dimensional grid placed on one side of a slightly enlarged bounding box of the data model, and end at the opposite side, \cf \cref{fig:dexel_image}.
 Three of these raycasts along the three axes of the coordinate system result in three dexel images.
 As the raycasting code is kept separated from the tri-dexel data structures, a function is passed to the raycasting code which is invoked each time a ray has found a surface intersection.
 Therefore, the same code is capable of creating other data structures as well, \cf \cref{ch:point_cloud_based}.
@@ -260,13 +260,13 @@ The entry routine and ray creation code of the raycasting algorithm is shown in 
 		\EndProcedure
 	\end{algorithmic}
 	\caption[Axis parallel raycast]{
-		Basic algorithm for performing a parallel raycast along all three coordinate system axes on the VML's data model.
+		Basic algorithm for performing a parallel raycast along all three coordinate system axes on the data model of the VML.
 	}
 	\label{alg:tri_dexel_raycast}
 \end{algorithm}
 %
-The outmost procedure \textproc{Raycast} takes four arguments: the VML's regular grid data structure, the bounding box of the raycasted area, the resolution of the raycasted \enquote{image} as well as a function, which is called on every surface hit.
-The algorithm starts off by iterating over the three coordinate system's axes.
+The outmost procedure \textproc{Raycast} takes four arguments: the regular grid data structure of the VML, the bounding box of the raycasted area, the resolution of the raycasted \enquote{image} as well as a function, which is called on every surface hit.
+The algorithm starts off by iterating over the three axes of the coordinate system.
 The index of each axis is stored in the variable \var{axis0}, where 0 denotes the x-, 1 the y- and 2 the z-axis.
 \var{axis0} is also called primary axis and is accompanied by \var{axis1} and \var{axis2} which hold the other two, secondary axes, in cyclic order.
 Depending on the choice of primary and secondary axes, the resolution of the 2-dimensional grid spawning the rays is determined and assigned to \var{xCount} and \var{yCount}, for the horizontal and vertical resolution.
@@ -277,22 +277,22 @@ The result is assigned to the variables \var{\Delta x} and \var{\Delta y}.
 Now, the algorithm starts creating and casting all rays along their primary axis.
 Two nested loops iterate over all points of the 2-dimensional grid spawning rays.
 For each grid point at $\var{x}, \var{y}$ a ray is created using the \textproc{CreateRay} function.
-Subsequently, the ray is cast into the VML's regular grid by invoking \textproc{CastRay}, passing a closure which is invoked each time a hit is recorded.
+Subsequently, the ray is cast into the regular grid by invoking \textproc{CastRay}, passing a closure which is invoked each time a hit is recorded.
 
-The \textproc{CreateRay} function's objective is to create an instance of \var{Ray}, storing the ray's origin and direction.
-The origin is calculated by starting from the bounding box's \var{lower} corner.
+The objective of the \textproc{CreateRay} function is to create an instance of \var{Ray}, storing the origin and direction of the ray.
+The origin is calculated by starting from the \var{lower} corner of the bounding box.
 Along the primary axis, this value is already correct.
-On the secondary axes, the origin, currently at the origin for ray $0, 0$, must be moved according to the ray's \var{x} and \var{y} coordinate.
-Thus, \var{x} and \var{y} are multiplied by the distances between incident rays, \var{\Delta x} and \var{\Delta y}, and added to the origin's secondary axes.
+On the secondary axes, the origin, currently at the origin for ray $0, 0$, must be moved according to the \var{x} and \var{y} coordinate of the ray.
+Thus, \var{x} and \var{y} are multiplied by the distances between incident rays, \var{\Delta x} and \var{\Delta y}, and added to the secondary axes of the origin.
 %
-Computing the ray's direction is simpler, as it is axis aligned.
+Computing the direction of the ray is simpler, as it is axis aligned.
 Therefore, the direction is a unit vector along the primary axis, created by setting the corresponding component of a zeroed vector to one.
 %
 Finally, \var{origin} and \var{direction} are aggregated into an instance of \var{Ray} and returned.
 
-After rays have been created, they are cast into the VML's regular grid data structure using the \textproc{CastRay} procedure.
+After rays have been created, they are cast into the regular grid of the VML using the \textproc{CastRay} procedure.
 Traversing a ray through a regular grid is done using the 3D-DDA algorithm \cite{3DDDA}, \cf \cref{fig:traverser}.
-However, as the rays are axis-parallel, traversal essentially boils down to mapping the ray's origin to the appropriate grid cell and incrementing the 3-dimensional cell index along the primary axis until the other end of the grid is reached.
+However, as the rays are axis-parallel, traversal essentially boils down to mapping the origin of the ray to the appropriate grid cell and incrementing the 3-dimensional cell index along the primary axis until the other end of the grid is reached.
 This logic is hidden behind the \var{AxisAlignedTraverser} class and is no further elaborated.
 
 During traversal, the ray is intersected with each cell pulled from the traverser using the \textproc{IntersectCell} algorithm.
@@ -302,7 +302,7 @@ Furthermore, minor inconsistencies are tolerable and may result in a few pixel e
 However, when creating dexels, a consistent number of surface entries and exits as well as numerically correct ordering of the intersections is substantial.
 Consequently, such an intersection routine must employ a great deal of numeric precautions and extra checks to deliver a correct result, even sacrificing intersections for the sake of consistency.
 This procedure forms the heart of the raycasting algorithm.
-As it is quite comprehensive and highly tailored to the VML's internal data structures, the detailed pseudocode of the \textproc{IntersectCell} routine is omitted.
+As it is quite comprehensive and highly tailored to the internal data structures of the VML, the detailed pseudocode of the \textproc{IntersectCell} routine is omitted.
 
 
 \subsection{Tri-dexel image and grid generation}
@@ -393,19 +393,19 @@ For each dexel image further loops are necessary to iterate over all dexels of t
 For each segment the affected range of grid points is computed.
 Two coordinates of these points are already known, which are the same as the coordinates of the dexel in its image.
 The third, missing coordinates are spanned by the dexel segment.
-To compute these coordinates, the dexel segment's start and end depth are mapped to grid point coordinates.
+To compute these coordinates, the  start and end depth of the dexel segment are mapped to grid point coordinates.
 Each call to \textproc{DepthToGrid} yields the lower grid point coordinate along the specified axis for a given depth on this axis.
 This value is also equivalent to the index of the edge along \var{axis} on which a dexel node with the given depth would lie.
 The computed range, \var{start} to \var{end}, in conjunction with \var{axis1Val} and \var{axis2Val}, now gives all indices of the affected grid points and edges.
 
 The innermost loop finally iterates over all edges of the tri-dexel grid spanned by the current dexel segment \var{seg}.
-The variables \var{gridFrom} and \var{gridTo} are the indices of the grid points incident to the current edge, which's index is also \var{gridFrom}.
+The variables \var{gridFrom} and \var{gridTo} are the indices of the grid points incident to the current edge, which is also indexed by \var{gridFrom}.
 For both grid points of the current edge a depth value along the current axis is calculated.
 Two conditionals then compare these depth values against the start and end depth of the current dexel segment.
-If the depth of any grid point is between a dexel segment's start and end depth, \ie the segment spans the grid point, it is marked as occupied by setting the corresponding element of the grid's \var{occupancy} member.
+If the depth of any grid point is between the start and end depth of a dexel segment, \ie the segment spans the grid point, it is marked as occupied by setting the corresponding element of the \var{occupancy} member of the grid.
 After this point occupancy check, the segment is added to the current edge, incident to the grid points \var{gridFrom} and \var{gridTo}.
-As the cells of the tri-dexel grid are processed independently later and to ease calculations, the dexel-segments are further clamped to the cell's bounds, \ie constrained to the range of the cell's grid point's depth values.
-Therefore, a copy of the current segment is made and the start and end depth set to the respective grid point's depth values, in case they are outside.
+As the cells of the tri-dexel grid are processed independently later and to ease calculations, the dexel-segments are further clamped to the bounds of a cell, \ie constrained to the range of the depth values of the cell of the grid point.
+Therefore, a copy of the current segment is made and the start and end depth set to the respective depth values of the grid point, in case they are outside.
 Finally, the clamped segment is added to the current edge.
 
 After \textproc{CreateTriDexelGrid} returned, the tri-dexel image is no longer needed, as the semantically equivalent information is stored in the newly created tri-dexel grid.
@@ -413,14 +413,14 @@ The main algorithm, \cref{alg:tri_dexel}, may release resources held for the \va
 
 The newly created tri-dexel grid \var{dgrid} is now used to iterate over all cells and process them further.
 The call to $\var{dgrid}.\var{cells}()$, for each cell, collects all data from the tri-dexel grid belonging to a single cell into an instance of \var{Cell}.
-The created cells contain deep copies of the grid's data, as the cell's edges are shared with neighboring cells, but will be modified in subsequent parts of the algorithm.
+The created cells contain deep copies of the grid data, as the edges of the cell are shared with neighboring cells, but will be modified in subsequent parts of the algorithm.
 This is no problem in a single threaded context, but would lead to data races when multiple cells are processed concurrently, \cf \cref{sec:tri_dexel_parallelization}.
 
 
 \subsection{Regularization}
 \label{sec:tri_dexel_regularization}
 
-During the conversion of the VML's data model into a tri-dexel representation errors may occur.
+During the conversion of the data model of the VML into a tri-dexel representation errors may occur.
 Dexel segments, for example, might not be of accurate length because of numeric instabilities in the triangle intersection routine or corrections applied by the raycaster when sorting and counting through the intersected structures to identify surface hits.
 Such defects are especially critical at the intersection points of dexels from multiple dexel images, the grid points.
 Furthermore, the number of different configurations a single tri-dexel cell may have is huge, as each edge may contain an arbitrary number of dexel segments, rendering the creation of an appropriate triangulation algorithm almost impossible.
@@ -652,15 +652,15 @@ Thus, in this case, all segments are simply replaced by an empty set.
 
 Rule three is applied if only one grid point is marked as occupied.
 If segments are present on the current edge, the algorithm tests whether the first or last segment touches the occupied grid point, or is very close to it.
-If the source point is marked, the first segment's start must touch or be near to it, \ie the start node's depth must not be further away from the grid point than a small $\rho$.
+If the source point is marked, the start of the first segment must touch or be near to it, \ie the depth of the start node  must not be further away from the grid point than a small $\rho$.
 This length may be chosen arbitrarily, but as its purpose is to correct a numeric issue, a tiny value is sufficient.
-In case the destination point is marked, the last segment's end must touch or be near it.
+In case the destination point is marked, the end of the last segment must touch or be near it.
 If existing segments are nearer than $\rho$ to an occupied grid point, they are extended to reach it.
 If there are no segments on the edge or the present segments are not in close proximity to their appropriate points, a new dexel segment is added.
 The new segment starts at the occupied grid point and has a small length of $\rho$.
 Regarding the normal, the surface intersection represented by the newly added segment might be used by a later triangulation.
-However, the true normal is stored on the numerically too short segment in the appropriate neighboring cell, which is hard to retrieve as the tri-dexel grid's cells are isolated to allow independent processing.
-Hence, an artificial normal is added in the direction of the edge's axis.
+However, the true normal is stored on the numerically too short segment in the appropriate neighboring cell, which is hard to retrieve as the cells of the tri-dexel grid are isolated to allow independent processing.
+Hence, an artificial normal is added in the direction of axis parallel to the edge.
 
 The last rule, rule four, finally checks all segments if they touch at least one grid point.
 If any segment does not satisfy this condition, the segment is removed.
@@ -669,7 +669,7 @@ After all four rules have been applied to all twelve edges of the cell, the cell
 \begin{itemize}
 	\item Between two occupied grid points, there is always one full segment.
 	\item Between two non-occupied grid points, there is never a segment.
-	\item Between two differently marked grid points, there is exactly one segment with one node's depth not equal to the depth of any grid point.
+	\item Between two differently marked grid points, there is exactly one segment with the depth of one node not equal to the depth of any grid point.
 \end{itemize}
 These properties now allow for a subsequent triangulation.
 
@@ -684,7 +684,7 @@ Secondly, from the loop, vertex and normal information, optional feature points 
 Thirdly, the boundary loops with optional feature information are triangulated.
 
 For the initial boundary loop detection, a depth-first search process is started at non-occupied grid points of the cell, one after the other.
-The search traverses the cell's edges and backtracks each time an occupied grid point and therefore a grid edge containing a dexel node is found.
+The search traverses the edges of the cell and backtracks each time an occupied grid point and therefore a grid edge containing a dexel node is found.
 Traversed grid points are marked as visited and cause future searches to backtrack immediately.
 The list of visited grid edges containing dexel nodes, per search, in the order they were visited, form a boundary loop.
 A cell might contain multiple boundary loops, which are found in multiple searches when starting at different, non-occupied grid points.
@@ -806,12 +806,12 @@ In problematic cases, the loop search routine is started at occupied vertices an
 After all loops have been identified, they are sent to the \textproc{TriangulateLoopSimple} function which generates triangles from the loop.
 The union of all triangulated loops is returned as triangulation result of the given tri-dexel cell.
 
-The \textproc{FindLoops} algorithm is the entry into the depth-first search based traversal of the cell's edges as shown in \cref{fig:tri_dexel_triangulation}.
+The \textproc{FindLoops} algorithm is the entry into the depth-first search based traversal of the edges of the cell as shown in \cref{fig:tri_dexel_triangulation}.
 It starts by initializing an array with eight Boolean values, set to false.
 These values keep track of the already visited vertices.
 For each of the eight possible start grid points an empty array \var{loop} is created, which is passed recursively through the following depth-first search.
 It collects information about the encountered dexel nodes, in the order they are visited, to form a boundary loop.
-The call to \textproc{DepthFirstSearch} then starts traversing the cell's edges starting at the grid point \var{start}.
+The call to \textproc{DepthFirstSearch} then starts traversing the edges starting at the grid point \var{start}.
 After the call has returned, a conditional checks if loop vertices have been found and adds the loop in this case.
 After a search has been launched from each start point, the set of collected loops is returned.
 
@@ -826,15 +826,15 @@ On each neighboring grid point, its occupancy is checked for inequality to \var{
 If this is true, then \var{cur} and \var{n} have different occupancy and the edge between them contains a vertex of the surface.
 This vertex is now constructed from the corresponding dexel node together with some meta data.
 Using the \var{edgeToAxis} table of \cref{fig:tri_dexel_tables}, the axis parallel to the current edge is obtained.
-Using \var{pointsToEdgeId}, the segment on the corresponding cell's edge is also retrieved.
+Using \var{pointsToEdgeId}, the segment on the corresponding edge is also retrieved.
 Furthermore, the coordinates of the current and neighboring grid point are stored in local variables.
 The \var{node} variable is then set to the dexel node which does not touch one of the grid points.
 The vertex on the current edge is then constructed starting with the coordinate of the current grid point \var{curReal}.
-Choosing the neighboring grid point's coordinate is also valid, as both coordinates only differ at the component at \var{axis}.
-This component of the new vertex is then set to the selected node's depth.
-Finally, an instance of \var{EdgeVertex} is added to the boundary loop, containing both grid point's ids, the newly calculated vertex and the corresponding surface normal as obtained from the dexel node.
+Choosing the coordinate of the neighboring grid point is also valid, as both coordinates only differ at the component at \var{axis}.
+This component of the new vertex is then set to the depth of the selected node.
+Finally, an instance of \var{EdgeVertex} is added to the boundary loop, containing the ids of both grid points, the newly calculated vertex and the corresponding surface normal as obtained from the dexel node.
 As final step, the function returns and the search backtracks.
-In case the current neighbor's occupancy is equal to \var{occupied}, \ie no vertex on the current edge, the depth-first search is recursively continued with the current point index passed as last and the neighbor index passed as current.
+In case the occupancy of the current neighbor is equal to \var{occupied}, \ie no vertex on the current edge, the depth-first search is recursively continued with the current point index passed as last and the neighbor index passed as current.
 
 Finally, in \cref{alg:tri_dexel_triangulation}, the \textproc{TriangulateLoopSimple} function just maps each \var{EdgeVertex} of the passed loop to its position, creating a pure list of 3-dimensional vertices.
 These vertices are then sent to the \textproc{TriangulateLoopIntoFan} function, which creates a triangle fan from the given vertices around their center of mass.
@@ -915,7 +915,7 @@ The one on the right shows the creation of three intermediate vertices and the c
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/tri_dexel_refinement}
 	\caption[Feature reconstruction]{
-		Triangulating a tri-dexel cell's boundary loops with additional feature information \cite{tridexel_reconstruction}.
+		Triangulating the boundary loops of a tri-dexel cell with additional feature information \cite{tridexel_reconstruction}.
 		The left image shows the creation of two intermediate vertices, F and H.
 		The right image shows the creation of three intermediate vertices, D, E and F, and an apex vertex, G.
 	}
@@ -923,20 +923,20 @@ The one on the right shows the creation of three intermediate vertices and the c
 \end{figure}
 %
 All feature points are calculated using the intersection of three planes.
-For the intermediate vertices between two adjacent loop vertices, two planes are given by the two vertices' normals and one plane is given by the cell's side containing both vertices.
+For the intermediate vertices between two adjacent loop vertices, two planes are given by the normals of the two vertices and one plane is given by the cell side containing both vertices.
 
 On the left of \cref{fig:tri_dexel_refinement}, the original boundary loop consists of the vertices A, B, C, and D.
 Each of these points holds an additional normal, $n_A$, $n_B$, $n_C$ and $n_D$.
 Now, the intermediate point G for example is calculated from the two planes described by the positions and normals of D and C and the cell side to the left.
 Using this scheme, an intermediate vertex is calculated for each adjacent pair of vertices on the boundary loop.
-In case the calculated vertex is too close to the original edge or lies outside the cell's bounding box, the vertex is discarded.
+In case the calculated vertex is too close to the original edge or lies outside the bounding box of the cell, the vertex is discarded.
 The vertices G and E are too close to their edges CD and AB and discarded, whereas vertex H and F are kept.
 
 If at least three intermediate vertices are created, an additional apex vertex may be calculated, again as intersection of three planes.
 For these planes, the first three loop vertices are taken, which have resulted in the construction of a valid intermediate vertex.
 In the right drawing of \cref{fig:tri_dexel_refinement}, the loop vertices A, B and C have resulted in intermediate vertices, namely D, E and F.
 The first three of them, A, B, and C, are then used to form three planes which intersect in the apex point G.
-The location of the apex is also checked against the cell's bounding box.
+The location of the apex is also checked against the bounding box of the cell.
 In case it is outside, the apex is discarded again.
 
 Finally, after creating intermediate and apex vertices, the enhanced boundary loops must be triangulated.
@@ -1008,7 +1008,7 @@ This algorithm acts as a replacement for the \textproc{TriangulateLoopSimple} fu
 In the beginning, a closure is created to test if a point is inside the bounding box of the passed cell.
 Then, a few arrays are created.
 One contains a list of vertices which have led to a valid intermediate point and may be considered for creating an apex vertex, called \var{apexVertices}.
-The variable \var{finalLoop} will contain the original boundary loop's vertices interleaved with the created intermediate vertices.
+The variable \var{finalLoop} will contain the original vertices of the boundary loop interleaved with the created intermediate vertices.
 The \var{isEdgeVertex} array complements the \var{finalLoop} array, as it stores a Boolean value for each of the vertices in the final loop.
 This Boolean value is true if the vertex at the same index originated from an edge of the cell and false if the vertex is an intermediate vertex.
 Finally, a counter for the number of successfully created intermediate vertices is created and initialized to zero.
@@ -1016,9 +1016,9 @@ A loop iterates over all vertices \var{a} and their successors \var{b}, \ie adja
 Vertex \var{a} is added to the final loop and \True to \var{isEdgeVertex}.
 The four grid point indices of both edge vertices are collected and uniqued.
 As both edge vertices share a common side of the cell, the result is a list of grid point indices with either three or four elements, depending on whether or not one of them is shared.
-Three of these indices uniquely identify one of the cell's sides and are used as indices into another lookup table, \var{cellSideNormals}, storing the cell side's normal for each combination of three grid points.
+Three of these indices uniquely identify one of the sides of the cell and are used as indices into another lookup table, \var{cellSideNormals}, storing the normal of a cell side for each combination of three grid points.
 The normal is retrieved using the first three grid points of the current edge vertex pair and stored in \var{n}.
-Now, three planes are created, one using the cell side's normal and the coordinate of a grid point on this cell side and two others from the pair of edge vertices.
+Now, three planes are created, one using the normal of the cell side and the coordinate of a grid point on this cell side and two others from the pair of edge vertices.
 By calling \textproc{IntersectPlanes}, the intersection point of the three planes is calculated, which is a possible intermediate vertex.
 The returned result in \var{intermed} is tested for validity as \textproc{IntersectPlanes} may return an empty result if no intersection could be found.
 Furthermore, the intersection point must lie within the bounds of the cell.
@@ -1031,7 +1031,7 @@ Furthermore, the intermediate vertex counter is incremented and both edge vertic
 After all edge vertex pairs of the initial loop have been processed and all intermediate vertices have been created, an apex vertex may be generated.
 Therefore, the number of emitted intermediate vertices is checked.
 If this number is larger than or equal to three, the first three unique edge vertices are used to create three planes which are again intersected.
-In case an intersection point could be found and it also lies within the cell's bounding box, it is accepted as valid apex vertex.
+In case an intersection point could be found and it also lies within the bounding box of the cell, it is accepted as valid apex vertex.
 
 Now, enough information has been gathered from the normal information at each vertex to begin triangulating the loop.
 This second part of the \textproc{TriangulateLoopRefined} function is listed in \cref{alg:tri_dexel_refinement_triangulation}.
@@ -1102,7 +1102,7 @@ Therefore, the loop is rotated to start with the intermediate vertex and then pa
 
 Loops with no apex vertex and more than one intermediate vertex are more difficult to triangulate.
 The case illustrated in \cref{fig:tri_dexel_refinement} on the left shows that the final loop must actually split into two sub loops, one containing C, D, H and F, as well as one containing A, B, D, H.
-This fact becomes even clearer with cases like the one on the right if the apex vertex was invalid, \eg the apex G would be outside the cell's box.
+This fact becomes even clearer with cases like the one on the right if the apex vertex was invalid, \eg the apex G would be outside the bounding box of the cell.
 In this case, all intermediate vertices D, E and F would form a plateau.
 The remaining parts of the final loop are sub loops, each consisting of two neighboring intermediate vertices and the edge vertices in-between.
 
@@ -1110,7 +1110,7 @@ This sub loop clipping strategy is now algorithmically applied to \var{finalLoop
 A for loop iterates over the indices of all vertices, each the first element of a potential sub loop.
 If the vertex at this current index is not an edge vertex, \ie an intermediate vertex, then a nested loop searches the next, cyclically occurring intermediate vertex on the loop, skipping all edge vertices in between.
 After it has been found, the inclusive range from \var{first} to \var{last} contains a sub loop, which is now copied from \var{finalLoop} and triangulated into a fan.
-Afterwards, the sub loop's edge vertices are removed from \var{finalLoop} and \var{isEdgeVertex}.
+Afterwards, the edge vertices of the sub loop are removed from \var{finalLoop} and \var{isEdgeVertex}.
 After all such sub loops have been clipped and triangulated, \var{finalLoop} consists only of intermediate vertices.
 These are also triangulated.
 The union of the triangulations of all sub loops and the remaining final loop forms the triangulation of the complete boundary loop and is returned.
@@ -1165,7 +1165,7 @@ Therefore, in this case, the function does not return a result, \ie a result whi
 The function \textproc{PointLineDistance} computes the closest distance of a point \var{p} to the line defined by two other points \var{a} and \var{b}.
 The implemented variant to solve this problem \cite{point_line_distance}, computes the length of the cross product between the two vectors from \var{p} to both line endings.
 This value is the doubled area of the triangle \var{a}, \var{b}, \var{c}, where the line distance is the altitude of the triangle.
-Dividing the doubled area by the triangle's base, \ie the length of the line $\overline{\var{a}\var{b}}$, the point to line distance is obtained.
+Dividing the doubled area by the base of the triangle, \ie the length of the line $\overline{\var{a}\var{b}}$, the point to line distance is obtained.
 
 
 \subsection{Cell slicing}
@@ -1176,7 +1176,7 @@ Still, features within a cell and especially thin features not crossing any grid
 The reason therefore is the the destructive regularization step described in \cref{sec:tri_dexel_regularization}, which sacrifices smaller dexel segments in favor of regularity, throwing away useful information, especially of smaller features.
 To preserve this information and still obtain regular tri-dexel cells, which can be passed into the triangulation routines of \cref{sec:tri_dexel_triangulation,sec:tri_dexel_refinement}, an alternative to the regularization algorithm has been developed.
 This novel approach depends on the ability to resample dexels at any time, an ability usually not given in scenarios where the dexel model is the main data model, \ie typical, dexel-based machining simulations.
-However, as the dexel model used for surface reconstruction is derived from the VML's internal data model, it allows to arbitrarily recreate dexels.
+However, as the dexel model used for surface reconstruction is derived from the internal data model of the VML, it allows to arbitrarily recreate dexels.
 
 \begin{figure}
 	\centering
@@ -1184,7 +1184,7 @@ However, as the dexel model used for surface reconstruction is derived from the 
 	\caption[Cell slicing]{
 		Creating regular cells by slicing two irregular cells sharing an irregular edge.
 		The actual surface is drawn in green, the reconstructed one in red.
-		A possible intermediate vertex in the left scenario is discarded, as it is outside the cell's bounding box.
+		A possible intermediate vertex in the left scenario is discarded, as it is outside the bounding box of the cell.
 	}
 	\label{fig:tri_dexel_cellslicing}
 \end{figure}
@@ -1222,8 +1222,8 @@ Adaptively slicing cells and resampling the model to a higher level of detail in
 The tri-dexel reconstruction algorithm usually generates a closed manifold by assuming that the same feature points and edges are created by two adjacent cells at their common border.
 If one of the cells is sliced, feature points might be estimated differently.
 \Cref{fig:tri_dexel_hole_creation} shows an example of a case where a hole is created between a normal and a sliced cell.
-The sketch on the left shows a cell side estimating a feature point based on the dexel segments at the cell's edges.
-The sketch on the right shows the adjacent cell's side, which has been sliced, \eg by another irregular edge at the opposite cell side.
+The sketch on the left shows a cell side estimating a feature point based on the dexel segments at the edges of the cell.
+The sketch on the right shows the side of the adjacent cell, which has been sliced, \eg by another irregular edge at the opposite cell side.
 Due to the additional information gathered by the resampled dexel at the slicing plane, two feature points are calculated in the sliced cell, instead of one in the unsliced cell.
 Thus, a different surface is created at the border, resulting in a typically thin hole.
 
@@ -1373,21 +1373,21 @@ The second one just creates a divider at the midpoint of each range.
 Whereas the first method creates fewer dividers and therefore fewer sub cells which have to be reprocessed, the second one is consistent across neighboring cells as two cells attached to the same irregular edge will create the same dividers.
 
 In \cref{alg:tri_dexel_cell_slicing}, the first method is implemented as it produces overall better results.
-Dividers are computed per axis from the list of ranges found for the current axis, sorted by the ranges' start.
-On each axis, the first divider is the bounding box itself, \ie the component of the box's lower vertex corresponding to the current axis.
+Dividers are computed per axis from the list of ranges found for the current axis, sorted by the start of the ranges.
+On each axis, the first divider is the bounding box itself, \ie the component of the lower vertex of the box corresponding to the current axis.
 Then, an interval $(\var{start}, \var{end})$ is set to the first range, indicating a range of possible dividers.
 This interval is now iteratively adapted/narrowed to span as many ranges as possible.
 For this purpose, a loop iterates over all remaining ranges.
-If the start of the current range does exceed the current interval, \ie the range's start is larger than the interval's end, a divider is created for the current interval and the interval reset to the current range.
-If the current range does not exceed the current interval, \ie the range's start lies within the interval, it is narrowed by moving its start to the start of the current range.
+If the start of the current range does exceed the current interval, \ie the start of the range is larger than the end of the interval, a divider is created for the current interval and the interval reset to the current range.
+If the current range does not exceed the current interval, \ie the start of the range lies within the interval, it is narrowed by moving its start to the start of the current range.
 The end of the current interval is also adapted.
 After looping over all ranges has completed, a further divider is also calculated for the remaining interval.
-Finally, the bounding box's upper vertex is used to create a last divider.
+Finally, the upper vertex of the bounding box is used to create a last divider.
 As last step, the dividers are returned and used for the creation of the bounding boxes of sub cells.
 
 The \textproc{SegmentsToRanges} function is a simple selector and translator of dexel segments and their space between them.
 The algorithm creates the ranges on each axis which must be sliced, \ie for which a divider has to be created.
-In order to do so all segments of an edge are flattened into a list of start and end depth values, except values which are at the cell's border, \ie equal to \var{srcDepth} or \var{dstDepth}.
+In order to do so all segments of an edge are flattened into a list of start and end depth values, except values which are at the border of the cell, \ie equal to \var{srcDepth} or \var{dstDepth}.
 Then, each pair of neighboring depth values are grouped into a tuple, creating a list of depth ranges.
 These ranges are shown in orange in \cref{fig:cellslicing_dividers} and returned at the end of the function.
 
@@ -1396,7 +1396,7 @@ These ranges are shown in orange in \cref{fig:cellslicing_dividers} and returned
 \label{sec:tri_dexel_parallelization}
 
 The tri-dexel surface reconstruction algorithm shown in this chapter consists of a number of steps.
-The first one is the creation of a tri-dexel image by raycasting the VML's data model.
+The first one is the creation of a tri-dexel image by raycasting the data model of the VML.
 The size of the tri-dexel image and therefore the number of created rays is parameterized by the user.
 Typical resolutions range from 50 for quick approximations up to several hundred\footnote{Resolutions of up to 600 were successfully tested before hitting the \SI{16}{\gibi\byte} physical RAM limit on the used machine.} for fine and detailed reconstructions.
 As the number of created rays for a cubic grid with a resolution of $n$ is $3n^2$ and the ray traversal and intersection is perfectly isolated, parallelization of the raycast is embarrassingly simple and usually yields a high number of independent work items.
@@ -1428,11 +1428,11 @@ However, the information a cell contains, \ie grid point occupancies and segment
 Algorithms modifying a cells data are therefore subject to race conditions.
 This mainly concerns the regularization which changes the segments on cell edges.
 Several solutions are available to mitigate this issue.
-One possibility is locking a cell's edge during regularization.
+One possibility is locking the edge of a cell during regularization.
 Neighboring cells regularized later would then see this edge as already regularized.
 Unfortunately, this solution does not work well with the detection of irregular edges and cell slicing strategy, where cells are intentionally kept irregular during regularization.
 Furthermore, a huge amount of locks, $\mathcal{O}(n^3)$, would be necessary, putting pressure on the operating system kernel.
-A lock-free implementation of the edge's data structure and regularization rules using atomic operations might be possible, but is probably highly difficult to achieve.
+A lock-free implementation of the data structure of an edge and regularization rules using atomic operations might be possible, but is probably highly difficult to achieve.
 A more pragmatic solution, which has been implemented, is to just copy the data of each cell out of the tri-dexel grid before sending a cell to the regularization and subsequent algorithms.
 This allows fully independent cell processing, enabling the loop on all cells in \textproc{Reconstruct} in \cref{alg:tri_dexel} to run in parallel.
 
@@ -1445,4 +1445,4 @@ The \textproc{FindLoops} routine starting the depth-first searches on the cell m
 These loops may be further triangulated in parallel in \textproc{TriangulateCell}.
 Intermediate point calculation during refinement on each vertex pair of a loop might also be done in parallel, but is probably not worth the overhead.
 
-In the underlying implementation, parallelization has been applied where suitable, again using Microsoft's PPL and the parallel\_for primitive \cite{ppl_parallel_for}.
+In the underlying implementation, parallelization has been applied where suitable, again using the PPL of Microsoft and the parallel\_for primitive \cite{ppl_parallel_for}.
