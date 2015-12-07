@@ -156,6 +156,11 @@ draft,
 
 \renewcommand{\mod}{\bmod}
 
+% avoid widows and clubs, punish them hard
+\clubpenalty 10000
+\widowpenalty 10000
+\displaywidowpenalty 10000
+
 % scene constants
 \newcommand{\scene}[1]{\emph{#1}}
 
@@ -223,22 +228,16 @@ draft,
 
 \addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
-%\clearpage
 
 \addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
-%\clearpage
 
 \addcontentsline{toc}{chapter}{\listalgorithmname}
 \listofalgorithms
-%\clearpage
 
 \addcontentsline{toc}{chapter}{References}
 \setcounter{biburllcpenalty}{7000}
 \setcounter{biburlucpenalty}{8000}
 \printbibliography[title=References]
-
-%\appendix
-%\include{appendix}
 
 \end{document}
