@@ -124,6 +124,11 @@ draft,
 \ohead{\headmark}
 \pagestyle{scrheadings}
 
+%
+% pgfplots
+%
+\pgfplotsset{compat=newest}
+
 % ====================================================================================================
 % ===   Macros                                                                                     ===
 % ====================================================================================================
@@ -224,6 +229,8 @@ draft,
 %\clearpage
 
 \addcontentsline{toc}{chapter}{References}
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
 \printbibliography[title=References]
 
 %\appendix
