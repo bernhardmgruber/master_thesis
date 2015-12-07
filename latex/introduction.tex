@@ -120,17 +120,17 @@ After a bit of history on this project, the data model of the VML and a few core
 \Cref{ch:state_of_the_art} provides a literature review of existing algorithms and approaches which could be, fully or partially, used to tackle the problem of surface reconstruction for the data model of the VML.
 The presented references include means for direct triangle intersection, surface reconstruction from point clouds and triangulation of dexel-based as well as voxel-based representations.
 
-\Cref{ch:direct_intersection} discusses the first implemented approach to reconstruct a surface from the data model of the VML.
+\Cref{sec:direct_intersection} discusses the first implemented approach to reconstruct a surface from the data model of the VML.
 It relies on directly intersecting the triangles of the swept volumes stored within the VML.
 This method is the most naive, but, in theory, most exact.
 
-\Cref{ch:tri_dexel} describes the second implementation which is based on a tri-dexel representation.
+\Cref{sec:tri_dexel} describes the second implementation which is based on a tri-dexel representation.
 Utilizing an axis-aligned raycast to sample the data model of the VML, a tri-dexel image is created.
 This sampled data model is regularized to fight numeric issues and sampling errors.
 A subsequent feature reconstruction pass greatly enhances the visual quality of the output.
 At the end, a novel extension for adaptive resampling is introduced.
 
-\Cref{ch:point_cloud_based} builds on the idea of the axis-aligned raycast to sample a point cloud of the data model of the VML.
+\Cref{sec:point_cloud_based} builds on the idea of the axis-aligned raycast to sample a point cloud of the data model of the VML.
 As surface reconstruction algorithms for point clouds are greatly available in literature, the potential of these kinds of algorithms is discussed.
 The main example is a variant of the Ball Pivoting Algorithm used by the VML for swept volume computation.
 Furthermore, a Poisson surface reconstruction algorithm is also shortly presented.

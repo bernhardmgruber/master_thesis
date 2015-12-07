@@ -1,9 +1,9 @@
 
-\chapter{Tri-dexel method}
-\label{ch:tri_dexel}
+\section{Tri-dexel method}
+\label{sec:tri_dexel}
 
 The second discussed method to extract a triangulated surface from the data model of the VML is based on a tri-dexel representation, \cf \cref{sec:surface_representations}.
-As observed with the previously shown method in \cref{ch:direct_intersection}, reconstructing a surface form the many triangles stored in the regular grid of the VML, by directly intersecting them, is computationally expensive, highly numerically unstable and prone to errors.
+As observed with the previously shown method in \cref{sec:direct_intersection}, reconstructing a surface form the many triangles stored in the regular grid of the VML, by directly intersecting them, is computationally expensive, highly numerically unstable and prone to errors.
 A more robust approach is desirable, which is able to always successfully reconstruct a surface with good quality.
 This reconstruction should succeed independently of the complexity of the maintained geometry.
 As a trade-off for robustness, the approach may offer up surface exactness and fine features.
@@ -16,7 +16,7 @@ For converting such a tri-dexel model into a final triangle mesh, various algori
 A well-written example by Ren \etal forms the idea and foundation of the implementation presented in this chapter \cite{tridexel_reconstruction}.
 
 
-\section{Concept}
+\subsection{Concept}
 \label{sec:tri_dexel_concept}
 
 Firstly, a tri-dexel representation of the data model of the VML has to be obtained.
@@ -109,7 +109,7 @@ This is especially necessary to reconstruct features of the model.
 This optional feature reconstruction pass is run on the loops found in the previous step and may create additional vertices.
 Taking these vertices into account allows the creation of better loop triangulations.
 
-\section{Implementation}
+\subsection{Workflow}
 \label{sec:tri_dexel_implementation}
 
 In order to run the tri-dexel surface reconstruction, the user must supply a resolution as parameter.
@@ -217,7 +217,7 @@ The raycast is performed with parallel, axis-aligned and equidistant rays.
 All rays start at the intersection points of a uniform, 2-dimensional grid placed on one side of a slightly enlarged bounding box of the data model, and end at the opposite side, \cf \cref{fig:dexel_image}.
 Three of these raycasts along the three axes of the coordinate system result in three dexel images.
 As the raycasting code is kept separated from the tri-dexel data structures, a function is passed to the raycasting code which is invoked each time a ray has found a surface intersection.
-Therefore, the same code is capable of creating other data structures as well, \cf \cref{ch:point_cloud_based}.
+Therefore, the same code is capable of creating other data structures as well, \cf \cref{sec:point_cloud_based}.
 
 The entry routine and ray creation code of the raycasting algorithm is shown in \cref{alg:tri_dexel_raycast}.
 %

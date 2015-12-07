@@ -7,7 +7,7 @@
 \chapter{Results}
 \label{ch:results}
 
-The three implementations discussed in \cref{ch:direct_intersection,ch:tri_dexel,ch:point_cloud_based} have been tested on the scenes described in chapter \cref{ch:test_scenes}.
+The three implementations discussed in \cref{sec:direct_intersection,sec:tri_dexel,sec:point_cloud_based} have been tested on the scenes described in chapter \cref{ch:test_scenes}.
 Each implementation has been benchmarked on the same machine, utilizing an Intel Core i7-3770 quad-core processor at \SI{3.4}{\giga\hertz} with \SI{16}{\gibi\byte} RAM.
 All timings in this chapter are averaged over ten runs, unless stated otherwise.
 The CPU utilization of each algorithm is shown as well, measured using the profiler of Microsoft Visual Studio 2013.
@@ -19,7 +19,7 @@ Finally, the number of created boundary edges is given for each reconstructed me
 \section{Direct intersection}
 \label{sec:direct_intersection_results}
 
-The runtime and output size of the test runs of the direct intersection surface reconstruction, \cf \cref{ch:direct_intersection}, are detailed in \cref{tbl:direct_intersection_results}.
+The runtime and output size of the test runs of the direct intersection surface reconstruction, \cf \cref{sec:direct_intersection}, are detailed in \cref{tbl:direct_intersection_results}.
 
 \begin{table}
 	\centering
@@ -167,7 +167,7 @@ The created boundary edges are listed in \cref{tbl:direct_intersection_boundary_
 \section{Tri-dexel}
 \label{sec:tri_dexel_results}
 
-For testing the tri-dexel surface reconstruction approach, \cf \cref{ch:tri_dexel}, a few different grid resolutions have been used, which are 50, 100, 200 and 400.
+For testing the tri-dexel surface reconstruction approach, \cf \cref{sec:tri_dexel}, a few different grid resolutions have been used, which are 50, 100, 200 and 400.
 \Cref{tbl:tri_dexel_results} contains the runtime and output size of the test runs.
 
 \begin{table}

@@ -1,6 +1,6 @@
 
-\chapter{Direct intersection method}
-\label{ch:direct_intersection}
+\section{Direct intersection method}
+\label{sec:direct_intersection}
 
 The first presented method to extract a triangulated surface from the data model of the VML is by directly processing the stored triangles inside the regular grid of the VML.
 This approach is the most straightforward, computationally intensive, but, in theory, most accurate one.
@@ -11,7 +11,7 @@ Due to the triangle elimination strategy using cell classification, \cf \cref{se
 Thus, regular CAD kernels cannot be used to intersect the meshes maintained by the VML and a custom mesh intersection algorithm has been developed.
 The idea of this approach is based on a work about finding and deforming the intersection between two meshes as well as applying textures to those regions to increase the realism in computer graphics, \ie computer games \cite{mesh_intersection}.
 
-\section{Concept}
+\subsection{Concept}
 \label{sec:direct_intersection_concept}
 
 Every time a swept volume is added to the VML, a unique identifier, \ie a number, is generated and assigned to each of the swept volume triangles before they are mapped to the cells of the regular grid.
@@ -87,7 +87,7 @@ This final structure is the reconstructed surface of the data model of the VML.
 \end{figure}
 
 
-\section{Implementation}
+\subsection{Workflow}
 \label{sec:direct_intersection_implementation}
 
 In general, intersecting each triangle of a structure against each other triangle of another structure is an expensive procedure.
