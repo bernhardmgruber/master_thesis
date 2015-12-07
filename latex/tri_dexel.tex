@@ -123,9 +123,8 @@ For esthetic reasons, the specified resolution is only used for the longest dime
 The resolution along the other dimensions is usually smaller in order to make the cells more cubic, although the implementation does not require cubic cells.
 This property will become important in an extension to the tri-dexel reconstruction discussed in \cref{sec:tri_dexel_cellslicing}.
 
-
 In addition to the types already specified by the VML, \cf \cref{fig:vml_datamodel}, the tri-dexel reconstruction algorithm requires a few more types.
-Most of these type definitions and also the algorithms themselves are vastly simplified when compared with the underlying source code.
+Most of these and also the algorithms themselves are vastly simplified when compared with the underlying source code.
 Especially parallelism, asynchrony, memory efficient handling of data structures and numeric stability enhancements have been intentionally left out in the discussed pseudo code.
 
 
@@ -142,18 +141,18 @@ The additional types needed for the tri-dexel implementation are shown in the cl
 %
 The most central data structure is the \var{TriDexelGrid} class.
 It represents a tri-dexel representation of the complete VML workpiece, prepared for subsequent regularization and triangulation.
-In addition to the resolution of the tri-dexel \var{res} and bounding box \var{aabb}, the \var{TriDexelGrid} class further contains the occupancy information for each grid point in \var{occupancy}, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \var{edges}.
+In addition to the resolution \var{res} and bounding box \var{aabb}, the \var{TriDexelGrid} class further contains the occupancy information for each grid point in \var{occupancy}, \ie whether a grid point is spanned by a dexel or not, as well as the actual dexel segments between the grid points, stored in \var{edges}.
 The \var{cells} method separates all this information into distinct and independent cells.
 
 Each cell is an instance of the \var{Cell} class and contains the same information as the tri-dexel grid, but locally for a single cell.
-A cell stores its bounding box in \var{box}, the point occupancy of each of the corners corners in \var{occupancy}, the coordinates of the corners in \var{realPoints} and the twelve edges of the cell, stored in \var{edges}.
+A cell stores its bounding box in \var{box}, the point occupancy of each of the corners corners in \var{occupancy}, the coordinates of the corners in \var{realPoints} and the twelve edges of the cell in \var{edges}.
 Each edge of the cell is an instance of \var{Edge} and contains all spanning dexel segments, clamped to the interval between the incident grid points of the edge.
 Furthermore, a method \var{isBoundary} is provided to check if the cell is a boundary cell, \ie contains occupied and non-occupied grid points, and therefore contains a part of the surface of the workpiece.
 
 The \var{TriDexelGrid} is constructed from the \var{TriDexelImage} class, which, fundamentally, contains the same information as the tri-dexel grid.
 The difference is substantially clearer from the perspective of the workflow.
-Whereas the \var{TriDexelGrid} is already prepared for further processing, the \var{TriDexelImage} class only contains the raw data created by raycasting the data model of the VML from three orthogonal directions.
-This data only consists of the resolution \var{res} used for raycasting as well as three dexel images \var{images} along the three coordinate system axes.
+Whereas the \var{TriDexelGrid} is already prepared for further processing, the \var{TriDexelImage} class only contains the raw data created by raycasting the data model of the VML.
+This data only consists of the raycasting resolution \var{res} as well as three dexel images \var{images} along the three coordinate system axes.
 
 A \var{DexelImage} describes the result of a single raycast along the axis specified in \var{axis0}, where 0 denotes the x-, 1 the y- and 2 the z-axis.
 The members \var{axis1Res} and \var{axis2Res} store the resolution of the dexel image along the two cyclically following axes after \var{axis0}.
@@ -559,7 +558,7 @@ These tables are shown in \cref{fig:tri_dexel_tables} and relate cell corners, e
 	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
-			\shortintertext{neighborIds:}
+			\intertext{neighborIds:}
 			0 &\colon (1, 4, 2) \\
 			1 &\colon (0, 3, 5) \\
 			2 &\colon (0, 6, 3) \\
@@ -573,7 +572,7 @@ These tables are shown in \cref{fig:tri_dexel_tables} and relate cell corners, e
 	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
-			\shortintertext{edgeToPointIds:}
+			\intertext{edgeToPointIds:}
 			 0 &\colon (0, 1) \\
 			 1 &\colon (2, 3) \\
 			 2 &\colon (4, 5) \\
@@ -591,7 +590,7 @@ These tables are shown in \cref{fig:tri_dexel_tables} and relate cell corners, e
 	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
-			\shortintertext{pointsToEdgeId:}
+			\intertext{pointsToEdgeId:}
 			(0, 1), (1, 0) &\colon  0 \\
 			(2, 3), (3, 2) &\colon  1 \\
 			(4, 5), (5, 4) &\colon  2 \\
@@ -609,7 +608,7 @@ These tables are shown in \cref{fig:tri_dexel_tables} and relate cell corners, e
 	\begin{subfigure}[t]{0.25\textwidth}
 		\centering
 		\begin{align*}
-			\shortintertext{edgeToAxis:}
+			\intertext{edgeToAxis:}
 			(0, 1), (1, 0) &\colon 0 \\
 			(2, 3), (3, 2) &\colon 0 \\
 			(4, 5), (5, 4) &\colon 0 \\
@@ -627,7 +626,7 @@ These tables are shown in \cref{fig:tri_dexel_tables} and relate cell corners, e
 	\begin{subfigure}[t]{0.4\textwidth}
 		\centering
 		\begin{align*}
-			\shortintertext{cellSideNormals:}
+			\intertext{cellSideNormals:}
 			\binom{\{0, 2, 4, 6\}}{3} &\colon (         - 1,\phantom{-}0,\phantom{-}0) \\
 			\binom{\{1, 3, 5, 7\}}{3} &\colon (\phantom{-}1,\phantom{-}0,\phantom{-}0) \\
 			\binom{\{0, 1, 4, 5\}}{3} &\colon (\phantom{-}0,         - 1,\phantom{-}0) \\

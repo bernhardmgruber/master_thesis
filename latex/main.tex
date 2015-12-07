@@ -21,7 +21,7 @@ draft,
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage[binary-units=true,group-digits=false]{siunitx}
-\usepackage[draft]{graphicx}
+\usepackage{graphicx}
 \usepackage{pgfplots}
 \usepackage[subrefformat=parens]{subcaption}
 \usepackage[style=numeric,backend=biber,urldate=iso8601,maxbibnames=1000]{biblatex}
@@ -30,9 +30,10 @@ draft,
 \usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{booktabs}
-\usepackage[final]{pdfpages}
+\usepackage{pdfpages}
 \usepackage{chngcntr}
 \usepackage{float}
+\usepackage{setspace}
 \usepackage[hidelinks]{hyperref}
 \usepackage[plain]{algorithm}
 \usepackage[noend]{algpseudocode}
@@ -83,6 +84,7 @@ draft,
 	\setcounter{ALG@line}{\numexpr#1-1}}
 \makeatother
 
+% TODO: use \pretocmd
 % hack to create spacing between algorithms of different chapters in list of algorithms
 \makeatletter
 \let\oldchapter\chapter
@@ -128,6 +130,7 @@ draft,
 % pgfplots
 %
 \pgfplotsset{compat=newest}
+
 
 % ====================================================================================================
 % ===   Macros                                                                                     ===
@@ -185,11 +188,13 @@ draft,
 \pagenumbering{roman}
 \setcounter{page}{2} % make up for titlepage
 
-\input{declaration}
-\input{acknowledgement}
-\input{abstract}
+\include{declaration}
+\include{acknowledgement}
+\include{abstract}
 
-\tableofcontents
+\begin{spacing}{0.95}
+	\tableofcontents
+\end{spacing}
 \clearpage
 
 % ====================================================================================================

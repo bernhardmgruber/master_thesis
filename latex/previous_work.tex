@@ -84,7 +84,7 @@ In fact, swept volumes are stored side by side together with the stock and theor
 A separate processing step is required to calculate the exact surface.
 For visualization, the data model is sampled using a raycast which calculates a point on the surface for each ray, \cf \cref{sec:raycasting}.
 
-\begin{figure}[h]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/vml_csg}
 	\caption[VML CSG representation]{
@@ -116,7 +116,7 @@ Cells which are occupied by triangles of the mesh surface are surface cells.
 Cells inside and outside the mesh are inside and outside cells and contain no triangles.
 The sketches in \cref{fig:classification_before,fig:classification_sv} illustrate the classification of a single solid inside the grid, \ie stock, as well as a swept volume before it is merged.
 
-\begin{figure}[!h]
+\begin{figure}[h]
 	\centering
 	\begin{tabular}{cc}
 		\begin{subfigure}[t]{0.3\textwidth}
@@ -192,7 +192,7 @@ As the contents of outside cells are simply deleted, the stored geometries are n
 \Cref{fig:cylinders_classification} shows the effects of triangle elimination by example.
 Surface points can still be calculated as shown by the example of the raycast used for visualization in \cref{sec:raycasting}.
 
-\begin{figure}[!h]
+\begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
@@ -228,7 +228,7 @@ If an intersection occurs, the pixel associated with the ray is colored accordin
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.7\textwidth]{raycasting}
+	\includegraphics[width=0.75\textwidth]{raycasting}
 	\caption[Raycasting principle]{
 		Principle of raycasting.
 		A ray is sent from an eye point, \ie camera position, through each pixel of an image plane and is traversed through the scene containing the workpiece.
@@ -322,6 +322,16 @@ To allow the extraction methods presented in this thesis to interface with the r
 This information conceptually reflects the actual implementation, providing a simplified but sufficient abstraction.
 
 The regular grid data structure relies on a few classes shown in \cref{fig:vml_datamodel}.
+%
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{vml_datamodel}
+	\caption[VML UML class diagram]{
+		Simplified UML class diagram of the VML data model.
+	}
+	\label{fig:vml_datamodel}
+\end{figure}
+%
 The \var{RegularGrid} class basically stores a bit of meta data together with a large set of cells.
 The meta data consists of the axis-aligned bounding box (AABB) of the grid, \var{aabb}, the size of a cell in one dimension, \var{cellSize}, as well as the number of cells in each dimension, \var{cellCount}.
 The cells of the grid are stored linearized in a flat array.
@@ -339,12 +349,3 @@ Each triangle also stores an unsigned integer, \var{structure}, referencing the 
 This field is used to group triangles inside a cell by the swept volume they originated from.
 
 Finally, the \var{Vertex} class represents a simple 3-dimensional spatial point, storing the coordinates in its \var{values} member.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.9\textwidth]{vml_datamodel}
-	\caption[VML UML class diagram]{
-		Simplified UML class diagram of the VML data model.
-	}
-	\label{fig:vml_datamodel}
-\end{figure}

@@ -352,8 +352,9 @@ Several of these libraries have been tested for their suitability to retriangula
 Usually, these triangulation algorithms operate on 2-dimensional point clouds with optional constrained edges between points of this cloud.
 As output they generate a Delaunay triangulation, with the convex hull of the point cloud as boundary.
 
+\begingroup
 \renewcommand{\arraystretch}{1.5} % row spacing
-\begin{table}[h]
+\begin{table}
 	\centering
 	\begin{tabular}{p{3cm} l l p{2.4cm} p{3.9cm}}
 		Library                                          &                           & Language & License                                  & Notes                                                             \\
@@ -371,7 +372,7 @@ As output they generate a Delaunay triangulation, with the convex hull of the po
 	}
 	\label{tbl:delaunay_libs}
 \end{table}
-\renewcommand{\arraystretch}{1.0}
+\endgroup
 
 The poly2tri library requires constraints to be specified as polylines which may not touch each other.
 This is a problem as constraints may touch the boundary of the original triangle.
@@ -476,7 +477,7 @@ An example of such an issue is shown in \cref{fig:inside_test_error}.
 %
 \begin{figure}[!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{inside_test_error}
+	\includegraphics[width=0.7\textwidth]{inside_test_error}
 	\caption[Triangle inside structure test]{
 		Testing if a triangle of one structure is inside another structure using a ray.
 		Due to triangle elimination, the ray can miss removed structures, \eg when traversing outside cells, causing the inside test to fail, \cf left ray.
