@@ -53,7 +53,6 @@ The fine tessellation of the cutter mesh results in high resolution swept volume
 The amount of triangles in each grid cell varies greatly between the test scenes and also in the scenes themselves.
 This property is interesting, as it has the largest impact on algorithms which have to iterate over the triangles of a cell.
 Furthermore, largely divergent triangle counts inside cells challenge schedulers in parallel processing of cells and increase branch divergence on GPU architectures.
-An optimal distribution would be an almost empty histogram with a peak at a certain location, meaning all surface cells contain roughly the same number of triangles.
 \Cref{fig:histograms} shows histograms of the triangles per cell distribution for the test scenes of \cref{tbl:test_scenes}.
 %
 \begin{figure}[!]
@@ -107,6 +106,8 @@ An optimal distribution would be an almost empty histogram with a peak at a cert
 	}
 	\label{fig:histograms}
 \end{figure}
+%
+An optimal distribution would be an almost empty histogram with a peak at a certain location, meaning all surface cells contain roughly the same number of triangles.
 
 The \cubes scene contains few triangles in general.
 Most cells contain only one or two triangles and probably not more than one structure.
@@ -121,7 +122,7 @@ Whereas the \cylinders scene holds mostly between 5 and 20 triangles, the cells 
 Nevertheless, despite their lower triangle counts, there is a peek of triangles in the \cylinders scene at 128 triangles, which are cells at the center of the cylinder.
 
 The \impeller scene shows a quite good but broad distribution with most cells containing between 1 and 100 triangles.
-The further large part of all cells store between 100 and around 500 triangles.
+The next large part of all cells stores between 100 and around 500 triangles.
 Unfortunately, the \impeller scene contains several cells with extraordinary high quantities of triangles, up to 2574 triangles in a single cell, 2563 for the \impellerhalf scene.
 
 Finally, the \turbine scene attracts attention by its smooth distribution of triangle counts.

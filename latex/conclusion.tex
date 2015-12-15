@@ -7,7 +7,7 @@
 % introduction
 Many different representations exist for discribing solids, their volumes and surfaces.
 Triangle meshes are one of the most prominent representations, as they are perfectly suited for immediate visualization using modern hardware architectures, \ie GPUs, and APIs, \eg OpenGL and DirectX.
-They are also well-established for processing, storing, editing, distributing and celling geometric models.
+They are also well-established for processing, storing, editing, distributing and selling geometric models.
 Other representations such as depth and dexel images, spatial decomposition, functional models and CSG are mostly tailored towards specific applications and found in their repsective domains.
 One example is the description of a workpiece created by subtractive manufacturing based on Boolean operations as a special kind of CSG tree.
 Sometimes, these representations have to be converted into triangle meshes.
@@ -40,15 +40,15 @@ As first implementation, a direct intersection approach has been implemented.
 The algorithm separates the distinct stock and swept volume meshes and performs a pairwise reduction until a final mesh is left.
 Due to the high number of calculations involved and the limited precision of conventional computers, this algorithm is susceptible to nummerical instabilities with an increasing complexity of the scene, \eg the number of swept volumes.
 Although several extensions have been proposed to mitigate these numeric issues, the algorithm was only able to reconstruct simple scenes.
-The implementation provides good scalability on multiple cores but scaled directly with the number of swept volumes and their resolution, considerably increasing the runtime for complex scenes.
+The implementation provides good scalability on multiple cores but scales directly with the number of swept volumes and their resolution, considerably increasing the runtime for complex scenes.
 
 % implementations: tri-dexel
 To provide a more robust and sampling based reconstruction, a tri-dexel based approach has been implemented.
 An adapted raycast along the three axes of the coordinate system creates a tri-dexel image of the workpiece.
-This image is converted into a tri-dexel grid and is regularized.
+This image is converted into a tri-dexel grid and regularized.
 Based on this grid, boundary loops are detected in boundary cells.
 These loops are refined using surface normal information and triangulated.
-The tri-dexel approach reconstructs all test scenes successfully and creates oriented and closed meshes.
+The tri-dexel approach reconstructs all test scenes successfully and creates orientable and closed meshes.
 Cell slicing is proposed as an extension to this tri-dexel reconstruction to allow adaptive resampling of features at the cost of creating T-vertices and thin holes.
 The tri-dexel implementation scales well on multi-core processors and, without cell slicing, requires roughly the same runtime for all scenes.
 The raycasting resolution provides a good steering parameter between quality and runtime.
@@ -59,7 +59,7 @@ This way, a lot of algorithms found in literature and ready-to-use libraries bec
 As examples, the BPA used internally by the VML for computing swept volumes as well as the Poisson surface reconstruction of MeshLab have been tested.
 Both algorithms provide good results.
 The BPA is sometimes troubled by smaller features, leading to non-manifold meshes and holes.
-The Poisson surface reconstruction creates perfectly oriented, closed and manifold meshes but loses sharp features due to its robust design against noisy input.
+The Poisson surface reconstruction creates perfectly orientable, closed and manifold meshes but loses sharp features due to its robust design against noisy input.
 The BPA does not scale well on multiple cores, but is heavily optimized and generally fast.
 Similar to the tri-dexel variant, the raycasting resolution is used to steer quality and computational demands.
 
@@ -67,7 +67,7 @@ Similar to the tri-dexel variant, the raycasting resolution is used to steer qua
 % the actual conclusion
 Concluding and regarding the problem statement and goals specified in \cref{sec:problem,sec:goal}, two viable candidates have been found for extracting a surface mesh from the data model of the VML: the tri-dexel and the point cloud/BPA approach.
 Regarding all the criteria given in the original problem statement, \cf \cref{sec:problem}, the tri-dexel approach slightly surpasses the results of the BPA, mostly because of its stability.
-Without using cell slicing, all reconstructed meshes are perfectly oriented, closed and manifold.
+Without using cell slicing, all reconstructed meshes are perfectly orientable, closed and manifold.
 Although the BPA delivers good results if the point cloud does not contain ball-sized concave features, there are still scenes, \cf the \turbine at lower resolutions, which cause the BPA to produce larger holes, non-manifold and differently oriented geometry.
 Regarding visual quality, both algorithms have their troubles: the BPA omits small concave features whereas the tri-dexel generally drops small features during regularization.
 The cell slicing extension of the tri-dexel approach further demonstrates a concept and prototype to greatly improve the capabilities of reconstructing features, at the consequence of T-vertices and thin holes.

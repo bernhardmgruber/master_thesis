@@ -227,8 +227,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 \begin{description}
 	\item[Vector clipping] \hfill \\
-	Vector clipping is mainly used in CAE to verify the correctness of a generated NC program before it is run on an actual milling machine.
-	It was first described by Chappel \cite{vector_clipping} in 1983.
+	First described in 1983, vector clipping is mainly used in CAE to verify the correctness of a generated NC program before it is run on an actual milling machine \cite{vector_clipping}.
 	The method requires the surface of the final workpiece as well as the stock.
 	Initially, points on the final workpiece are calculated together with surface normals, \ie a point cloud, where the normals are not of unit length but long enough to reach the surface of the stock.
 	To simulate the manufacturing process, the cutter is moved over this point cloud and the vectors attached to the points are clipped by the moving cutter, \cf \cref{fig:vector_clipping}.
@@ -248,7 +247,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 
 	\item[Z-maps and depth images] \hfill \\
-	Describing solids using z-maps has been proposed by Anderson \cite{zmap} in 1978.
+	Describing solids using z-maps has been proposed in 1978 \cite{zmap}.
 	It is furthermore the most widespread representation used in 3-axis material removal simulations.
 	Z-maps approximate a solid by sampling its height at each crossing of a regular 2-dimensional grid.
 	This grid is usually placed perpendicular to the cutting direction at one side of the stock, \eg the bottom.
@@ -288,13 +287,13 @@ The following section is based on a comprehensive overview with sketches and des
 
 
 	\item[Dexel images] \hfill \\
-	Dexel-based representations have been proposed by Hook to circumvent the shortcomings of depth images \cite{dexel}.
-	Instead of a scalar value per pixel of a regular 2-dimensional grid, z-maps, a complex data element is stored, called a dexel, abbreviated from depth element.
+	Dexel-based representations have been proposed to circumvent the shortcomings of depth images \cite{dexel}.
+	Instead of a scalar value per pixel of a regular 2-dimensional grid, \cf z-maps, a complex data element is stored, called a dexel, abbreviated from depth element.
 	A dexel is created by tracing a ray, starting at a grid point, perpendicular to the plane of the grid through the workpiece and collecting all surface intersections.
 	Therefore, a 2-dimensional dexel image is sometimes also referred to as ray-rep, abbreviated from ray representation.
 	Each dexel stores a sorted list of these intersections, where an intersection is also called a dexel node.
 	A node basically contains the depth value of the intersection and can contain further information such as a surface normal or a color value.
-	Pairs of dexel nodes where the first node has been an entry and the second an exit are called segments and always lie inside the workpiece.
+	Pairs of dexel nodes, where the first node is an entry and the second an exit, are called segments and always lie inside the workpiece.
 	\Cref{fig:dexel_image} shows a dexel representation of a half sphere with a smaller, concentric half sphere drilled out.
 
 	Material removal is done in a similar fashion as with z-maps.
@@ -302,7 +301,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Instead of updating to the minimum value as done with z-maps, a 1-dimensional Boolean subtraction of all sweep dexels from the workpiece dexels is performed.
 
 	In comparison with image-based representations like z-maps and depth images, dexel-based approaches are able to represent overlapping surfaces and workpieces with a front- and a back-face.
-	Nevertheless, the sampling resolution from the perspective of the surface is dependent on the orientation of the surface towards the dexel grid.
+	Nevertheless, the sampling resolution of the surface is dependent on the orientation of the surface towards the dexel grid.
 	The more parallel the surface lies to to the grid, the smaller becomes the distance between two neighboring entry/exit points on the surface.
 	In case the surface is perpendicular to the grid, the dexels lie parallel to the surface and do not capture any intersections.
 
@@ -318,7 +317,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 	\item[Multi-dexel images] \hfill \\
 	To increase the accuracy of dexel-based models, especially in regions of the surface where the surface normals are parallel to the dexels, multiple dexel images can be used.
-	This idea was described by Benouamer \etal in 1997 to provide a good representation that can combine B-rep and CSG models \cite{tridexel_intersection}.
+	This idea was described in 1997 to provide a good representation that can combine B-rep and CSG models \cite{tridexel_intersection}.
 	Although multiple dexel images can be created from any orientations, it is common to create three dexel images along the three axes of a Cartesian coordinate system.
 	Therefore, the 2-dimensional dexel grids lie in the three planes defined by pairs of axes of the coordinate system, \ie xy-, yz-, zx-plane.
 	This case of multi-dexel image is also referred to as triple- or tri-dexel image.
@@ -337,7 +336,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 	\item[Constructive Solid Geometry (CSG)] \hfill \\
 	CSG is a technique widely spread in solid modeling.
-	It has its origins in 1978 where Gossard \etal tried to use set theory to verify material removal in NC processes \cite{csg}.
+	It has its origins in 1978 where an attempt was made to use set theory to verify material removal in NC processes \cite{csg}.
 	CSG describes a solid by its construction process from a set of simple primitives, making it therefore an interesting approach in procedural modeling.
 	Although primitives are typically basic shapes such as cubes, spheres or cylinders, they can, in theory, be any kind of complex shape.
 	Pairs of primitives can be combined using Boolean set operations such as union, intersection or difference.
@@ -348,7 +347,7 @@ The following section is based on a comprehensive overview with sketches and des
 	Additive manufacturing, e.g. 3-dimensional printing, is also easily representable by adding a new solid.
 
 	CSG trees can also be rendered directly using OpenGL or DirectX by making use of the depth and stencil buffers of a GPU.
-	Well known algorithms in this area include Goldfeather's algorithm \cite{goldfeather} and Nigel's Sequenced Convex Subtraction (SCS) algorithm \cite{scs}.
+	Well known algorithms in this area include the Goldfeather \cite{goldfeather} and the Sequenced Convex Subtraction (SCS) algorithm \cite{scs}.
 
 	\begin{figure}[H]
 		\centering
@@ -407,7 +406,7 @@ The following section is based on a comprehensive overview with sketches and des
 			\label{fig:spatial_decomposition_hsd}
 		\end{subfigure}
 		\caption[USD and HSD]{
-			The solid on the left side can be described using spatial decomposition in either a uniform manner, central image, or a hierarchical manner, right image \cite{virtual_machining_review}.
+			The solid in~\subref{fig:spatial_decomposition_solid} can be described using spatial decomposition in either a uniform manner, \cf~\subref{fig:spatial_decomposition_usd}, or a hierarchical manner, \cf~\subref{fig:spatial_decomposition_hsd} \cite{virtual_machining_review}.
 		}
 		\label{fig:spatial_decomposition}
 	\end{figure}
@@ -415,7 +414,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 	\item[Boundary representation (B-rep)] \hfill \\
 	Boundary representations, are the most wide-spread representations used in modern CAD systems.
-	As the term suggests, B-reps describe a solid by specifying its boundary surface.
+	They describe a solid by specifying its boundary surface.
 	This surface typically consists of faces, \ie bounded surfaces, edges between those faces, \ie bounded curves, vertices, \ie 3-dimensional points, as well as their topology.
 	B-reps are therefore closed meshes.
 	Faces can be specified using a variety of mathematical models from complex splines such as B-splines and NURBs to simple polygons like triangles.
@@ -438,8 +437,7 @@ The following section is based on a comprehensive overview with sketches and des
 	\end{figure}
 
 	\item[Functional representation (F-rep)] \hfill \\
-	From a more mathematical point of view, surfaces can also be represented using real-valued functions.
-	Pasko \etal give a good overview on this subject in the context of modeling and computer graphics \cite{frep}.
+	From a more mathematical point of view, surfaces can also be represented using real-valued functions, especially in the context of modeling and computer graphics \cite{frep}.
 	A sphere, for example, is defined analytically as the infinite set of points with the same distance, \ie radius, to a distinct center point $c$.
 	By defining a function $d$ for the distance of a point $p$ to the center $c$,
 	\begin{align}

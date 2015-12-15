@@ -13,14 +13,14 @@ These so-called region-growing or advancing front algorithms are typically faste
 Eventually, this collection of algorithms should also be available for reconstructing surfaces from the data model of the VML.
 
 In the previous \cref{sec:tri_dexel}, the tri-dexel based surface reconstruction approach relied on a raycast to sample the regular grid of the VML into dexels.
-This raycast be used to sample other data structures as well.
+This raycast may be used to sample other data structures as well.
 In its simplest form, by only collecting the surface hits, a point cloud is obtained.
 This point cloud may then be used as input to most of the point cloud based surface reconstruction algorithms, including the ones mentioned above.
 
-Compared with the other two implementations, \cf \cref{sec:direct_intersection,sec:tri_dexel}, this chapter resembles more an additional idea than a serious implementation.
+Compared with the other two implementations, \cf \cref{sec:direct_intersection,sec:tri_dexel}, this section resembles more an additional idea than a serious implementation.
 The reason therefore is that reconstructing a surface, especially with features, turned out to be much harder from a point cloud than from semantically richer data structures such as a tri-dexel image.
 Currently, the tri-dexel approach is the preferred reconstruction approach inside the VML.
-However, giving the ability to export a point cloud opens up another huge world of research work and algorithms, and is therefore discussed in this chapter.
+However, giving the ability to export a point cloud opens up another huge world of research work and algorithms, and is therefore discussed.
 
 
 \subsection{Concept}
@@ -173,15 +173,15 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 	From this seed triangle, the ball is pivoted over each edge of the triangle until it touches another point, creating a new triangle with new edges to roll over.
 	If no point is found during pivoting, the edge is left as a boundary.
 	The front of edges is rolled over repeatedly until no more edges are available.
-	If all pivots where successful, a closed, manifold and oriented mesh has been created.
-	The BPA requires a user supplied ball size, which steers the capability of rolling into finer features and the danger of creating holes or falling into the point cloud.
+	If all pivots where successful, a closed, manifold and orientable mesh has been created.
+	The BPA requires a user supplied ball size, which steers the capability of rolling into finer features and the danger of falling into the point cloud.
 	If the point density is too low or the ball is too small, holes are created, \cf \cref{fig:bpa_principle_2}.
 	If concave features are too small or the ball is too large, features may be lost, \cf \cref{fig:bpa_principle_3}.
 
 	A highly tuned version of the BPA with elements of the G2S algorithm is already utilized by the VML for its swept volume computation \cite{bpa_vml}.
 	A further implementation of the BPA is available in CGAL \cite{cgal_bpa}.
 	MeshLab also offers a BPA version, parameterizable via its GUI.
-	The BPA will be the main example for a point cloud surface reconstruction algorithm throughout this chapter, especially the results \cref{sec:point_cloud_results}.
+	The BPA will be the main example for a point cloud surface reconstruction algorithm throughout the results \cref{sec:point_cloud_results}.
 
 %	\begin{figure}
 %		\centering
@@ -277,7 +277,7 @@ Two examples of algorithms for surface reconstruction from point clouds are give
 
 	\item[Poisson] \hfill \\
 	Poisson surface reconstruction is based on implicit functions \cite{poisson}, \cf \cref{fig:poisson_principle}.
-	The goal is to compute a so-called indicator function $\chi$, which yields one for positions inside the workpiece and zero for positions outside, \cf \cref{fig:poisson_indicator_function}
+	The goal is to compute a so-called indicator function $\chi$, which yields one for positions inside the workpiece and zero for positions outside, \cf \cref{fig:poisson_indicator_function}.
 	When moving into the workpiece from outside, the values of $\chi$ change from zero to one around the surface.
 	The indicator function $\chi$, specifically its gradient $\nabla\chi$, \cf \cref{fig:poisson_gradient_function}, is strongly related to the normals of the input point set, a vector field $V$, \cf \cref{fig:poisson_oriented_points}.
 	Therefore, the problem is transformed into finding a function $\chi$ whose gradient $\nabla\chi$ best approximates $V$, the normals of the point cloud, \ie $\min_\chi |\nabla\chi - V|$.

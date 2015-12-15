@@ -221,7 +221,7 @@ Surface points can still be calculated as shown by the example of the raycast us
 
 The regular grid of the VML with its open geometries resulting from classification are visualized using an adapted raycasting approach.
 For this purpose a virtual camera is placed relative to the regular grid.
-The position of the camera and orientation describe an image plane, \ie a rectangle, in front of the camera which will correspond to the final image.
+The position and orientation of the camera describe an image plane, \ie a rectangle, in front of the camera which will correspond to the final image.
 Originating from the position of the camera, a ray is sent through each pixel of the image plane into the scene.
 If an intersection occurs, the pixel associated with the ray is colored according to properties of the intersected surface, \eg color, normal and material.
 \Cref{fig:raycasting_principle} shows the basic principle of raycasting inside the VML.
@@ -240,7 +240,7 @@ If an intersection occurs, the pixel associated with the ray is colored accordin
 
 When the rays hit the regular grid, they have to be traversed through the cells of the grid.
 A fast algorithm for traversing regular grids using a single ray is found in literature \cite{3DDDA}.
-The algorithm is a slight modification of the digital differential analyzer (DDA) which is used for the rasterization of lines.
+The algorithm is a slight modification of the digital differential analyzer (DDA), which is used for the rasterization of lines.
 \Cref{fig:cell_traverser} shows a sketch of a single ray traversed cell by cell through the grid.
 %
 As neighboring rays typically take the same or a similar path through the grid, grouping rays into ray packets has been proposed as a good optimization \cite{packet_caster}.
@@ -262,7 +262,7 @@ This approach has been implemented for the VML using CPU SIMD vector extensions 
 		\label{fig:slice_traverser}
 	\end{subfigure}
 	\caption[Single ray and ray packet traverser]{
-		Traversing a regular grid with a single ray, cell by cell, left image, and a ray packet, slice by slice, right image.
+		Traversing a regular grid with a single ray, cell by cell, \cf~\subref{fig:cell_traverser}, and a ray packet, slice by slice, \cf~\subref{fig:slice_traverser}.
 	}
 	\label{fig:traverser}
 \end{figure}
@@ -273,9 +273,9 @@ Upon entry into a surface cell, the ray has to determined the number of structur
 This number is called the inside counter.
 The stock volume is handled specially during the raycast, as it is inverted and turned into a swept volume itself to allow uniform handling.
 After the inside counter has been determined, all intersections of the ray with structures inside the cell are iterated from the nearest to the farthest.
-During this iterating the inside counter is modified on each structure entry or exit to constantly reflect the number of structures the ray is currently inside.
-If the counter becomes zero, the surface has been reached and a hit is reported with data from the hit triangle which is later used to color the final image of the scene.
-\Cref{fig:raycast} shows a detailed example of such an intersection procedure and explains the algorithmic steps to retrieve the surface hit.
+During this iterating, the inside counter is modified on each structure entry or exit to constantly reflect the number of structures the ray is currently inside.
+If the counter becomes zero, the surface has been reached and a hit is reported with data from the hit triangle, which is later used to color the final image of the scene.
+\Cref{fig:raycast} shows a detailed example of such an intersection procedure and explains the algorithmic steps required to retrieve the surface hit.
 
 \begin{figure}
 	\centering
@@ -299,7 +299,7 @@ If the counter becomes zero, the surface has been reached and a hit is reported 
 		The ray hits the structures sub 0 and sub 2.
 		The surface normal of the nearest hit point with sub 2 points into a different half space than the ray direction.
 		Therefore, the ray is outside sub 2 upon entry.
-		The normal of the nearest hit point with sub 0 points into the same half space than the ray direction.
+		The normal of the nearest hit point with sub 0 points into the same half space as the ray direction.
 		Thus, the ray is inside sub 0 at the entry point.
 		As the ray does not hit sub 1, a secondary ray is sent to a reference point on a triangle of sub 1.
 		As the normal of sub 1 points into a different half space than the secondary ray, the ray is outside sub 1.
@@ -336,7 +336,7 @@ The \var{RegularGrid} class basically stores a bit of meta data together with a 
 The meta data consists of the axis-aligned bounding box (AABB) of the grid, \var{aabb}, the size of a cell in one dimension, \var{cellSize}, as well as the number of cells in each dimension, \var{cellCount}.
 The cells of the grid are stored linearized in a flat array.
 
-An axis-aligned bounding box is represented by the \var{Extends} class.
+An axis-aligned bounding box is represented by the \var{BoundingBox} class.
 It stores two vertices, \var{lower} and \var{upper}, which contain the minimum and maximum values for each Cartesian coordinate axis.
 
 The cells of the regular grid are modeled by the \var{Cell} class.
@@ -348,4 +348,4 @@ Especially intersection tests, \eg during raycasting or classification, read thi
 Each triangle also stores an unsigned integer, \var{structure}, referencing the swept volume/structure this triangle belongs to.
 This field is used to group triangles inside a cell by the swept volume they originated from.
 
-Finally, the \var{Vertex} class represents a simple 3-dimensional spatial point, storing the coordinates in its \var{values} member.
+Finally, the \var{Vertex} class represents a simple 3-dimensional spatial point, storing the coordinates in its \var{x}, \var{y} and \var{z} member.

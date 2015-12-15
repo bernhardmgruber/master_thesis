@@ -2,8 +2,8 @@
 
 \begin{otherlanguage}{ngerman}
 	Am Beispiel der Virtual Modeling Library (VML), die an der RISC Software GmbH entwickelt wird, werden in diese Arbeit Algorithmen zur Oberflächenrekonstruktion aus Datenmodellen zur Simulation zerspanender Bearbeitungsprozesse diskutiert.
-	Zur Beschreibung eines Werkstücks einer derartigen Bearbeitung, verwaltet die VML Dreiecksmodelle des Ausgangs- und einer Serie an Abzugsvolumen, ähnlich einem CSG Baum.
-	Unter Verwendung eines angepassten Raycastingprozesses werden Oberflächenpunkte des Werkstücks abgetastet die eine Visualisierungen der Szene zu ermöglichen.
+	Zur Beschreibung eines Werkstücks einer derartigen Bearbeitung, verwaltet die VML Dreiecksmodelle des Ausgangsvolumen und einer Serie an Abzugsvolumina, ähnlich einem CSG Baum.
+	Unter Verwendung eines angepassten Raycastingprozesses werden Oberflächenpunkte des Werkstücks abgetastet, die eine Visualisierungen der Szene ermöglichen.
 
 	Für bestimmte Anwendungsfälle ist jedoch eine explizite Repräsentation des Werkstücks als Oberflächennetz gewünscht.
 	Zur Erzeugung eines derartigen Netzes werden drei Methoden vorgestellt.
@@ -17,7 +17,7 @@
 
 	Als dritte Methode kann ein Raycast auch zur Abtastung einer Punktwolke der Werkstücksoberfläche herangezogen werden.
 	Am Beispiel des Ball Pivoting Algorithm der VML und der Implementierung einer Poisson Oberflächenrekonstruktion in MeshLab werden noch die Verwendung von punktwolkenbasierten Algorithmen diskutiert.
-	Beide Varianten liefern visuell gute Ergebnisse, obwohl der BPA bei der Erzeugung manigfaltiger Netze in einigen Tests scheitert und die Poisson Rekonstruktion aufgrund ihrer Robustheit gegen Rauschen Details verliert.
+	Beide Varianten liefern visuell gute Ergebnisse, obwohl der BPA bei der Erzeugung mannigfaltiger Netze in einigen Tests scheitert und die Poisson Rekonstruktion aufgrund ihrer Robustheit gegen Rauschen Details verliert.
 
 	Zusammenfassend, auf Basis der vorgestellten Testszenen, produziert die Tri-Dexel basierte Oberflächenrekonstruktion die visuall besten und robustesten Resultate und wird deshalb Gegenstand weiterer Entwicklung sein.
 \end{otherlanguage}
@@ -26,8 +26,8 @@
 
 \chapter*{Abstract}
 
-Using the Virtual Modeling Library (VML) developed at the RISC Software GmbH as an example, surface reconstruction algorithms from data models used to simulate subtractive manufacturing are discussed in this thesis.
-To describe a machined workpiece created during this process, the VML stores a stock and a series of swept volume triangle meshes, similar to a CSG tree.
+Using the Virtual Modeling Library (VML), developed at the RISC Software GmbH, as an example, surface reconstruction algorithms from data models used to simulate subtractive manufacturing are discussed in this thesis.
+To describe a machined workpiece created during this process, the VML stores triangle meshes of a stock and a series of swept volumes, similar to a CSG tree.
 Via a custom raycasting process, surface points of the workpiece are sampled to produce visualizations of the scene.
 
 Sometimes, an explicit surface mesh representation of the workpiece is desired.
@@ -36,7 +36,7 @@ For the reconstruction of such a mesh, three approaches are presented.
 The first one relies on calculating the Boolean subtraction of the maintained stock and swept volumes by direct mesh intersection.
 Although producing exact results for simple scenes, this method fails for complex scenes due to numerical issues.
 
-The second approach samples a Tri-dexel image using an adapted raycast and reconstructs a triangle mesh from the tri-dexel representation.
+The second approach samples a tri-dexel image using an adapted raycast and reconstructs a triangle mesh from the tri-dexel representation.
 With overall good robustness, an acceptable visual outcome and excellent mesh qualities, this method works well for all tested scenarios.
 Additionally, a novel extension to the tri-dexel algorithm further improves the reconstruction of features at the cost of thin holes in the created surface.
 
