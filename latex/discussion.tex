@@ -17,7 +17,7 @@ This consequence can also be derived from \cref{alg:direct_intersection}, where 
 All other parameters influence the runtime in less easily comprehensible ways.
 The \turbine scene for example has a little more than three times the triangles to process than the \impeller scene and a lot less swept volumes, but requires more than ten times the computation time.
 What causes the big difference in this case is mostly the triangle density per structure.
-When dividing the number of totally stored triangles by the number of swept volumes, we can get a rough idea of the complexity of a single swept volume.
+When dividing the number of totally stored triangles by the number of swept volumes, a rough estimate of the complexity of a single swept volume is obtained.
 This number is roughly 2500 for the \impeller scenes and 33000 for the \turbine scene.
 As the grid resolution is almost identical in these scenes, the parts of a swept volume assigned to each cell, \ie the structures, are substantially larger.
 
@@ -323,7 +323,7 @@ Again, this may be solved by running a post processing step which recombines adj
 Similar to the tri-dexel, the BPA also reproduces the original triangulation of the volumes in the \cylindersd scene, clearly seen at the drilling and the lateral surface of the stock in \cref{fig:bpa_cylinders_d}.
 Also the small rills between the blades of the \impeller become visible again.
 Although the tri-dexel does a slightly better job with these nuances, as it may calculate feature and apex points from the normals of its dexel nodes.
-The BPA does not use point normals for reconstructing features, although a post processing pass might, \eg, further bend/tessellate created triangles based on their vertex normals.
+The BPA does not use point normals for reconstructing features, although a post processing pass might further bend or tessellate created triangles based on their vertex normals.
 
 Consequently, the only difficulty of the BPA is reconstructing small features, both convex and concave, \cf \cref{fig:bpa_cylinder_head_edges}.
 Concerning concave features, the ball size is the limiting component of the BPA as it does not allow the created surface to \enquote{crawl} into the sharp corners.
@@ -393,7 +393,7 @@ The rills are acceptably reconstructed at a resolution of 200 while the bottom n
 Compared with the tri-dexel approach and similarly to the BPA, the Poisson surface reconstruction also requires roughly twice the resolution of the tri-dexel for a visually comparable output regarding the captured features.
 However, as detailed in \cref{sec:point_cloud_concept}, the main reason for this issue is the richer semantic carried by the tri-dexel image when compared with a point cloud.
 
-Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10~-~20~times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
+Concerning timings, the Poisson surface reconstruction filter of MeshLab is roughly 10~to~20~times slower than the BPA implementation of the VML, \cf \cref{tbl:bpa_results}.
 The runtimes for the \turbine scene, for example, at the resolutions 50, 100, 200 and 400, averaged over five runs, are \SI{941}{\milli\second}, \SI{2816}{\milli\second}, \SI{10587}{\milli\second} and \SI{46397}{\milli\second}, respectively, measured using MeshLab.
 However, the algorithm employed by MeshLab runs single threaded.
 Accounting for this difference, the Poisson implementation of MeshLab and the BPA of the VML would both require a runtime in the same order of magnitude

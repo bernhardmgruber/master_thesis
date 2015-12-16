@@ -65,7 +65,7 @@ Similar to the tri-dexel variant, the raycasting resolution is used to steer qua
 
 
 % the actual conclusion
-Concluding and regarding the problem statement and goals specified in \cref{sec:problem,sec:goal}, two viable candidates have been found for extracting a surface mesh from the data model of the VML: the tri-dexel and the point cloud/BPA approach.
+Concluding and regarding the problem statement and goals specified in \cref{sec:problem,sec:goal}, two viable candidates have been found for extracting a surface mesh from the data model of the VML: the tri-dexel and the BPA approach.
 Regarding all the criteria given in the original problem statement, \cf \cref{sec:problem}, the tri-dexel approach slightly surpasses the results of the BPA, mostly because of its stability.
 Without using cell slicing, all reconstructed meshes are perfectly orientable, closed and manifold.
 Although the BPA delivers good results if the point cloud does not contain ball-sized concave features, there are still scenes, \cf the \turbine at lower resolutions, which cause the BPA to produce larger holes, non-manifold and differently oriented geometry.
@@ -95,7 +95,7 @@ These could be dropped without influencing the algorithm at all.
 In addition to these algorithmic improvements, further optimizations of the generated triangle meshes are possible.
 A desirable feature would be the ability to create meshes with adaptive resolutions, \ie triangle sizes.
 Thus, the overall triangle count of the output could be reduced significantly, which is beneficial for all subsequent processing of result meshes, \eg further analysis and simulations.
-Especially scenes with large flat areas, \cf the base/bottom side of almost all scenes, would greatly benefit from this adaptivity.
+Especially scenes with large flat areas, \cf the bottom side of almost all scenes, would greatly benefit from this adaptivity.
 
 Finally, the algorithms based on sampling the workpiece using a raycast, \ie tri-dexel and point cloud based ones, easily allow reconstructing surfaces from various kinds of representations, as long as surface entries and exits can be sampled using rays.
 This property allows the internal representation of the VML to change, enabling not only triangle mesh representations for stock and swept volumes.
