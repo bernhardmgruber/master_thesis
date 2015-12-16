@@ -142,7 +142,6 @@ The following is a list of definitions of common terms used in 3-dimensional com
 		\end{subfigure}
 		\caption[Orientable meshes]{
 			The left and central image show an orientable and not orientable mesh.
-			A mesh is orientable, if each pair of adjacent faces has a different vertex order on the shared edge.
 			A famous example of a not orientable mesh is the Klein bottle on the right image, for which a strict inside and outside facing cannot be determined.
 		}
 		\label{fig:orientable_mesh}
@@ -166,7 +165,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 
 
 	\item[Delaunay triangulation] \hfill \\
-	Named after the Russian mathematician Boris Delaunay, a 2-dimensional triangulation is called a Delaunay triangulation, when the circumcircle of each triangle does not contain a vertex of another triangle.
+	Named after the Russian mathematician Boris Delaunay, a 2-dimensional triangulation is called a Delaunay triangulation when the circumcircle of each triangle does not contain a vertex of another triangle.
 	The Delaunay triangulation is unique for each set of points, as long as not more than three vertices lie on a circle, \eg a square can be triangulated along any of the diagonals.
 	The concept of 2-dimensional Delaunay triangulations can be extended to three dimensions, where each triangle of a manifold mesh has an empty circumscribing sphere.
 	Such a triangle is sometimes also referred to as Gabriel 2-Simplex (G2S) \cite{g2s}.
@@ -186,7 +185,7 @@ The following is a list of definitions of common terms used in 3-dimensional com
 	\end{figure}
 
 
-	\item[Constrained Delaunay triangulation] \hfill \\
+	\item[Constrained Delaunay Triangulation (CDT)] \hfill \\
 	Sometimes, predefined edges, \ie constraints or constrained edges, have to be respected when triangulating a point cloud into a Delaunay triangulation.
 	The resulting triangulation is called a constrained Delaunay triangulation (CDT).
 	Each triangle of the mesh satisfies the Delaunay condition, \ie an empty circumcircle, except for triangles containing a constrained edge.
@@ -227,7 +226,7 @@ The following section is based on a comprehensive overview with sketches and des
 
 \begin{description}
 	\item[Vector clipping] \hfill \\
-	First described in 1983, vector clipping is mainly used in CAE to verify the correctness of a generated NC program before it is run on an actual milling machine \cite{vector_clipping}.
+	First described in 1983, vector clipping is mainly used in CAE to verify the correctness of a generated Numerical Control (NC) program before it is run on an actual milling machine \cite{vector_clipping}.
 	The method requires the surface of the final workpiece as well as the stock.
 	Initially, points on the final workpiece are calculated together with surface normals, \ie a point cloud, where the normals are not of unit length but long enough to reach the surface of the stock.
 	To simulate the manufacturing process, the cutter is moved over this point cloud and the vectors attached to the points are clipped by the moving cutter, \cf \cref{fig:vector_clipping}.
@@ -365,7 +364,7 @@ The following section is based on a comprehensive overview with sketches and des
 	To enumerate occupied regions, one must first decompose space into smaller regions.
 	This can be done in a uniform or hierarchical manner.
 
-	Uniform spatial decomposition (USD) divides space into equally sized cells.
+	Uniform Spatial Decomposition (USD) divides space into equally sized cells.
 	An example would be a regular grid with cubic cells.
 	This special case is known as voxel model, where a voxel, abbreviated from volume element, is a single cell of the regular grid.
 	\Cref{fig:spatial_decomposition_usd} shows a voxel model of a simple solid.
@@ -373,9 +372,9 @@ The following section is based on a comprehensive overview with sketches and des
 	USDs are simple to create and implement as they only require a three dimensional grid which stores for each cell whether it is occupied or not.
 	Boolean operations are also easily solved, as two uniform grids can be combined on a per cell basis similar to z-maps.
 	However, USDs are highly memory demanding to achieve a sufficient resolution to accurately represent a solid.
-	Furthermore, a high resolution may only be needed in certain regions of the solid, \ie features.
+	Furthermore, a high resolution may only be needed in certain regions of the solid to preserve features.
 
-	Hierarchical spatial decomposition (HSD) overcomes the shortcomings of USDs.
+	Hierarchical Spatial Decomposition (HSD) overcomes the shortcomings of USDs.
 	HSDs partition space in an adaptive way and increase their resolution only where detail is necessary.
 	Therefore, HSDs usually require less memory at the cost of increased complexity.
 	\Cref{fig:spatial_decomposition_hsd} shows an example of a solid represented by a hierarchically decomposed space.
@@ -413,9 +412,9 @@ The following section is based on a comprehensive overview with sketches and des
 
 
 	\item[Boundary representation (B-rep)] \hfill \\
-	Boundary representations, are the most wide-spread representations used in modern CAD systems.
+	Boundary representations are the most wide-spread representations used in modern CAD systems.
 	They describe a solid by specifying its boundary surface.
-	This surface typically consists of faces, \ie bounded surfaces, edges between those faces, \ie bounded curves, vertices, \ie 3-dimensional points, as well as their topology.
+	This surface typically consists of faces, edges between those faces, vertices as well as their topology.
 	B-reps are therefore closed meshes.
 	Faces can be specified using a variety of mathematical models from complex splines such as B-splines and NURBs to simple polygons like triangles.
 	\Cref{fig:brep} shows an example of a B-rep which represents a machining part using triangles as faces.

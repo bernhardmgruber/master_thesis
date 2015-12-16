@@ -12,7 +12,7 @@ Boolean operations on triangle meshes are already available in most CAD kernels.
 However, these kernels usually require the meshes to be closed.
 Due to the triangle elimination using cell classification, \cf \cref{sec:classification}, the meshes stored in the regular grid are no longer closed.
 Thus, regular CAD kernels cannot be used to intersect the meshes maintained by the VML and a custom mesh intersection algorithm has been developed.
-The idea of this approach is based on a work about finding and deforming the intersection between two meshes as well as applying textures to those regions to increase the realism in computer graphics, \ie computer games \cite{mesh_intersection}.
+The idea of this approach is based on a work about finding and deforming the intersection between two meshes as well as applying textures to those regions to increase the realism in computer graphics \cite{mesh_intersection}.
 
 \subsection{Concept}
 \label{sec:direct_intersection_concept}
@@ -102,7 +102,7 @@ This step can be done before or after intersecting the structures of a cell, but
 There is also a second reason why this direct intersection approach must be run on a cell level, which is discussed in \cref{sec:triangle_inside_test}.
 
 An abstracted algorithm of this reconstruction approach is shown in \cref{alg:direct_intersection}.
-The following sections discuss details of this algorithms and follow the order of subroutines/functions used within.
+The following sections discuss details of this algorithms and follow the order of subroutines and functions used within.
 The only exception is the \textproc{SeparateStructures} routine, which only groups the incoming triangles by their structure id.
 It returns a list of structures, where each structure is a set of triangles.
 
@@ -285,7 +285,7 @@ The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersec
 	\centering
 	\begin{algorithmic}[1]
 		\Function{IntersectTriangles}{$\var{t}_1, \var{t}_2$}
-			\State $\var{hasIntersected} =$ \Call{tri\_tri\_intersect\_with\_isectline}{$\hfill\break
+			\State $\var{hasIntersected} =$ \Call{TriTriIntersectWithIsectline}{$\hfill\break
 				% the phantoms at the line starts make sure all hspaces start at the same position
 				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t}_1.\var{vertices}_0, \var{t}_1.\var{vertices}_1, \var{t}_1.\var{vertices}_2,\hfill\break
 				\protect\vphantom{p}\hspace*{\dimexpr\algorithmicindent*2}\var{t}_2.\var{vertices}_0, \var{t}_2.\var{vertices}_1, \var{t}_2.\var{vertices}_2,\hfill\break
@@ -297,7 +297,7 @@ The \textproc{IntersectTriangle} routine referenced in \cref{alg:direct_intersec
 	\end{algorithmic}
 	\caption[Möller triangle-triangle intersection adapter]{
 		Adapter to Möller's triangle intersection routine provided as public domain C code on his website \cite{tri_tri_intersection_moller_code}.
-		This algorithm calls the C function \textproc{tri\_tri\_intersect\_with\_isectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p}_1$ and $\var{p}_2$ as output parameters.
+		This algorithm calls the C function \textproc{TriTriIntersectWithIsectline} with all triangle vertices as inputs and $\var{coplanar}$, $\var{p}_1$ and $\var{p}_2$ as output parameters.
 	}
 	\label{alg:triangle_intersection}
 \end{algorithm}
@@ -345,7 +345,7 @@ Hence, an algorithm for triangulating a triangle with respect to a set of lines 
 In the context of triangulations, this set of lines is usually called constraints or constrained edges and the according algorithm a constrained triangulation (CT).
 Initially, a manually written CT was used.
 Even though it was capable of triangulating simple cases, it suffered severely from numerical instability and poor output quality.
-A stricter triangulation of higher quality is the constrained Delaunay triangulation (CDT), which is also suggested by the work giving the initial idea to the direct intersection reconstruction approach \cite{mesh_intersection}.
+A stricter triangulation of higher quality is the Constrained Delaunay Triangulation (CDT), which is also suggested by the work giving the initial idea to the direct intersection reconstruction approach \cite{mesh_intersection}.
 However, as CDT algorithms are quite hard to implement regarding speed and robustness, using an established and tested library is highly recommended.
 A list of C/C++ libraries offering constrained Delaunay triangulations is given in \cref{tbl:delaunay_libs}.
 Several of these libraries have been tested for their suitability to retriangulate a triangle with a set of constraints.
@@ -477,7 +477,14 @@ An example of such an issue is shown in \cref{fig:inside_test_error}.
 %
 \begin{figure}[!]
 	\centering
-	\includegraphics[width=0.7\textwidth]{inside_test_error}
+	\begin{subfigure}[c]{0.6\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{inside_test_error}
+	\end{subfigure}
+	\begin{subfigure}[c]{0.15\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{images/classification_legend}
+	\end{subfigure}
 	\caption[Triangle inside structure test]{
 		Testing if a triangle of one structure is inside another structure using a ray.
 		Due to triangle elimination, the ray can miss removed structures, \eg when traversing outside cells, causing the inside test to fail, \cf left ray.
@@ -535,7 +542,7 @@ An algorithm for this \textproc{IsTriangleInsideStructure} test is given in \cre
 	\end{algorithmic}
 	\caption[Triangle inside structure test]{
 		Algorithm for testing whether a triangle is inside another structure.
-		The \textproc{IntersectRayTriangle} function is a branch-free version of the famous Möller-Trumbore ray-triangle intersection test \cite{ray_triangle_intersection_moller}.
+		The \textproc{IntersectRayTriangle} function is a branch-free version of the Möller-Trumbore ray-triangle intersection test \cite{ray_triangle_intersection_moller}.
 	}
 	\label{alg:triangle_inside_test}
 \end{algorithm}
@@ -549,7 +556,7 @@ This procedure ensures that after all triangles have been tested for intersectio
 The normal of the closest intersected triangle of the other structure is then finally compared to the direction of the ray.
 If they point into the same half space, the origin of the ray and therefore the tested triangle is inside the tested structure.
 
-For ray-triangle intersection the famous Möller-Trumbore intersection test is used \cite{ray_triangle_intersection_moller}.
+For ray-triangle intersection the Möller-Trumbore intersection test is used \cite{ray_triangle_intersection_moller}.
 An implementation of their algorithm in C is already given in the corresponding work.
 The original version has a few early exit tests on \var{u} and \var{v}, which might save some work in case the ray misses the triangle.
 However, branching is becoming increasingly expensive on modern hardware architectures, especially in vectorized code paths or GPU code.
@@ -564,7 +571,7 @@ The idea of the algorithm is shown in \cref{fig:ray_triangle_intersect}.
 		\left[-D, V_1 - V_0, V_2 - V_0 \right] \left[ \begin{array}{c} t \\ u \\ v \end{array} \right] = O - V_0
 	\end{equation*}
 	\caption[Möller-Trumbore ray-triangle intersection test]{
-		Principle of the famous Möller-Trumbore ray-triangle intersection test \cite{enlight_demo_workshop}.
+		Principle of the Möller-Trumbore ray-triangle intersection test \cite{enlight_demo_workshop}.
 	}
 	\label{fig:ray_triangle_intersect}
 \end{figure}
@@ -592,7 +599,7 @@ If the direct intersection method would be tested on various scenes now, it woul
 The problem is mainly numeric instability and the iterative nature of the approach.
 Each calculation with a fixed precision is effected by small rounding errors when the result is stored back into a register or to memory.
 This especially becomes a problem when theoretically equal calculations should practically yield equal results.
-When two incident triangles for example intersect with a third triangle, the shared edge of the first two triangles should intersect at the same point on triangle three.
+For example, when two incident triangles intersect with a third triangle, the shared edge of the first two triangles should intersect at the same point on triangle three.
 Depending on the order of operations this is not guaranteed.
 The result may be different if, \eg, the two points representing the edge are swapped.
 
@@ -642,7 +649,7 @@ Several improvements to mitigate degeneration and numeric errors are discussed i
 
 	\item[Collapse near points in constraints per triangle] \hfill \\
 	This correction is the most important one.
-	After all intersection lines have been recorded, collapse all constraint vertices which are closer than a defined epsilon distance.
+	After all intersection lines have been recorded, collapse all constraint vertices, which are closer than a defined epsilon distance, to their mean value.
 	This routine ensures that each pair of incident triangles intersecting another triangle produce an incident pair of constraints.
 	In other words, constrained edges which are not connected to each other, because of numerical issues in the intersection routine, are rejoined again to form closed polylines.
 	Furthermore, tiny constraints collapse to points and are removed.
@@ -693,7 +700,7 @@ Parallelizing the reduction of all surfaces into one, in addition to a cell-base
 The still high number of surface cells provide enough parallel work to saturate most workstations or even server CPUs.
 
 Most routines inside the \textproc{UnionStructure} algorithm are also viable candidates for parallelization, although the workload is significantly smaller.
-A structure inside a cell usually does not consist of more than 50 - 100 triangles.
+A structure inside a cell usually does not consist of more than 50 -- 100 triangles.
 These routines would probably benefit from data parallelism and SIMD constructs, \ie vectorization.
 Especially the \textproc{ClipPolygonAABB}, \textproc{IntersectTriangles} and \textproc{IsTriangleInsideStructure} algorithms contain only a few branches and operate on simple data structures, \ie arrays.
 
@@ -708,4 +715,4 @@ Furthermore, most GPU architectures rely on either vectorization or execution of
 	The on-chip GPUs of Intel rely on vectorization which has to be done manually by the programmer for medium and advanced algorithms.} to achieve a high throughput.
 Thus, the uneven workloads in all loops, \eg number of structures per cell, number of triangles per structure or number of intersections, hardly saturate these architectures, probably causing many threads to run empty loops because of a few larger cells or structures.
 
-In the underlying implementation, only the topmost loop of the \textproc{DirectIntersection} function has been parallelized using the Parallel Patterns Library (PPL) of Microsoft and the parallel\_for function, which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.
+In the underlying implementation, only the topmost loop of the \textproc{DirectIntersection} function has been parallelized using the Parallel Patterns Library (PPL) of Microsoft and the \var{parallel\_for} function, which uses a scheduler implementing work stealing to balance the workload \cite{ppl_parallel_for}.

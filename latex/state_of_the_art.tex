@@ -14,14 +14,14 @@ After a survey of existing approaches to surface reconstruction from models simi
 	Triangle-triangle intersection is described by Möller \cite{tri_tri_intersection_moller} as well as Tropp \etal \cite{tri_tri_intersection_2}.
 
 	To build a new surface mesh from two intersecting ones, each intersected triangle can be split into polygons based on the cut segments from other triangles and retriangulated using the cutting segments as constraints.
-	A possible solution for this retriangulation is the constrained Delaunay triangulation (CDT) and was first described by Chew \cite{cdt} and refined by Sloan \cite{cdt_fast}.
+	A possible solution for this retriangulation is the CDT and was first described by Chew \cite{cdt} and refined by Sloan \cite{cdt_fast}.
 	After retriangulating intersected triangles, all triangles not belonging to the new surface are removed.
 	A very similar approach is described by Gong \cite{cutter_workpiece_engagement}.
 
 
 	\item[Point cloud based] \hfill \\
 	Point clouds are data structures where an object is approximated by a set of points with optional normal vectors.
-	These points are obtained \eg by sampling the surface of a solid, either virtually using a raycast or in reality by scanning the surface of an object, \eg laser scans of buildings or sculptures.
+	These points are obtained by sampling the surface of a solid, either virtually using a raycast or in reality by scanning the surface of an object, \eg laser scans of buildings or sculptures.
 	The VML already uses surface sampling of its data model via its raycast based visualization.
 	%
 	Point clouds can be triangulated using different algorithms:
@@ -38,7 +38,7 @@ After a survey of existing approaches to surface reconstruction from models simi
 	Further algorithms of this class are Poisson \cite{poisson}, moving least squares (MLS) \cite{mls} and radial basis function (RBF) \cite{rbf}.
 	As all of these approaches are based on fitting a function into the point cloud, they are robust against noisy clouds, \eg from laser scans.
 
-	Bernardini \etal describe the ball-pivoting algorithm (BPA) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
+	Bernardini \etal describe the Ball-Pivoting Algorithm (BPA) for triangulating a point cloud which also contains points inside the cloud which are not relevant for the surface \cite{bpa}.
 	Based on the BPA, the G2S algorithm, named after the Gabriel 2-simplex criterion, further improved speed and triangle quality by assuming local surface continuity \cite{g2s}.
 	The BPA and its derivatives are region-growing based algorithms and typically provide good runtime performance, but may leave holes in the reconstructed mesh and therefore cannot guarantee water-tight solids.
 
@@ -52,11 +52,11 @@ After a survey of existing approaches to surface reconstruction from models simi
 
 
 	\item[Voxel based] \hfill \\
-	Enlight already uses a regular grid data structure to organize triangles and classify the voxels of the grid as inside, outside and surface.
-	Therefore, algorithms, which can directly operate on these cells/voxels, may profit from the existing infrastructure.
+	Enlight already uses a regular grid data structure to organize triangles and classify the cells, \ie voxels, of the grid as inside, outside and surface.
+	Therefore, algorithms, which can directly operate on these cells, may profit from the existing infrastructure.
 	Although the sole utilization of the classification leaves a lot of information untouched, reconstructing a surface along the surface cells would be a fast way of obtaining a coarse triangle mesh of the stored workpiece.
-	By using additional information inside each cell and on each grid point, well known algorithms like marching cubes (MC) may be used to retrieve a triangle mesh.
-	Kobbelt \etal propose a post-processing step to the marching cubes algorithm to extract/preserve features of the represented surface by making use of triangles, points and implicit functions inside each voxel to construct a scalar distance field, sampled at each grid point \cite{extended_marching_cubes}.
+	By using additional information inside each cell and on each grid point, well known algorithms like marching cubes may be used to retrieve a triangle mesh.
+	Kobbelt \etal propose a post-processing step to the marching cubes algorithm to extract and preserve features of the represented surface by making use of triangles, points and implicit functions inside each voxel to construct a scalar distance field, sampled at each grid point \cite{extended_marching_cubes}.
 	This algorithm is sometimes also referred to as extended marching cubes.
 	The OpenVDB library of DreamWorks Animation uses a similar approach for reconstructing triangle surfaces from large, sparse point clouds organized in octrees with fixed depth \cite{openvdb}.
 	The accuracy of this variant can even be further improved using dual contouring as described by Ju \etal \cite{dual_contouring}.
